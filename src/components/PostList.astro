@@ -1,0 +1,56 @@
+---
+// Renders a list of posts as linked rows. Used by topic pages and the archive.
+const { posts, showTopic = false } = Astro.props;
+
+const topicLabel = {
+  scheduling: 'Scheduling', shell: 'Shell', sysadmin: 'SysAdmin',
+  devops: 'DevOps', networking: 'Networking', python: 'Python',
+  security: 'Security', legacy: 'Legacy', files: 'Files', basics: 'Basics', services: 'Services', monitoring: 'Monitoring',
+};
+const fmtDate = (d) =>
+  d ? new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) : '';
+---
+<ul class="postlist">
+  {posts.map((p) => (
+    <li class="postlist__item">
+      <a class="postlist__link" href={`/${p.slug}/`}>
+        <span class="postlist__title">{p.data.title}</span>
+        <span class="postlist__meta">
+          {showTopic && <span class="postlist__topic">{topicLabel[p.data.topic] ?? p.data.topic}</span>}
+          <span class="postlist__date">{fmtDate(p.data.updatedDate ?? p.data.pubDate)}</span>
+        </span>
+      </a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .postlist { list-style: none; padding: 0; margin: 0; }
+  .postlist__item { border-bottom: 0.5px solid var(--border); }
+  .postlist__link {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 12px 4px;
+    text-decoration: none;
+    color: inherit;
+  }
+  .postlist__link:hover { color: var(--accent-ink); }
+  .postlist__title { font-size: 0.95rem; font-weight: 500; }
+  .postlist__meta {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+  }
+  .postlist__topic { color: var(--accent-ink); }
+  @media (max-width: 560px) {
+    .postlist__link { flex-direction: column; gap: 4px; }
+  }
+</style>

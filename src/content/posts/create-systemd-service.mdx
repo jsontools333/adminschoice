@@ -1,0 +1,167 @@
+---
+title: "How to Create a systemd Service on Linux"
+description: "Write a custom systemd service from scratch: a complete unit file with User, ExecStart, Restart, and environment settings, plus hardening and timers."
+pubDate: 2026-06-20
+updatedDate: 2026-06-20
+pageType: reference
+topic: services
+readingTime: "8 min read"
+tags: ["systemd", "unit-file", "services", "linux"]
+testedOn: ["Ubuntu 24.04", "Debian 12", "RHEL 9"]
+featured: false
+---
+
+To run your own program as a managed Linux service — started at boot, restarted
+on failure, with its logs in the journal — you write a systemd **unit file**.
+This guide builds one from scratch and explains every directive.
+
+## Where unit files live
+
+Unit files exist in a priority order:
+
+- `/etc/systemd/system/` — your custom and override units (highest priority)
+- `/run/systemd/system/` — runtime units, generated dynamically
+- `/lib/systemd/system/` — units installed by packages (lowest priority)
+
+Put your own services in `/etc/systemd/system/`. That keeps them separate from
+package-managed units and safe from being overwritten by updates.
+
+## A complete service unit
+
+Here's a production-ready unit for a Node.js app. Save it as
+`/etc/systemd/system/myapp.service`:
+
+```ini
+[Unit]
+Description=My Node.js Web Application
+Documentation=https://example.com/docs
+After=network.target
+Wants=postgresql.service
+
+[Service]
+Type=exec
+User=myapp
+Group=myapp
+WorkingDirectory=/opt/myapp
+Environment=NODE_ENV=production
+Environment=PORT=3000
+ExecStart=/usr/bin/node /opt/myapp/server.js
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+## What each section does
+
+**`[Unit]`** describes the service and its ordering:
+
+- `Description` — shown in `systemctl status`
+- `After=network.target` — start after networking is up
+- `Wants=` — a soft dependency (start it too, but continue if it fails). Use
+  `Requires=` for a hard dependency that fails your service if it fails.
+
+**`[Service]`** defines how to run it:
+
+- `Type=exec` — systemd considers the service started once the binary executes.
+  Use `forking` for daemons that background themselves, `oneshot` for run-once
+  tasks, `notify` for services that signal readiness.
+- `User`/`Group` — run as a non-root account (always do this for app services)
+- `WorkingDirectory` — the directory the process runs in
+- `Environment` — set environment variables; or use `EnvironmentFile=` to load
+  them from a file
+- `ExecStart` — the command to start the service (use absolute paths)
+- `Restart=on-failure` and `RestartSec=5` — restart on crash, waiting 5 seconds
+
+**`[Install]`** controls boot behavior:
+
+- `WantedBy=multi-user.target` — start at the normal multi-user boot stage when
+  the service is enabled
+
+## Loading and starting it
+
+After creating or editing the file, reload systemd and start the service:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now myapp.service
+systemctl status myapp.service
+```
+
+<Callout type="warning" title="daemon-reload first">
+systemd doesn't see a new or changed unit file until you run
+`systemctl daemon-reload`. Forgetting it is the most common reason a new service
+"doesn't exist" or an edit doesn't take.
+</Callout>
+
+## Loading environment from a file
+
+Rather than inline `Environment=` lines, keep config in a separate file:
+
+```ini
+[Service]
+EnvironmentFile=/etc/myapp/env
+ExecStart=/usr/bin/node /opt/myapp/server.js
+```
+
+```bash
+# /etc/myapp/env
+NODE_ENV=production
+PORT=3000
+DATABASE_URL=postgres://localhost/myapp
+```
+
+This keeps secrets out of the unit file and lets you change config without
+editing the service.
+
+## Hardening a service
+
+systemd can sandbox a service with a few directives. Add these to `[Service]` to
+reduce what a compromised process can do:
+
+```ini
+[Service]
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/myapp/data
+```
+
+- `NoNewPrivileges` — the process can't gain new privileges
+- `PrivateTmp` — gives it a private `/tmp`
+- `ProtectSystem=strict` — makes most of the filesystem read-only
+- `ReadWritePaths` — the exceptions it's allowed to write to
+
+## Overriding a unit without editing it
+
+To change a package-provided unit, don't edit it directly — create an override:
+
+```bash
+sudo systemctl edit myapp.service
+```
+
+This opens a drop-in file under
+`/etc/systemd/system/myapp.service.d/override.conf` that layers on top of the
+original. Your changes survive package updates.
+
+## FAQ
+
+**Which `Type=` should I use?**
+`exec` or `simple` for most foreground programs, `forking` for traditional
+daemons that fork into the background, `oneshot` for a task that runs and exits,
+`notify` for services that explicitly signal readiness to systemd.
+
+**Why run as a non-root user?**
+If the service is compromised, an attacker is confined to that user's
+permissions. Create a dedicated system user per service and set `User=`.
+
+**How do I run something on a schedule instead of continuously?**
+Use a systemd timer rather than a long-running service — see
+[systemd timers vs cron](/systemd-timers-vs-cron/).
+
+For the commands to control your new service, see
+[the systemctl reference](/systemctl-commands/). If it won't start, see
+[systemd service failed to start](/systemd-service-failed-to-start/).

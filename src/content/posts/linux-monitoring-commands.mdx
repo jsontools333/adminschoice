@@ -1,0 +1,196 @@
+---
+title: "Linux Monitoring Commands — CPU, Memory, Disk, and Processes"
+description: "The essential Linux server monitoring commands: top, htop, free, df, du, vmstat, iostat, and ps. What each shows and how to read it. Tested on Ubuntu 24.04."
+pubDate: 2026-06-20
+updatedDate: 2026-06-20
+pageType: reference
+topic: monitoring
+readingTime: "9 min read"
+tags: ["monitoring", "performance", "top", "htop", "linux"]
+testedOn: ["Ubuntu 24.04", "Debian 12", "RHEL 9"]
+featured: true
+---
+
+A server you can't see is a server you can't trust. Most incidents — a memory
+leak, a disk filling up, a runaway process — are visible in the data well before
+they cause an outage. This is the reference for the built-in commands that show
+you CPU, memory, disk, and process health, with how to read what each one tells
+you.
+
+<Callout type="tip" title="The 10-second health check">
+One line that covers the essentials: `uptime && free -h && df -h`. Load average,
+memory, and disk space — enough to catch most problems at a glance.
+</Callout>
+
+## CPU and processes — top
+
+`top` is the universal starting point: a live view of CPU, memory, and the
+busiest processes.
+
+```bash
+top                  # interactive, updates every few seconds
+top -d 2             # update every 2 seconds
+top -u www-data      # only one user's processes
+top -b -n 1          # batch mode — one snapshot, for scripts
+top -p 1234,5678     # specific PIDs only
+```
+
+The header line shows the load average and CPU breakdown:
+
+```text
+top - 14:30:00 up 45 days,  load average: 0.52, 0.58, 0.59
+%Cpu(s):  5.3 us,  2.1 sy,  0.0 ni, 92.0 id,  0.5 wa
+```
+
+Read the `%Cpu` line carefully: `us` is user time, `sy` is system (kernel) time,
+`id` is idle, and `wa` is I/O wait. **High `wa` means the CPU is waiting on disk**
+— an I/O bottleneck, not a CPU shortage. Inside `top`, press `P` to sort by CPU,
+`M` to sort by memory, `k` to kill a process.
+
+## CPU and processes — htop
+
+`htop` is `top` with color, mouse support, and a friendlier interface. It's not
+installed by default but is worth adding:
+
+```bash
+sudo apt install htop      # Debian/Ubuntu
+sudo dnf install htop      # RHEL/Fedora
+```
+
+Key bindings: `F6` sorts by a column, `F5` shows the process tree (great for
+seeing which processes a service spawned), `F9` sends a signal, `F4` filters by
+name. For a full comparison of when to use which, see
+[top vs htop](/top-vs-htop/).
+
+## Memory — free
+
+```bash
+free -h        # human-readable (GB/MB)
+free -h -s 5   # refresh every 5 seconds
+```
+
+```text
+              total        used        free      shared  buff/cache   available
+Mem:           15Gi       8.5Gi       1.2Gi       0.3Gi       5.8Gi       6.1Gi
+Swap:         2.0Gi          0B       2.0Gi
+```
+
+The column that matters is **available**, not free. Linux deliberately uses spare
+RAM for disk caching (`buff/cache`), so `free` looks low on a healthy system. The
+`available` column shows what applications can actually claim, including
+reclaimable cache. Watch for **swap usage growing over time** — that's the signal
+of memory pressure or a leak.
+
+## Memory and more — vmstat
+
+`vmstat` is plain but brutally honest about memory, swap, and CPU wait:
+
+```bash
+vmstat 1       # refresh every second
+vmstat 1 5     # 5 samples, one per second
+```
+
+Watch the `si`/`so` columns (swap in/out) — sustained nonzero values mean the
+system is swapping, which kills performance. The `wa` column (I/O wait) flags
+disk bottlenecks.
+
+## Disk space — df and du
+
+A full disk silently breaks things — failed writes, crashed databases, broken
+logging. Check usage with `df`:
+
+```bash
+df -h          # all filesystems, human-readable
+df -h /var     # just one path
+```
+
+Look for anything near 100%. A full `/` crashes the server; a full `/var` often
+kills logging and databases. **Set an alert at 80%.**
+
+When a disk is filling, find the culprit with `du`:
+
+```bash
+# Biggest items in /var, sorted
+sudo du -sh /var/* | sort -h
+
+# Drill into the logs
+sudo du -sh /var/log/* | sort -h
+
+# Find large files anywhere
+sudo find / -type f -size +100M 2>/dev/null
+```
+
+For the full disk-space workflow, see
+[how to check disk space on Linux](/check-disk-space-linux/).
+
+## Disk I/O — iostat
+
+When an app feels slow but CPU looks idle, the cause is often disk I/O:
+
+```bash
+iostat -x 1    # extended stats, every second
+```
+
+The `%util` column shows how busy each device is (near 100% = saturated), and
+`await` shows average I/O latency in milliseconds. Install it with the `sysstat`
+package if it's missing.
+
+## Processes — ps
+
+For one-off process queries, `ps` with sorting beats `top`:
+
+```bash
+# Top 10 by CPU
+ps aux --sort=-%cpu | head -11
+
+# Top 10 by memory
+ps aux --sort=-%mem | head -11
+
+# Count processes per user
+ps -eo user | sort | uniq -c | sort -rn
+```
+
+## A one-shot health-check script
+
+Combine the essentials into one script for a fast overview:
+
+```bash
+#!/bin/bash
+echo "=== Load and uptime ==="
+uptime
+echo "=== Memory ==="
+free -h
+echo "=== Disk ==="
+df -h
+echo "=== Top 5 CPU ==="
+ps aux --sort=-%cpu | head -6
+```
+
+## Command summary
+
+| Need | Command |
+|------|---------|
+| Live CPU + processes | `top` / `htop` |
+| Memory usage | `free -h` |
+| Memory + swap trends | `vmstat 1` |
+| Disk space | `df -h` |
+| What's using disk | `du -sh /path/* \| sort -h` |
+| Disk I/O | `iostat -x 1` |
+| Top processes | `ps aux --sort=-%cpu` |
+
+## FAQ
+
+**Why does `free` show almost no free memory on a healthy server?**
+Linux uses spare RAM for disk cache. That memory is reclaimable on demand — look
+at the `available` column, not `free`.
+
+**`top` shows high load average but low CPU usage — what's wrong?**
+Load average counts processes waiting on I/O, not just CPU. A high load with low
+CPU and high `wa` means a disk bottleneck. Check `iostat`.
+
+**Which tools are pre-installed?**
+`top`, `free`, `df`, `du`, `ps`, and `vmstat` are on virtually every system.
+`htop`, `iostat` (sysstat), and `iotop` usually need installing.
+
+For deeper dives, see [how to check memory usage](/check-memory-usage-linux/) and
+[how to check disk space](/check-disk-space-linux/).

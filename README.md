@@ -35,4 +35,18 @@ npm run build    # static output to dist/
 - Re-add sitemap integration with a version matching the installed Astro
 - Wire up category/topic index pages (/topics/...)
 - Add the favicon PNG variants (16px, 192px) and remaining OG variants
-# adminschoice
+
+## Downloading images
+
+The 76 content images aren't bundled (they're still on the live WordPress site).
+To fetch them into `public/images/`, run this while adminschoice.com is live:
+
+```bash
+bash download-images.sh
+```
+
+It uses `image-url-map.tsv` (built from your WordPress export) for fast exact
+lookups — 74 of 76 resolve instantly, 2 fall back to folder probing, and 3 dead
+widget images are skipped. Re-run anytime; already-downloaded files are skipped.
+Anything that fails lands in `public/images/_failed-downloads.txt` for manual
+FTP retrieval.

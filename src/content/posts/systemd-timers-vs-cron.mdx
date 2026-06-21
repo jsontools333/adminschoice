@@ -1,0 +1,154 @@
+---
+title: "systemd Timers vs Cron — A Practical Comparison"
+description: "When to use systemd timers instead of cron: the differences in logging, dependencies, missed-run handling, plus how to convert a cron job to a timer."
+pubDate: 2026-06-20
+updatedDate: 2026-06-20
+pageType: guide
+topic: services
+readingTime: "7 min read"
+tags: ["systemd", "timers", "cron", "scheduling"]
+testedOn: ["Ubuntu 24.04", "Debian 12", "RHEL 9"]
+featured: false
+---
+
+systemd timers are the modern alternative to cron for scheduling tasks on Linux.
+Both run commands on a schedule, but timers add logging, dependency ordering, and
+the ability to catch up on missed runs. This guide compares them and shows how to
+convert a cron job to a timer.
+
+## The short answer
+
+Use **cron** when you want a simple, portable, one-line schedule and the job is
+self-contained. Use **systemd timers** when you need logging through the journal,
+dependencies on other services, randomized delays, or guaranteed catch-up after
+downtime.
+
+| Feature | cron | systemd timer |
+|---------|------|---------------|
+| Setup | One line in a crontab | Two unit files (.timer + .service) |
+| Logging | You redirect output yourself | Automatic, via journalctl |
+| Missed runs (machine off) | Skipped | Can catch up with `Persistent=true` |
+| Dependencies | None | Full `After=`/`Requires=` ordering |
+| Randomized delay | No | `RandomizedDelaySec=` |
+| Per-run resource limits | No | Inherits systemd's cgroup controls |
+| Portability | Universal Unix | Linux with systemd only |
+
+## How a timer works
+
+A timer is two files: a `.service` that defines *what* to run, and a `.timer`
+that defines *when*. The names must match.
+
+The service — `/etc/systemd/system/backup.service`:
+
+```ini
+[Unit]
+Description=Nightly backup job
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/backup.sh
+```
+
+The timer — `/etc/systemd/system/backup.timer`:
+
+```ini
+[Unit]
+Description=Run backup nightly at 2am
+
+[Timer]
+OnCalendar=*-*-* 02:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+
+Enable the **timer** (not the service):
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now backup.timer
+```
+
+## The OnCalendar syntax
+
+`OnCalendar` uses the format `DOW YYYY-MM-DD HH:MM:SS`. Some examples:
+
+```ini
+OnCalendar=*-*-* 02:00:00        # every day at 2:00 AM
+OnCalendar=Mon-Fri 09:00         # weekdays at 9:00 AM
+OnCalendar=*-*-01 00:00:00       # first of every month
+OnCalendar=hourly                # top of every hour
+OnCalendar=*-*-* *:00/15         # every 15 minutes
+```
+
+Test any expression without waiting for it to fire:
+
+```bash
+systemd-analyze calendar "Mon-Fri 09:00"
+```
+
+This prints the next few times the expression will match — far easier than
+guessing, which is one of the genuine advantages over cron.
+
+## Seeing your timers
+
+```bash
+# All active timers, with next and last run times
+systemctl list-timers
+
+# Logs for a timer's job
+journalctl -u backup.service
+```
+
+`list-timers` shows a `NEXT` column (when each fires next) and `ACTIVATES` (which
+service it triggers) — there's no cron equivalent for this at-a-glance view.
+
+<Callout type="tip" title="Persistent=true is the killer feature">
+With `Persistent=true`, if the machine was off when the timer should have fired,
+the job runs once at next boot to catch up. A cron job in the same situation is
+simply skipped. For backups and maintenance, this matters.
+</Callout>
+
+## Converting a cron job to a timer
+
+Say you have this crontab line:
+
+```bash
+0 2 * * * /usr/local/bin/backup.sh
+```
+
+The equivalent timer is the two files shown above, with
+`OnCalendar=*-*-* 02:00:00`. The payoff: the job's output now goes to the journal
+automatically (no `>> logfile 2>&1` needed), you get catch-up on missed runs, and
+you can order it after other services.
+
+## When cron is still the right choice
+
+Timers aren't always better. Stick with cron when:
+
+- The job is simple and you value the one-line setup
+- You need portability across non-systemd Unix systems
+- A whole team already knows the crontab and not timer syntax
+- The overhead of two unit files isn't worth it for a trivial task
+
+For the cron side of this comparison, see the
+[crontab quick reference](/crontab-quick-reference/) and the
+[crontab examples cookbook](/crontab-examples/).
+
+## FAQ
+
+**Do I enable the .timer or the .service?**
+The `.timer`. The timer triggers the service; you never enable the service
+directly. `systemctl enable --now backup.timer`.
+
+**How do I run the job manually to test it?**
+Start the service directly: `systemctl start backup.service`. That runs it once,
+immediately, regardless of the schedule.
+
+**Where do timer logs go?**
+To the journal, under the service name: `journalctl -u backup.service`. This is
+automatic — no output redirection needed.
+
+For creating the service a timer triggers, see
+[how to create a systemd service](/create-systemd-service/).

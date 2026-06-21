@@ -1,0 +1,215 @@
+---
+title: "systemd Service Failed to Start — How to Fix It"
+description: "A systematic guide to debugging 'Failed to start' systemd errors: reading status, journal logs, exit codes (203, 217, 200), and the common causes."
+pubDate: 2026-06-20
+updatedDate: 2026-06-20
+pageType: reference
+topic: services
+readingTime: "9 min read"
+tags: ["systemd", "troubleshooting", "services", "journalctl"]
+testedOn: ["Ubuntu 24.04", "Debian 12", "RHEL 9", "Rocky Linux 10"]
+featured: true
+---
+
+When a systemd service won't start, the debugging path is always the same: check
+`systemctl --failed`, read the status, dig into the journal, and look at the exit
+code. The exit code tells you exactly where to look. This guide walks the full
+workflow and the most common causes.
+
+## The four-step workflow
+
+```bash
+# 1. What's failing?
+systemctl --failed
+
+# 2. Read the status — the bottom lines often show the actual error
+systemctl status myapp.service
+
+# 3. Get the full log for the service
+journalctl -u myapp.service -n 50 --no-pager
+
+# 4. Verify by running the start command manually (see below)
+```
+
+Most failures come down to a handful of causes: a wrong path, a missing user,
+bad permissions, a port conflict, or a config error. The journal almost always
+points straight at the culprit.
+
+## Reading the exit code
+
+The status output and journal show an exit code that narrows the cause
+immediately:
+
+| Exit code | Meaning | Where to look |
+|-----------|---------|---------------|
+| `203/EXEC` | systemd couldn't run the binary | Check the `ExecStart` path exists and is executable |
+| `217/USER` | The `User=` doesn't exist | Verify the user with `id <user>` |
+| `216/GROUP` | The `Group=` doesn't exist | Verify the group |
+| `200/CHDIR` | `WorkingDirectory=` doesn't exist | Check the path |
+| `1`–`199` | The application itself crashed | Read the app's own logs |
+
+To find the exit code:
+
+```bash
+systemctl status myapp.service | grep -i "main process"
+# or
+journalctl -u myapp.service | grep "Main process exited"
+```
+
+## Cause 1 — Wrong binary path (203/EXEC)
+
+systemd tried to run `ExecStart` and couldn't find or execute it:
+
+```bash
+# Check the path the unit expects
+systemctl cat myapp.service | grep ExecStart
+
+# Verify it exists and is executable
+ls -l /usr/bin/myapp
+file /usr/bin/myapp
+```
+
+Fix the path in the unit file, then reload and restart (see the bottom of this
+page for the reload step).
+
+## Cause 2 — Missing user or group (217/USER)
+
+```bash
+# Does the user in the unit file exist?
+systemctl cat myapp.service | grep -E "User|Group"
+id myapp        # "no such user" means you found the problem
+```
+
+Either create the user or correct the `User=` line.
+
+## Cause 3 — Port already in use
+
+A service that binds a port fails if another process already holds it:
+
+```bash
+# What's using port 80?
+sudo ss -tlnp | grep :80
+```
+
+Stop the conflicting process or change the service's port. Note that ports below
+1024 require root or the `CAP_NET_BIND_SERVICE` capability.
+
+## Cause 4 — Config error
+
+Most services can validate their own config before you restart:
+
+```bash
+sudo nginx -t                 # nginx
+sudo apachectl configtest     # Apache
+sudo sshd -t                  # SSH
+```
+
+Run the validator first — it'll point at the exact line.
+
+## Cause 5 — ExecStartPre failed
+
+If the unit has an `ExecStartPre` directive, a failure there stops the whole
+service before the main process even runs — easy to overlook:
+
+```bash
+systemctl cat myapp.service | grep ExecStartPre
+```
+
+A pre-start command that's allowed to fail is prefixed with `-`
+(e.g. `ExecStartPre=-/bin/somecheck`).
+
+## The manual run trick
+
+The most reliable way to see the real error is to run the start command yourself,
+as the service user, bypassing systemd entirely:
+
+```bash
+# Get the exact command
+systemctl cat myapp.service | grep ExecStart
+
+# Run it as the service user
+sudo -u www-data /usr/bin/myapp --config /etc/myapp/config.yaml
+```
+
+Whatever error the app prints here is the error systemd was hiding.
+
+## On RHEL: don't forget SELinux
+
+On RHEL-family systems, a service that "works on my dev box but not in
+production" is very often an SELinux denial:
+
+```bash
+# Look for denials related to the service
+sudo journalctl -u myapp.service | grep -i denied
+sudo ausearch -m avc -ts recent
+```
+
+If that's the cause, generate a policy with `audit2allow` or fix the file context
+with `restorecon`.
+
+## Clearing the failed state
+
+After you fix the problem, systemd remembers the failure until you reset it:
+
+```bash
+sudo systemctl reset-failed myapp.service
+sudo systemctl start myapp.service
+```
+
+## After editing the unit file
+
+Any change to the unit file needs a daemon reload before it takes effect:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart myapp.service
+systemctl status myapp.service
+```
+
+<Callout type="warning" title="The most common mistake">
+Editing a unit file and restarting without `daemon-reload` first. systemd keeps
+using the old definition until you reload. Make `daemon-reload` a reflex after
+every unit-file edit.
+</Callout>
+
+## Auto-restart on failure
+
+For services that fail intermittently, configure systemd to restart them
+automatically. Add to the unit file with `systemctl edit myapp.service`:
+
+```ini
+[Unit]
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+Restart=on-failure
+RestartSec=5
+```
+
+This restarts on failure (but not on a clean exit), waiting 5 seconds between
+attempts, and gives up after 3 tries in 60 seconds. Note that the `StartLimit*`
+directives belong in `[Unit]`, not `[Service]` — a common mistake.
+
+## FAQ
+
+**What does "Active: activating (auto-restart)" mean?**
+The service is crashing and systemd is repeatedly trying to restart it. Read the
+journal to find why each attempt fails.
+
+**The service was killed — how do I know if it was the OOM killer?**
+Check for out-of-memory kills: `journalctl -b | grep -i "oom\|killed process"`.
+If the kernel killed it for memory, the service needs a memory limit raised or a
+leak fixed.
+
+**`systemctl status` only shows a few log lines — how do I see more?**
+Use `journalctl -u <service> -n 100` for the last 100 lines, or `-xe` for the
+most recent entries with explanations.
+
+For the full command set see [the systemctl reference](/systemctl-commands/), and
+for reading logs in depth see [viewing logs with journalctl](/journalctl-view-logs/).
+
+---
+
+*If you're troubleshooting a production outage, work the steps in order — the exit
+code plus the journal almost always identifies the cause within a few minutes.*

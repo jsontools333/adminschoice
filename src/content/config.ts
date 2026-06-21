@@ -15,6 +15,7 @@ const posts = defineCollection({
     topic: z.enum([
       'scheduling', 'shell', 'sysadmin', 'devops',
       'networking', 'python', 'security', 'legacy',
+      'files', 'basics', 'services', 'monitoring',
     ]),
     // Reading-time eyebrow and difficulty signal
     readingTime: z.string().optional(),

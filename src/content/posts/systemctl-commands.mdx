@@ -1,0 +1,202 @@
+---
+title: "systemctl Commands — The Complete Reference"
+description: "Every systemctl command you'll actually use: start, stop, restart, enable, status, and managing systemd units. Tested on Ubuntu 24.04 and RHEL 9."
+pubDate: 2026-06-20
+updatedDate: 2026-06-20
+pageType: reference
+topic: services
+readingTime: "8 min read"
+tags: ["systemd", "systemctl", "services", "linux"]
+testedOn: ["Ubuntu 24.04", "Debian 12", "RHEL 9", "Rocky Linux 10"]
+featured: true
+---
+
+`systemctl` is the command you use to control services on any modern Linux
+system. systemd is the init system — the first process that starts at boot (PID 1)
+— and `systemctl` is its control interface. Whether you're on Ubuntu, Debian,
+RHEL, Fedora, or Rocky, the commands below are identical.
+
+<Callout type="tip" title="The four you'll use most">
+`systemctl start`, `stop`, `restart`, and `status` cover the vast majority of
+day-to-day work. Everything else on this page is for the less common cases.
+</Callout>
+
+## Service lifecycle — start, stop, restart, reload
+
+These four operations are the core of service management:
+
+```bash
+sudo systemctl start nginx     # bring the service up now
+sudo systemctl stop nginx      # shut it down now
+sudo systemctl restart nginx   # full stop then start
+sudo systemctl reload nginx    # re-read config without dropping connections
+```
+
+The difference between `restart` and `reload` matters in production. `restart`
+fully stops the service — which briefly drops connections — then starts it again.
+`reload` tells the service to re-read its configuration without going down, but
+not every service supports it. When in doubt:
+
+```bash
+# Reload if the service supports it, otherwise restart
+sudo systemctl reload-or-restart nginx
+
+# Restart only if it's already running (no-op if stopped)
+sudo systemctl try-restart nginx
+```
+
+## Checking status
+
+```bash
+# Full status: active state, PID, memory, and last log lines
+systemctl status nginx
+
+# Show more log lines in the status output
+systemctl status nginx -n 50
+
+# Just the active state — scriptable, returns "active" or "inactive"
+systemctl is-active nginx
+
+# Is it set to start at boot?
+systemctl is-enabled nginx
+
+# Has it failed?
+systemctl is-failed nginx
+```
+
+The colored dot at the top of `systemctl status` summarizes state at a glance:
+green for running, white for inactive, red for failed.
+
+## Enable and disable (boot behavior)
+
+Starting a service and enabling it are **two separate things**. `start` runs it
+now; `enable` makes it start automatically at boot. You almost always want both:
+
+```bash
+# Start now AND enable at boot (the common pattern)
+sudo systemctl enable --now nginx
+
+# Just enable for next boot (doesn't start it now)
+sudo systemctl enable nginx
+
+# Stop now AND disable at boot
+sudo systemctl disable --now nginx
+```
+
+<Callout type="warning" title="Avoid the split-brain state">
+Using `enable` and `start` separately can leave a service enabled but not
+running (or vice versa). Use `enable --now` and `disable --now` to keep the
+boot state and the running state in sync.
+</Callout>
+
+## Listing services
+
+```bash
+# All currently active services
+systemctl list-units --type=service
+
+# All services including stopped ones
+systemctl list-units --type=service --all
+
+# Every installed service and whether it's enabled at boot
+systemctl list-unit-files --type=service
+
+# Filter by state
+systemctl list-unit-files --state=enabled
+systemctl --failed                        # only failed units
+```
+
+`systemctl --failed` is the one to run after every reboot — a service that
+failed silently on boot is a common source of mysterious behavior.
+
+## Masking — the strongest off switch
+
+Masking links a unit to `/dev/null` so it can't be started at all, manually or as
+a dependency. Use it to completely prevent a service from running:
+
+```bash
+sudo systemctl mask postfix     # block it entirely
+sudo systemctl unmask postfix   # allow it again
+```
+
+This is stronger than `disable`. A disabled service won't start at boot but can
+still be started manually or pulled in by another unit; a masked one cannot.
+
+## Inspecting unit files
+
+```bash
+# Show the effective unit file, including any overrides
+systemctl cat nginx
+
+# Show every property systemd knows about the service
+systemctl show nginx
+
+# Show specific properties
+systemctl show nginx -p ExecStart -p User -p Restart
+
+# List what a unit depends on
+systemctl list-dependencies nginx
+```
+
+## Power and system state
+
+```bash
+sudo systemctl reboot      # restart the machine
+sudo systemctl poweroff    # shut down
+sudo systemctl suspend     # suspend to RAM
+systemctl is-system-running    # overall state: running / degraded / ...
+```
+
+## After editing a unit file
+
+Whenever you change a unit file, systemd doesn't see the change until you reload
+its configuration:
+
+```bash
+sudo systemctl daemon-reload     # re-read all unit files
+sudo systemctl restart myapp     # apply the change
+```
+
+Forgetting `daemon-reload` is the single most common reason an edit "doesn't
+take." Make it a reflex after any unit-file change.
+
+## Command summary
+
+| Command | Action |
+|---------|--------|
+| `systemctl start UNIT` | Start now |
+| `systemctl stop UNIT` | Stop now |
+| `systemctl restart UNIT` | Full stop then start |
+| `systemctl reload UNIT` | Re-read config, no downtime |
+| `systemctl status UNIT` | Status + recent logs |
+| `systemctl enable --now UNIT` | Start now and at boot |
+| `systemctl disable --now UNIT` | Stop now and at boot |
+| `systemctl mask UNIT` | Block entirely |
+| `systemctl --failed` | List failed units |
+| `systemctl daemon-reload` | Reload unit files after edits |
+
+## FAQ
+
+**What's the difference between `systemctl stop` and `disable`?**
+`stop` halts the running service now but it'll start again at next boot if
+enabled. `disable` removes the boot-time autostart but doesn't touch the running
+instance. Use `disable --now` to do both.
+
+**Why does my service start manually but not at boot?**
+It's not enabled. Run `systemctl enable --now <service>`. Check with
+`systemctl is-enabled <service>`.
+
+**Do I need `sudo` for all of these?**
+Read-only commands (`status`, `list-units`, `is-active`, `cat`, `show`) work
+without `sudo`. Anything that changes state (`start`, `stop`, `enable`, `mask`)
+needs root.
+
+**My distro uses `crond`/`httpd` not `cron`/`apache2` — does that matter?**
+Service names differ by distro (RHEL uses `httpd`, Debian uses `apache2`), but
+the `systemctl` commands are identical. Use `systemctl list-units --type=service`
+to find the exact name on your system.
+
+For checking whether a specific service is up, see
+[how to check if a service is running](/check-if-service-is-running-linux/). When
+a service won't start, see
+[systemd service failed to start](/systemd-service-failed-to-start/).

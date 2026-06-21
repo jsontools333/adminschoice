@@ -1,0 +1,137 @@
+---
+title: "How to Check Memory Usage on Linux (free and vmstat)"
+description: "Check Linux memory usage with free, vmstat, and ps. Understand buff/cache vs available memory, spot swap pressure, and find memory-hungry processes."
+pubDate: 2026-06-20
+updatedDate: 2026-06-20
+pageType: guide
+topic: monitoring
+readingTime: "6 min read"
+tags: ["memory", "free", "vmstat", "swap", "monitoring"]
+testedOn: ["Ubuntu 24.04", "Debian 12", "RHEL 9"]
+featured: false
+---
+
+Checking memory on Linux trips people up because a healthy server looks like it's
+almost out of RAM. That's by design — Linux uses spare memory for caching. This
+guide shows how to read memory usage correctly with `free`, `vmstat`, and `ps`,
+and how to spot real memory pressure.
+
+## The quick check — free
+
+```bash
+free -h        # human-readable
+free -h -s 5   # refresh every 5 seconds
+```
+
+```text
+              total        used        free      shared  buff/cache   available
+Mem:           15Gi       8.5Gi       1.2Gi       0.3Gi       5.8Gi       6.1Gi
+Swap:         2.0Gi          0B       2.0Gi
+```
+
+<Callout type="tip" title="Read 'available', not 'free'">
+The `free` column looks alarmingly low on every healthy Linux system because the
+kernel uses spare RAM for disk cache (`buff/cache`). That cache is handed back to
+applications the instant they need it. The real number is **available** — memory
+apps can claim right now. Here, 6.1 GB is available even though only 1.2 GB is
+"free."
+</Callout>
+
+## Why free memory is "low" on a healthy system
+
+Linux treats unused RAM as wasted RAM, so it fills it with cached disk reads.
+This makes everything faster and costs nothing — the cache evaporates the moment
+an application asks for memory. So `free` being low is not a problem. The signals
+of an *actual* problem are:
+
+- **`available` dropping toward zero** — genuine memory exhaustion
+- **swap `used` growing over time** — the system is pushing memory to disk
+
+## Watching swap — the real warning sign
+
+```bash
+free -h | grep Swap
+vmstat 1 5
+```
+
+In `vmstat`, watch the `si` and `so` columns (swap in / swap out):
+
+```text
+procs -----------memory---------- ---swap-- -----io----
+ r  b   swpd   free   buff  cache   si   so    bi    bo
+ 1  0      0 1258000 234000 5800000   0    0    12    8
+```
+
+Sustained nonzero `si`/`so` means the system is actively swapping — pushing memory
+to disk and pulling it back. That's a severe performance hit. Occasional swap use
+is fine; *growing* swap use means memory pressure or a leak.
+
+## Finding memory-hungry processes
+
+```bash
+# Top 10 processes by memory
+ps aux --sort=-%mem | head -11
+
+# In top: press M to sort by memory
+# In htop: press F6, select PERCENT_MEM
+top -b -o %MEM -n 1 | head -17
+```
+
+The `RSS` column in `ps` is resident memory (actual physical RAM the process
+holds) — the number that matters most for finding the hog.
+
+## Detailed memory breakdown
+
+For the full picture from the kernel:
+
+```bash
+cat /proc/meminfo
+```
+
+Key fields: `MemAvailable` (the same available number `free` reports),
+`SwapTotal`/`SwapFree`, `Cached`, and `Buffers`. Most of the time `free -h` is
+enough, but `/proc/meminfo` has everything.
+
+## Did the OOM killer strike?
+
+When memory runs out, the kernel's OOM (out-of-memory) killer terminates a
+process to recover. If a service vanished unexpectedly, check:
+
+```bash
+sudo journalctl -b | grep -i "oom\|killed process\|out of memory"
+dmesg | grep -i "killed process"
+```
+
+If the OOM killer is firing, you need more RAM, a memory limit on the offending
+service, or to fix a leak.
+
+## Per-process memory over time
+
+To watch a specific process's memory climb (catching a leak):
+
+```bash
+watch -n 5 'ps -o pid,rss,cmd -p $(pgrep -d, myapp)'
+```
+
+A steadily rising `RSS` is the signature of a memory leak.
+
+## FAQ
+
+**My server shows 90% memory used — should I worry?**
+Probably not. Check the `available` column in `free -h`. If a few GB are
+available, the "used" figure is mostly reclaimable cache. Only worry if
+`available` is near zero or swap is growing.
+
+**What's a healthy amount of swap usage?**
+A little, steady swap use is normal — the kernel moves rarely-used pages out. The
+warning sign is swap that keeps *growing*, or active swapping (`si`/`so` in
+vmstat), which means you're short on RAM.
+
+**How do I clear the cache to "free" memory?**
+You generally shouldn't — the cache is helping you, and the kernel reclaims it
+automatically. Forcing it (`echo 3 > /proc/sys/vm/drop_caches`) just makes the
+next reads slower. If you're doing it to make `free` look better, that's the
+wrong instinct.
+
+For the full toolkit see [Linux monitoring commands](/linux-monitoring-commands/),
+and for disk see [how to check disk space](/check-disk-space-linux/).

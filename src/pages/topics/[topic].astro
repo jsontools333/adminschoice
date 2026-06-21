@@ -1,0 +1,57 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostList from '../../components/PostList.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  const topics = [...new Set(posts.map((p) => p.data.topic))];
+  return topics.map((topic) => ({
+    params: { topic },
+    props: {
+      topic,
+      posts: posts
+        .filter((p) => p.data.topic === topic)
+        .sort((a, b) => new Date(b.data.pubDate) - new Date(a.data.pubDate)),
+    },
+  }));
+}
+
+const { topic, posts } = Astro.props;
+
+const topicMeta = {
+  scheduling: { label: 'Scheduling', blurb: 'cron, crontab, systemd timers, and Kubernetes CronJobs.' },
+  shell:      { label: 'Shell & scripting', blurb: 'bash, awk, sed, find, vi, and command-line tooling.' },
+  sysadmin:   { label: 'System administration', blurb: 'permissions, users, services, file systems, and core admin tasks.' },
+  devops:     { label: 'DevOps & cloud', blurb: 'Docker, Kubernetes, Terraform, AWS, and CI/CD.' },
+  networking: { label: 'Networking', blurb: 'SSH, SSL/TLS, DNS, netstat, and network administration.' },
+  python:     { label: 'Python', blurb: 'syntax, libraries, automation, and getting started.' },
+  security:   { label: 'Security', blurb: 'hardening, threats, and keeping systems safe.' },
+  legacy:     { label: 'Solaris & legacy Unix', blurb: 'Solaris, Veritas, and classic Unix references — kept for reference.' },
+  files:      { label: 'Files & storage', blurb: 'permissions, backups, file systems, archives, and disk tools.' },
+  basics:     { label: 'Getting started', blurb: 'Unix and Linux fundamentals, distros, installs, and editors for newcomers.' },
+  services:   { label: 'Services & systemd', blurb: 'systemctl, unit files, journalctl, timers, and managing Linux services.' },
+  monitoring: { label: 'Monitoring & performance', blurb: 'top, htop, free, df, vmstat — watching CPU, memory, disk, and processes.' },
+};
+const meta = topicMeta[topic] ?? { label: topic, blurb: '' };
+---
+<BaseLayout
+  title={`${meta.label} — Admin's Choice`}
+  description={`${meta.label} references and guides. ${meta.blurb}`}
+>
+  <main class="topic-page">
+    <nav class="crumb"><a href="/topics/">Topics</a> / {meta.label}</nav>
+    <h1>{meta.label}</h1>
+    <p class="lede">{meta.blurb}</p>
+    <p class="count">{posts.length} {posts.length === 1 ? 'article' : 'articles'}</p>
+    <PostList posts={posts} />
+  </main>
+</BaseLayout>
+
+<style>
+  .topic-page { max-width: 720px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+  .crumb { font-size: 0.8rem; color: var(--text-tertiary); margin-bottom: 1rem; }
+  .crumb a { color: var(--text-secondary); text-decoration: none; }
+  .lede { font-size: 1.05rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
+  .count { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-tertiary); margin-bottom: 1.5rem; }
+</style>

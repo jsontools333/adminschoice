@@ -1,0 +1,70 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const posts = await getCollection('posts');
+
+const topicMeta = {
+  scheduling: { label: 'Scheduling', blurb: 'cron, crontab, systemd timers', icon: 'ti-clock' },
+  shell:      { label: 'Shell & scripting', blurb: 'bash, awk, sed, find, vi', icon: 'ti-terminal-2' },
+  sysadmin:   { label: 'System administration', blurb: 'permissions, services, file systems', icon: 'ti-server' },
+  devops:     { label: 'DevOps & cloud', blurb: 'Docker, Kubernetes, Terraform, AWS', icon: 'ti-cloud' },
+  networking: { label: 'Networking', blurb: 'SSH, SSL/TLS, DNS, netstat', icon: 'ti-network' },
+  python:     { label: 'Python', blurb: 'syntax, libraries, automation', icon: 'ti-brand-python' },
+  security:   { label: 'Security', blurb: 'hardening, threats, prevention', icon: 'ti-shield' },
+  legacy:     { label: 'Solaris & legacy Unix', blurb: 'Solaris, Veritas, classic Unix', icon: 'ti-history' },
+  files:      { label: 'Files & storage', blurb: 'permissions, backups, file systems', icon: 'ti-files' },
+  basics:     { label: 'Getting started', blurb: 'fundamentals, distros, installs', icon: 'ti-rocket' },
+  services:   { label: 'Services & systemd', blurb: 'systemctl, unit files, journalctl', icon: 'ti-settings-cog' },
+  monitoring: { label: 'Monitoring & performance', blurb: 'top, htop, free, df, vmstat', icon: 'ti-activity' },
+};
+
+const counts = {};
+for (const p of posts) counts[p.data.topic] = (counts[p.data.topic] ?? 0) + 1;
+
+const topics = Object.keys(topicMeta)
+  .filter((t) => counts[t])
+  .map((t) => ({ slug: t, ...topicMeta[t], count: counts[t] }))
+  .sort((a, b) => b.count - a.count);
+---
+<BaseLayout
+  title="Browse by topic — Admin's Choice"
+  description="Browse all Admin's Choice references and guides by topic: scheduling, shell, system administration, DevOps, networking, Python, security, and legacy Unix."
+>
+  <main class="topics">
+    <h1>Browse by topic</h1>
+    <p class="lede">{posts.length} references and guides across {topics.length} topics.</p>
+    <div class="grid">
+      {topics.map((t) => (
+        <a class="topic-card" href={`/topics/${t.slug}/`}>
+          <i class={`ti ${t.icon}`} aria-hidden="true"></i>
+          <div class="topic-card__label">{t.label}</div>
+          <div class="topic-card__blurb">{t.blurb}</div>
+          <div class="topic-card__count">{t.count} {t.count === 1 ? 'article' : 'articles'}</div>
+        </a>
+      ))}
+    </div>
+    <p class="all-link"><a href="/posts/">Or see all posts, newest first →</a></p>
+  </main>
+</BaseLayout>
+
+<style>
+  .topics { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+  .lede { font-size: 1.05rem; color: var(--text-secondary); margin-bottom: 1.75rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .topic-card {
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .topic-card:hover { border-color: var(--border-strong); }
+  .topic-card i { font-size: 22px; color: var(--accent); display: block; margin-bottom: 10px; }
+  .topic-card__label { font-size: 0.95rem; font-weight: 500; margin-bottom: 4px; }
+  .topic-card__blurb { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 8px; }
+  .topic-card__count { font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-tertiary); }
+  .all-link { margin-top: 2rem; }
+  .all-link a { color: var(--accent-ink); text-decoration: none; font-size: 0.9rem; }
+</style>

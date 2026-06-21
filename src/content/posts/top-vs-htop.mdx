@@ -1,0 +1,134 @@
+---
+title: "top vs htop — Which Linux Process Monitor to Use"
+description: "top vs htop compared: features, keyboard shortcuts, and when to use each. How to read the CPU, memory, and load average fields in both."
+pubDate: 2026-06-20
+updatedDate: 2026-06-20
+pageType: guide
+topic: monitoring
+readingTime: "6 min read"
+tags: ["top", "htop", "monitoring", "processes"]
+testedOn: ["Ubuntu 24.04", "Debian 12", "RHEL 9"]
+featured: false
+---
+
+`top` and `htop` both show a live view of processes and system resources. The
+short version: use `top` because it's always there, and `htop` when you want a
+nicer interface for interactive troubleshooting. Here's how they compare and how
+to read both.
+
+## The comparison
+
+| | top | htop |
+|---|-----|------|
+| Pre-installed | Yes, everywhere | Usually needs installing |
+| Interface | Plain text | Color, mouse support |
+| Sorting | Keyboard (`P`, `M`) | Click a column or `F6` |
+| Process tree | Limited | `F5`, clear tree view |
+| Kill processes | `k` then type PID | `F9`, select from list |
+| Filter by name | No | `F4` |
+| Scripting | Excellent (`-b` batch mode) | Not designed for it |
+
+The practical split: **`top` for scripts and servers where you can't install
+anything; `htop` for interactive debugging on machines where it's available.**
+
+## Reading the top header
+
+Both tools show the same underlying numbers. In `top`:
+
+```text
+top - 14:30:00 up 45 days,  2 users,  load average: 0.52, 0.58, 0.59
+Tasks: 287 total,   1 running, 286 sleeping
+%Cpu(s):  5.3 us,  2.1 sy,  0.0 ni, 92.0 id,  0.5 wa
+MiB Mem :  15921 total,   1234 free,   8765 used,   5921 buff/cache
+```
+
+- **Load average** — three numbers: the 1-, 5-, and 15-minute averages. Compare
+  them to your CPU core count. On a 4-core box, a load of 4.0 means fully busy;
+  above that means processes are queuing.
+- **`%Cpu(s)`** — `us` user, `sy` system/kernel, `id` idle, `wa` I/O wait. High
+  `wa` points at a disk bottleneck, not a CPU shortage.
+- **Mem** — note that `buff/cache` is reclaimable; the system isn't really using
+  all that memory.
+
+<Callout type="tip" title="Load average vs CPU count">
+A load average is only meaningful next to your core count. `nproc` tells you how
+many cores you have. Load 8 on an 8-core machine is fully utilized; load 8 on a
+2-core machine means heavy queuing.
+</Callout>
+
+## top keyboard shortcuts
+
+| Key | Action |
+|-----|--------|
+| `P` | Sort by CPU |
+| `M` | Sort by memory |
+| `k` | Kill a process (prompts for PID) |
+| `r` | Renice (change priority) |
+| `c` | Toggle full command path |
+| `1` | Show per-core CPU |
+| `h` | Help |
+| `q` | Quit |
+
+## htop keyboard shortcuts
+
+| Key | Action |
+|-----|--------|
+| `F3` | Search for a process |
+| `F4` | Filter by name |
+| `F5` | Tree view |
+| `F6` | Sort by column |
+| `F9` | Send a signal (kill) |
+| `Space` | Tag a process |
+| `F10` | Quit |
+
+htop's tree view (`F5`) is genuinely useful for understanding systemd services:
+it shows which child processes a service spawned, so you can see the whole family
+at once.
+
+## Targeting specific processes
+
+Both can focus on a single application's processes:
+
+```bash
+# Monitor all nginx workers
+top -p $(pgrep -d',' nginx)
+htop -p $(pgrep -d',' nginx)
+
+# Monitor one user's processes
+top -u www-data
+htop -u www-data
+```
+
+## When you want neither — a quick snapshot
+
+For a non-interactive snapshot (in a script or over a flaky SSH link), skip both
+and use `ps`:
+
+```bash
+ps aux --sort=-%cpu | head -10    # top 10 by CPU
+ps aux --sort=-%mem | head -10    # top 10 by memory
+```
+
+Or `top` in batch mode, which prints once and exits:
+
+```bash
+top -b -n 1 | head -20
+```
+
+## FAQ
+
+**Is htop better than top?**
+For interactive use, htop is friendlier — color, mouse, easier sorting and
+killing. But top is always installed and works in scripts, so both have a place.
+Many admins reach for top first by habit and htop when digging in.
+
+**htop isn't installed — how do I get it?**
+`sudo apt install htop` on Debian/Ubuntu, `sudo dnf install htop` on RHEL/Fedora.
+
+**What's btop?**
+A newer, graph-heavy terminal monitor with smooth real-time charts. It's the
+nicest-looking of the three but, like htop, needs installing. Good for visual
+checks during troubleshooting.
+
+For the full set of monitoring tools, see
+[Linux monitoring commands](/linux-monitoring-commands/).

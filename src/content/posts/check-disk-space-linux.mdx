@@ -1,0 +1,122 @@
+---
+title: "How to Check Disk Space on Linux (df and du)"
+description: "Check disk space on Linux with df and du: see free space per filesystem, find what's using space, and locate large files before a disk fills up."
+pubDate: 2026-06-20
+updatedDate: 2026-06-20
+pageType: guide
+topic: monitoring
+readingTime: "5 min read"
+tags: ["disk", "df", "du", "monitoring", "storage"]
+testedOn: ["Ubuntu 24.04", "Debian 12", "RHEL 9"]
+featured: false
+---
+
+A full disk is one of the most common — and most preventable — causes of Linux
+outages. Failed writes, crashed databases, and broken logging all trace back to a
+filesystem hitting 100%. The two commands you need are `df` (how much space is
+free) and `du` (what's using it).
+
+## See free space — df
+
+```bash
+df -h          # all filesystems, human-readable
+df -h /var     # just the filesystem holding /var
+df -hT         # also show filesystem type
+```
+
+```text
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1        50G   42G  5.5G  89% /
+/dev/sda2       100G   30G   65G  32% /var
+```
+
+The **Use%** column is what to watch. Anything near 100% is a problem waiting to
+happen. A full `/` crashes the server; a full `/var` usually takes down logging
+and databases first.
+
+<Callout type="warning" title="Set an alert at 80%">
+Don't wait for 100%. Alert when any filesystem crosses 80% — that gives you time
+to act before writes start failing. Disks fill faster than you expect once logs
+or a runaway process get going.
+</Callout>
+
+## Find what's using space — du
+
+When a filesystem is filling up, `du` finds the culprit. Work top-down:
+
+```bash
+# Biggest items at the top level of /var, sorted smallest to largest
+sudo du -sh /var/* | sort -h
+
+# Drill into whatever was biggest — say, logs
+sudo du -sh /var/log/* | sort -h
+```
+
+`-s` summarizes each argument, `-h` makes sizes human-readable, and `sort -h`
+orders by those human-readable sizes. Keep drilling into the largest directory
+until you find the offender.
+
+## Find large files anywhere
+
+To hunt down big individual files regardless of location:
+
+```bash
+# Files over 100 MB, anywhere
+sudo find / -type f -size +100M 2>/dev/null
+
+# Over 1 GB, with sizes, sorted
+sudo find / -type f -size +1G -exec du -h {} + 2>/dev/null | sort -h
+```
+
+The `2>/dev/null` discards permission-denied noise so you see only the results.
+
+## The "disk full but du shows nothing" trap
+
+Sometimes `df` says the disk is full but `du` can't find the space. The usual
+cause is a **deleted file still held open by a running process** — the space
+isn't freed until the process closes it. Find these:
+
+```bash
+sudo lsof +L1
+```
+
+This lists open files with a link count of zero (deleted but still open).
+Restarting the process holding the file releases the space. A common case is a
+log file that was deleted while the service writing to it kept running.
+
+## Check inode usage too
+
+A filesystem can be "full" with space to spare if it's out of inodes — common
+when something creates millions of tiny files:
+
+```bash
+df -i          # inode usage per filesystem
+```
+
+If `IUse%` is at 100% but `Use%` isn't, you're out of inodes, not space. Find the
+directory with too many files:
+
+```bash
+sudo find / -xdev -type f 2>/dev/null | cut -d/ -f2 | sort | uniq -c | sort -rn | head
+```
+
+## FAQ
+
+**What's the difference between df and du?**
+`df` reports free space as the filesystem sees it (fast, whole-filesystem). `du`
+adds up actual file sizes in directories (slower, but tells you *what's* using the
+space). They can disagree when deleted-but-open files exist.
+
+**Why does df show less total space than my disk size?**
+Filesystems reserve a percentage (often 5%) for root, and formatting overhead
+takes some. The reserved space is why a "full" disk can still be written to by
+root.
+
+**How do I monitor disk space automatically?**
+A simple cron job that emails when usage crosses a threshold works; for proper
+alerting, tools like Netdata or Prometheus track it continuously. See the
+[crontab quick reference](/crontab-quick-reference/) for the scheduling side.
+
+For the full monitoring toolkit, see
+[Linux monitoring commands](/linux-monitoring-commands/), and for memory see
+[how to check memory usage](/check-memory-usage-linux/).

@@ -1,0 +1,123 @@
+---
+title: "How to Check if a Service Is Running on Linux"
+description: "Check whether a systemd service is running with systemctl is-active, status, and list-units — plus how to check several services at once."
+pubDate: 2026-06-20
+updatedDate: 2026-06-20
+pageType: guide
+topic: services
+readingTime: "5 min read"
+tags: ["systemd", "systemctl", "services", "monitoring"]
+testedOn: ["Ubuntu 24.04", "Debian 12", "RHEL 9"]
+featured: false
+---
+
+The quickest way to check whether a service is running on a modern Linux system
+is `systemctl is-active <service>`. This guide covers that and the other ways to
+verify service state, including checking several services at once.
+
+## The quick check
+
+```bash
+systemctl is-active nginx
+```
+
+This prints `active` if the service is running, `inactive` if it's stopped, or
+`failed` if it crashed. It's scriptable — the exit code is `0` when active — so
+it's ideal for health checks:
+
+```bash
+if systemctl is-active --quiet nginx; then
+  echo "nginx is up"
+else
+  echo "nginx is DOWN"
+fi
+```
+
+The `--quiet` flag suppresses the text output so you only get the exit code.
+
+## The detailed check
+
+When you want more than a one-word answer, `status` shows the active state, the
+main PID, memory use, and the last few log lines:
+
+```bash
+systemctl status nginx
+```
+
+```text
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/lib/systemd/system/nginx.service; enabled)
+     Active: active (running) since Tue 2026-06-16 09:32:45 UTC; 3 days ago
+   Main PID: 1056 (nginx)
+     Memory: 12.4M
+```
+
+The line that matters is **Active:** — `active (running)` is what you want.
+`inactive (dead)` means stopped; `failed` means it crashed.
+
+## Checking several services at once
+
+On a production server you often want to confirm a whole stack is up. Pass
+multiple names to `is-active`:
+
+```bash
+systemctl is-active nginx php-fpm mysql redis
+```
+
+Each prints its state on its own line. Or list every running service and filter:
+
+```bash
+# All running services
+systemctl list-units --type=service --state=running
+
+# Is a specific one in the running list?
+systemctl list-units --type=service --state=running | grep nginx
+```
+
+## Other useful state checks
+
+```bash
+# Is it set to start at boot?
+systemctl is-enabled nginx
+
+# Has it failed?
+systemctl is-failed nginx
+
+# Show every service that has failed
+systemctl --failed
+```
+
+<Callout type="tip" title="active but not enabled">
+A service can be running now (`is-active` → active) but not set to start at boot
+(`is-enabled` → disabled). After a reboot it won't come back. Check both, and use
+`systemctl enable --now <service>` to fix it.
+</Callout>
+
+## The pre-systemd way
+
+On older systems without systemd (or inside some containers), use the `service`
+command or check the process directly:
+
+```bash
+service nginx status        # SysVinit-style
+ps aux | grep nginx         # is the process there at all?
+pgrep -a nginx              # cleaner: PID + command
+```
+
+## FAQ
+
+**What does "active (exited)" mean?**
+The service ran successfully and finished — common for one-shot units that do a
+task and stop, like a script that sets up networking. It's not an error.
+
+**`is-active` says "activating" — what's that?**
+The service is starting up but hasn't finished (or it's stuck retrying). Check
+`systemctl status` and the logs to see whether it's progressing or failing.
+
+**How do I check a service on a remote machine?**
+`systemctl --host user@remote is-active nginx` runs the check over SSH, provided
+SSH access is configured.
+
+For the full set of service commands, see
+[the systemctl reference](/systemctl-commands/). If a service shows `failed`, see
+[systemd service failed to start](/systemd-service-failed-to-start/).

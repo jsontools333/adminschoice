@@ -1,0 +1,156 @@
+---
+title: "journalctl — View and Filter systemd Logs"
+description: "Read systemd journal logs with journalctl: filter by service, follow in real time, filter by time and priority, and manage journal disk usage."
+pubDate: 2026-06-20
+updatedDate: 2026-06-20
+pageType: reference
+topic: services
+readingTime: "7 min read"
+tags: ["journalctl", "systemd", "logs", "troubleshooting"]
+testedOn: ["Ubuntu 24.04", "Debian 12", "RHEL 9"]
+featured: false
+---
+
+The systemd journal replaces traditional syslog with a structured, indexed log,
+and `journalctl` is how you read it. You don't need to know where a service
+writes its logs — systemd captures all stdout and stderr, and `journalctl` has it
+all. This is the reference for the filters you'll actually use.
+
+## The essential filters
+
+```bash
+# Logs for one service
+journalctl -u nginx
+
+# Follow in real time (like tail -f)
+journalctl -u nginx -f
+
+# Last N lines only
+journalctl -u nginx -n 50
+
+# Since the last boot
+journalctl -u nginx -b
+```
+
+`-u` (unit) plus `-f` (follow) is the combination you'll reach for most:
+leave it running while you reproduce a problem and watch errors appear live.
+
+## Filtering by time
+
+```bash
+journalctl -u nginx --since "1 hour ago"
+journalctl -u nginx --since "2026-06-20 10:00" --until "2026-06-20 11:00"
+journalctl --since "yesterday" --until "today"
+journalctl -u nginx --since "5 min ago"
+```
+
+Time expressions are flexible: `"1 hour ago"`, `"yesterday"`, `"09:00"`, or a
+full timestamp all work.
+
+## Filtering by priority
+
+The journal records a syslog priority (0 = emergency, 7 = debug) for each entry.
+Filter to just the serious ones:
+
+```bash
+journalctl -p err                # errors and above
+journalctl -p warning -u myapp   # warnings and above, for one service
+```
+
+Priority levels in order: `emerg`, `alert`, `crit`, `err`, `warning`, `notice`,
+`info`, `debug`. Naming one includes everything more severe.
+
+## Filtering by boot
+
+```bash
+journalctl -b           # current boot only
+journalctl -b -1        # the previous boot
+journalctl --list-boots # list all recorded boots
+```
+
+`journalctl -b -1` is invaluable after an unexpected reboot — it shows what the
+last boot logged right up to the crash.
+
+<Callout type="tip" title="Persistent logs across reboots">
+By default some systems keep the journal only for the current boot. To keep logs
+across reboots, create `/var/log/journal` (`sudo mkdir -p /var/log/journal`) and
+the journal becomes persistent. Then `journalctl -b -1` works reliably.
+</Callout>
+
+## Output formats
+
+```bash
+journalctl -u myapp -o json          # JSON, one object per line
+journalctl -u myapp -o json-pretty   # pretty-printed JSON
+journalctl -u myapp -o short-iso     # ISO 8601 timestamps
+journalctl -u myapp -o cat           # message only, no metadata
+```
+
+The `cat` format is handy when you want just the log text to pipe elsewhere;
+`json` is for feeding logs into other tools.
+
+## Debugging a service that won't start
+
+This sequence usually reveals the problem:
+
+```bash
+# Status first, for the summary
+systemctl status myapp
+
+# Then the full recent log, no pager
+journalctl -u myapp -n 50 --no-pager
+
+# Or follow the log while you try to start it
+journalctl -u myapp -f &
+systemctl start myapp
+```
+
+The `--no-pager` flag prints everything to the terminal instead of opening a
+pager — useful for scrolling back or piping output.
+
+## Managing journal disk usage
+
+The journal can grow large. Check and trim it:
+
+```bash
+# How much space is the journal using?
+journalctl --disk-usage
+
+# Keep only the last 500 MB
+sudo journalctl --vacuum-size=500M
+
+# Keep only the last 2 weeks
+sudo journalctl --vacuum-time=2weeks
+```
+
+To cap it permanently, set `SystemMaxUse=` in `/etc/systemd/journald.conf`.
+
+## Command summary
+
+| Command | Shows |
+|---------|-------|
+| `journalctl -u UNIT` | All logs for a service |
+| `journalctl -u UNIT -f` | Follow in real time |
+| `journalctl -u UNIT -n 50` | Last 50 lines |
+| `journalctl -b` | Current boot |
+| `journalctl -b -1` | Previous boot |
+| `journalctl -p err` | Errors and above |
+| `journalctl --since "1 hour ago"` | Time-filtered |
+| `journalctl --disk-usage` | Journal size |
+
+## FAQ
+
+**Why does `journalctl` open a pager?**
+By default it pipes through `less`. Press `q` to quit, `G` to jump to the end, or
+add `--no-pager` to print directly.
+
+**How do I see logs from all services together, newest last?**
+Plain `journalctl` shows everything chronologically. Add `-e` to jump to the end,
+or `-r` to reverse (newest first).
+
+**Can I follow logs for several services at once?**
+Yes — repeat `-u`: `journalctl -u nginx -u php-fpm -f`.
+
+For managing the services whose logs you're reading, see
+[the systemctl reference](/systemctl-commands/). When a service is failing, pair
+this with [systemd service failed to start](/systemd-service-failed-to-start/).
