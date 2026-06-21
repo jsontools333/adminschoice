@@ -1,0 +1,173 @@
+---
+title: "Learn How To Obfuscate JavaScript with Node.js"
+description: "Obfuscation of your JavaScript code means that your code cannot be used in other places."
+pubDate: 2019-08-23
+updatedDate: 2026-06-20
+pageType: guide
+topic: security
+tier: "TIER 2 (core reference)"
+tags: ["programming", "security"]
+testedOn: ["Linux", "Unix"]
+---
+
+Obfuscation of your JavaScript code means that your code cannot be used in other places. This is a very useful technique for people that sell code. For instance, if you sell your code on Themeforest, your code can be copied easily from the browser which can be quite dangerous for you and you could lose the rights for your code. But with an obfuscator, it can still be copied but not read so easily from the person who copied it. It can be even worse with the minification. Here, we will show how you can perform the obfuscation with Node.js and you can use the JavaScript module.
+
+## Install JavaScript Obfuscator Module
+
+The start of the obfuscation of any of the JS code for the browser with Node.js, is relying on the JavaScript obfuscator module. This obfuscator is a powerful free tool that obfuscates JavaScript and Node.js with many features which protects the source code.
+
+This module has no real limits or restrictions, it can run easily on any local machine and it doesn’t send any data to the server. It’s compatible with es2015, es2016 and es2017 as well. You can install it by using the command like npm install javascript-obfuscator and then after installation, you can require the module in your scripts by typing in and using javascript-obfuscator which is quite simple.
+
+The obfuscator is free and open source which is written in TypeScript and it’s BSD-2-Clause licensed. You can see an online implementation of the module in many places online. You can get more information about the library in the official Github repository.
+
+## How To Use the Obfuscator
+
+The logic of this is very simple - obfuscating some piece of code with the module. You can create an instance of the module and then from that you can obfuscate the method that will expect the first argument of code that you want to deal with and obfuscate.
+
+This method returns what was obfuscated synchronously and through a series of variable/functions/arguments renaming and then the removing of the strings. Your source code will be transformed into something that is unreadable for other people and you as well but it will still work in the same way as it did before.
+
+Here’s an example:
+
+// Require the JavaScript obfuscator
+
+var JavaScriptObfuscator = require('javascript-obfuscator');
+
+// Obfuscate the code providen as first argument
+
+var obfuscationResult = JavaScriptObfuscator.obfuscate(`
+
+(function()&#123;
+
+var variable1 = '5' - 3;
+
+var variable2 = '5' + 3;
+
+var variable3 = '5' + - '2';
+
+var variable4 = ['10','10','10','10','10'].map(parseInt);
+
+var variable5 = 'foo ' + 1 + 1;
+
+console.log(variable1);
+
+console.log(variable2);
+
+console.log(variable3);
+
+console.log(variable4);
+
+console.log(variable5);
+
+&#125;)();
+
+`);
+
+// Display obfuscated result
+
+console.log(obfuscationResult.getObfuscatedCode());
+
+The obfuscator can later be customized if you give it the configuration object as the second argument in the obfuscate method.
+
+JavaScriptObfuscator.obfuscate(YourCode, &#123;
+
+compact: true,
+
+controlFlowFlattening: false,
+
+controlFlowFlatteningThreshold: 0.75,
+
+deadCodeInjection: false,
+
+deadCodeInjectionThreshold: 0.4,
+
+debugProtection: false,
+
+debugProtectionInterval: false,
+
+disableConsoleOutput: false,
+
+domainLock: [],
+
+log: false,
+
+mangle: false,
+
+renameGlobals: false,
+
+reservedNames: [],
+
+rotateStringArray: true,
+
+seed: 0,
+
+selfDefending: false,
+
+sourceMap: false,
+
+sourceMapBaseUrl: '',
+
+sourceMapFileName: '',
+
+sourceMapMode: 'separate',
+
+stringArray: true,
+
+stringArrayEncoding: false,
+
+stringArrayThreshold: 0.75,
+
+target: 'browser',
+
+unicodeEscapeSequence: false
+
+&#125;);
+
+You may also want to read the documentation in the library because the new options can appear. The repository can offer the presets and this can provide different feeling of different obfuscation levels. There is a special combination of options here as well. The better the obfuscation is, the slower this step is.
+
+Here’s an example of a high obfuscation:
+
+compact: true,
+
+controlFlowFlattening: true,
+
+controlFlowFlatteningThreshold: 1,
+
+deadCodeInjection: true,
+
+deadCodeInjectionThreshold: 1,
+
+debugProtection: true,
+
+debugProtectionInterval: true,
+
+disableConsoleOutput: true,
+
+log: false,
+
+mangle: false,
+
+renameGlobals: false,
+
+rotateStringArray: true,
+
+selfDefending: true,
+
+stringArray: true,
+
+stringArrayEncoding: 'rc4',
+
+stringArrayThreshold: 1,
+
+unicodeEscapeSequence: false
+
+&#125;
+
+It’s almost impossible to recover the original source code from the version that was obfuscated. However, if a person who takes your obfuscated code has enough time and invests a lot of effort, knowledge and patience in extracting the original code from this, they can reverse-engineer it which wouldn’t be a huge problem for them.
+
+You can do a custom obfuscation as well and provide a configuration object.
+
+Aimee Laurence is a web developer at
+
+*Research Papers Done*
+
+. She also creates courses on how to learn to code.

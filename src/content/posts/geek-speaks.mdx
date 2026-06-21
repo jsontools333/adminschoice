@@ -1,0 +1,46 @@
+---
+title: "Geek Speaks"
+description: "High Voltage Differential interface drives two lines for each SCSI signal."
+pubDate: 2009-12-29
+updatedDate: 2026-06-20
+pageType: guide
+topic: sysadmin
+tier: "TIER 2 (core reference)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+Geek Speaks - collection of previous geek speaks
+SE, HVD, LVD SCSI interfaces
+CIDR : Classless Inter-Domain Routing
+Priority Paging
+FSSTABLE
+umask
+Dynamic System Domains
+
+SE, HVD, LVD SCSI interfaces
+
+- Single Ended interface drives each signal line against ground & is susceptible to noise and has short length.
+High Voltage Differential interface drives two lines for each SCSI signal. One line is the inverse of the other line and the SCSI signal is the difference and hence term differential.
+Low Voltage Differential uses 3.3 volt logic which is 5V in HVD. Maximum cable lenth supported are from 1.5 to 6 meter in SE , 25 meters in HVD & 12 Meters in LVD.
+A multimode LVD device will automatically switch between LVD and single-ended operation by detecting whether the other devices on the chain are running in SE or LVD mode. SE & LVD are not electrically compatible to HVD due to voltage difference.
+
+CIDR
+
+: Classless Inter-Domain Routing - the notation often used instead of writing the subnet mask along with ip-address . It has network prefix at the end of a address as / number of network bits.This means that the IP address 192.200.20.10 with the subnet mask 255.255.255.0 can also be expressed as 192.200.20.10/24. The /24 indicates the network prefix length, which is equal to the number of continuous binary one-bits in the subnet mask (11111111.11111111.11111111.000000). Zeros are for addressing the hosts on this network.
+
+Priority Paging
+
+: Priority paging parameter in pre Solaris 8 versions allows file system cache in the memory to be paged out first leaving application and data in the memory . Free memory is used for caching file system in Pre Solaris 8 versions and paging in such cases sometimes led to paging out of application & data , making application experience a page-in page-out time delay.Solaris 8 keeps file cache isolated so it is not required there. This can be enabled in pre solaris 8 versions by adding line "set priority paging=1" in /etc/system. Remove this line if upgrading from Solaris 7 to 8 & retaining old /etc/system file.
+
+FSSTABLE
+
+: File System Stable state flag. The file system is (or was) mounted but has not changed since the last checkpoint (sync or fsflush) that normally occurs every 30 seconds. The kernel periodically checks if a file system is idle and, if so, flushes the information in the superblock back to the disk and marks it as FSSTABLE. If the system crashes, the file system structure is stable, but users might lose a small amount of data. File systems that are marked as FSSTABLE can skip the checking before mounting. The mount command will not mount a file system for read and write access if the file system state is not FSCLEAN, FSSTABLE, or FSLOG in case of logging file system
+
+umask
+
+- is the filter which determines the default file and directory permissions at the time of their creation . It is represented by 3 octal values representing permissions to be denied by default .First value is for user ,second for group and third for others permission .Default is 022 and set in /etc/profile .Current value can be seen by typing umask at command prompt
+
+Dynamic System Domains
+
+- the ability to create multiple (Solaris) systems within a single Enterprise 10000 chassis. The components which form a domain (system boards, CPU, memory and i/o) are electrically isolated from other domains to provide the protection between applications running in different domains. The hardware within domains can be reconfigured under software control to meet fluctuating demands of applications running within the domains of an Enterprise 10000

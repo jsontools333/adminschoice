@@ -1,0 +1,248 @@
+---
+title: "Crontab — Quick Reference"
+description: "The complete crontab reference: syntax, real-world examples, environment gotchas, and debugging. Tested on Linux, BSD, and macOS."
+pubDate: 2009-12-20
+updatedDate: 2026-06-20
+pageType: reference
+topic: scheduling
+readingTime: "9 min read"
+tier: "crown-jewel"
+tags: ["cron", "crontab", "scheduling", "automation"]
+testedOn: ["Ubuntu 24.04", "Debian 12", "RHEL 9", "macOS 14"]
+featured: true
+canonicalSlug: crontab-quick-reference
+---
+
+cron is the standard task scheduler on Unix-like systems — Linux, the BSDs,
+Solaris, and macOS. It runs commands automatically in the background at fixed
+intervals, driven by the **cron daemon**. This page is the complete reference:
+syntax, the most-copied expressions, the environment gotchas that cause most
+failures, and how to debug a job that won't run.
+
+<Callout type="tip" title="The fast path">
+Need the syntax right now? Jump to the [field reference](#the-five-fields) or the
+[most-copied examples](#most-copied-examples). Everything else is below for when
+a job misbehaves.
+</Callout>
+
+## What cron actually is
+
+**cron** is a daemon started at boot from your init system. The name comes from
+*chronos*, the Greek word for time. You can stop, start, or restart it through
+your service manager — `systemctl restart cron` on Debian/Ubuntu, or
+`systemctl restart crond` on RHEL/Fedora.
+
+A **crontab** (cron table) is the file that holds your scheduled entries. You
+never edit it directly — you use the `crontab` command, which validates your
+changes before installing them.
+
+## Crontab restrictions
+
+Whether you can use cron at all is controlled by two files:
+
+- If `/etc/cron.allow` exists, your username must be listed in it.
+- If only `/etc/cron.deny` exists, you can use cron unless you're listed in it.
+- If neither file exists, on most systems only root may use cron.
+
+The allow/deny files contain one username per line. (Older systems keep these
+under `/usr/lib/cron/`.)
+
+## Crontab commands
+
+Set your preferred editor first, then use the four core commands:
+
+```bash
+export EDITOR=vi    # or nano, emacs, etc.
+```
+
+| Command | What it does |
+|---------|--------------|
+| `crontab -e` | Edit your crontab (creates one if it doesn't exist) |
+| `crontab -l` | List the contents of your crontab |
+| `crontab -r` | Remove your crontab entirely |
+| `crontab -v` | Show when you last edited it (limited support) |
+
+To work with another user's crontab, add `-u`: `sudo crontab -u www-data -l`.
+
+## The five fields
+
+A crontab entry has five time fields followed by the command to run:
+
+```text
+* * * * * command
+│ │ │ │ │
+│ │ │ │ └─ day of week (0–6, Sunday = 0 or 7)
+│ │ │ └─── month (1–12)
+│ │ └───── day of month (1–31)
+│ └─────── hour (0–23)
+└───────── minute (0–59)
+```
+
+A `*` means "every valid value for this field." Beyond `*`, each field accepts:
+
+- **Lists** — `1,15,30` (these specific values)
+- **Ranges** — `9-17` (an inclusive range)
+- **Steps** — `*/15` (every 15th value)
+
+<Callout type="warning" title="Three things that trip up almost everyone">
+1. **Day-of-month and day-of-week are OR, not AND.** When *both* are restricted,
+the entry runs when *either* matches. `0 0 1 * 1` runs on the 1st of the month
+**or** any Monday — not only Mondays that fall on the 1st.
+2. **Step syntax like `*/2` isn't universal.** Some older crons reject it. If
+crontab complains, the implementation doesn't support it.
+3. **Escape `%` as `\%`.** An unescaped `%` is treated as a newline and silently
+truncates your command — this bites anyone using `date` formats in a cron line.
+</Callout>
+
+## Most-copied examples
+
+| Expression | Runs |
+|------------|------|
+| `* * * * *` | Every minute |
+| `0 * * * *` | Top of every hour |
+| `30 2 * * *` | Daily at 2:30 AM |
+| `0 9 * * 1-5` | Weekdays at 9:00 AM |
+| `0 0 1 * *` | First of every month, midnight |
+| `*/15 * * * *` | Every 15 minutes |
+
+A worked example — remove temp files every day at 6:30 PM:
+
+```bash
+30 18 * * * rm /home/someuser/tmp/*
+```
+
+### Every hour
+
+Keep the hour field as `*`. Set the minute to `0` to fire at the top of the
+hour, or any minute to offset it:
+
+```bash
+0 * * * * /path/to/script.sh     # top of every hour
+15 * * * * /path/to/script.sh    # 15 past every hour
+```
+
+### Every minute
+
+```bash
+* * * * * /path/to/script.sh
+```
+
+### Specific months or weekdays
+
+```bash
+# 00:30 on the 1st of January, June, and December
+30 0 1 1,6,12 * /path/to/script.sh
+
+# 8:00 PM every weekday in October
+0 20 * 10 1-5 /path/to/script.sh
+
+# Midnight on the 1st, 10th, and 15th of every month
+0 0 1,10,15 * * /path/to/script.sh
+```
+
+For 75+ ready-to-use recipes grouped by task — backups, monitoring, log
+rotation, business-hours patterns — see the
+[crontab examples cookbook](/crontab-examples/).
+
+## Crontab environment
+
+This is the single most common reason a job "works in my shell but not in cron."
+cron runs your command from your home directory under a **minimal environment**:
+
+```bash
+HOME=/home/your-user
+LOGNAME=your-user
+PATH=/usr/bin:/bin
+SHELL=/bin/sh
+```
+
+Note what's missing: cron does **not** source your `.bashrc`, `.profile`, or any
+shell startup file. No aliases, no functions, no custom `PATH`. Two consequences:
+
+1. **Use absolute paths for every command.** Find them with `which docker`,
+`which node`, etc. Tools in `/usr/local/bin` or `~/.local/bin` won't be found
+otherwise.
+2. **If you need your shell environment, source it explicitly** inside the script
+cron calls, or set `PATH=` and `SHELL=/bin/bash` at the top of the crontab.
+
+```bash
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+0 2 * * * /home/user/scripts/backup.sh
+```
+
+## Disable email
+
+By default cron emails the job's output to the local user. To silence it, set
+`MAILTO` to an empty string at the top of the crontab:
+
+```bash
+MAILTO=""
+```
+
+Set it to an address instead to route output somewhere you'll actually see it.
+
+## Generate a log file
+
+Redirect both stdout and stderr to a file so failures aren't silent:
+
+```bash
+*/5 * * * * /path/to/script.sh >> /var/log/myjob.log 2>&1
+```
+
+The `>>` appends; use `>` to overwrite each run. The `2>&1` sends stderr to the
+same place as stdout — and the order matters. `>> file 2>&1` captures both;
+`2>&1 >> file` does not. (For the full explanation, see
+[what `2>&1` means in shell](/what-does-2-1-mean-in-shell/).)
+
+## Crontab file location
+
+User crontabs are stored — but don't edit these directly, always use `crontab -e`:
+
+- **Debian / Ubuntu:** `/var/spool/cron/crontabs/`
+- **RHEL / CentOS / Fedora:** `/var/spool/cron/`
+- **System-wide:** `/etc/crontab` and the `/etc/cron.d/` directory
+
+Note that `/etc/crontab` and files in `/etc/cron.d/` use a **different syntax** —
+they add a username field between the time fields and the command:
+
+```bash
+# /etc/crontab — note the extra "root" field
+30 2 * * * root /path/to/script.sh
+```
+
+## Why isn't my cron job running?
+
+Work through these in order — the first three catch most failures:
+
+1. **Did cron fire it?** Check the log:
+   `journalctl -u cron --since "1 hour ago"` (or `-u crond` on RHEL). No entry
+   means the schedule is wrong or the crontab isn't installed for that user.
+2. **Did the command succeed?** Redirect output to a file (see above) and read it.
+3. **Is it the PATH problem?** See [Crontab environment](#crontab-environment) —
+   this is the usual culprit.
+4. **Is the script executable?** `chmod +x script.sh`, and confirm the shebang
+   line. Windows line endings (`\r\n`) break the shebang — fix with `dos2unix`.
+5. **Right user?** `crontab -e` edits the current user's crontab. Root's is
+   separate: `sudo crontab -l`.
+6. **The day-of-month / day-of-week trap?** See the warning above.
+
+For the full systematic walkthrough — SELinux, time zones, overlap prevention,
+and a copy-paste debug crontab — see the
+[complete cron debugging checklist](/cron-job-not-running/).
+
+## When not to use cron
+
+cron is the right tool for simple, time-based jobs. If you need more, modern
+alternatives are worth knowing:
+
+- **systemd timers** — dependency management, persistent jobs across reboots,
+  randomized delays, and journaled output. Native on most current Linux distros.
+- **Kubernetes CronJobs** — the same cron syntax, for containerized workloads,
+  with concurrency policies and history limits.
+- **Cloud schedulers** — AWS EventBridge Scheduler, GCP Cloud Scheduler, Azure
+  Logic Apps — for serverless workloads.
+
+Rule of thumb: if your job needs retries, monitoring, or dependencies on other
+jobs, you've outgrown cron.

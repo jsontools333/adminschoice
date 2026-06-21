@@ -1,0 +1,188 @@
+---
+title: "vi editor Quick Reference & Cheat Sheet"
+description: "Learn about the default text editor, vi, pronounced as \u201dvee eye\u201d, in Unix, Linux and other Unix like systems."
+pubDate: 2009-12-20
+updatedDate: 2026-06-20
+pageType: reference
+topic: shell
+tier: "TIER 2 (core reference)"
+tags: ["basics", "featured"]
+testedOn: ["Linux", "Unix"]
+---
+
+## Introduction
+
+Learn about the default text editor, vi, pronounced as ”vee eye”, in Unix, Linux and other Unix like systems. A short, concise vi quick reference lets you get started with vi today. Explains vi editor mode & vi commands with examples for editing in vi. Click to download and print
+
+```bash
+vi editor Cheat Sheet
+```
+
+in PDF format.
+
+In order to work correctly the vi need correct terminal type (TERM) setting depending on the type of terminal you have. Commonly used TERM types are vt100 , vt220 and ansi. In most cases vt100 will work fine. In case vi is not able to understand the TERM you have given, it starts in open mode giving you a line by line display .
+TERM's value is taken from .profile or /etc/profile but can be set at the command line as :
+$TERM=vt100
+$export TERM
+echo $TERM will display the current TERM set.
+
+## Modes in vi
+
+vi operates in following two modes :
+i.)
+
+Command Mod
+
+e: After a file is opened it is opened in command mode and input from the keyboard will be treated as vi commands, you will not see the words you are typing on the screen
+ii.)
+
+Insert Mode
+
+: vi enters in insert mode by pressing letter ‘i’ or ‘a’ and it will accept letter typed as input
+iii)
+
+Switch between vi mode
+
+: Press Esc key to swich modes, Esc -> i (text mode) -> Esc (command mode)
+
+## Following sections provide a vi quick referance to perform everyday tasks.
+
+1. [File Open/Save/Quit](#File)
+2. [Moving Around](#Moving)
+3. [Editing](#Editing)
+4. [Operations](#Operations)
+5. [Search/Replace](#Search)
+
+## File Open/Save/Quit
+
+| Command | Description |
+| --- | --- |
+| vi filename | Open or create file |
+| vi | Open new file to be named later |
+| vi -r filename | Recover crashed file |
+| view filename | Open file read-only |
+
+| Saving and Quitting |
+| --- |
+| :w | Save changes (write buffer) |
+| :w filename | Write buffer to named file |
+| :wq | Save changes and quit vi |
+| ZZ | Save changes and quit vi |
+| :q! | Quit without saving changes |
+
+## Moving Around
+
+| Moving Cursor in file |
+| --- |
+| h | Move one character left |
+| j | Move one line down |
+| k | Move one line up |
+| l | Move one character to right |
+| w | Move one word right |
+| W | Move one word (past punctuation) right |
+| b | Move one word left |
+| B | Move one word (past punctuation) left |
+| e | Move to of current word end |
+
+| Moving Cursor with keys |
+| --- |
+| Return/Enter key | Move down one line down |
+| Backspace | Move left one character left |
+| Spacebar | Move right one character right |
+
+| Moving on Screen |
+| --- |
+| H | Move to of screen top |
+| M | Move to middle of screen |
+| L | Move to bottom of screen |
+
+| Moving on Screen using ctrl key combination |
+| --- |
+| Ctrl-f | Page forward one screen forward |
+| Ctrl-d | Scroll forward one-half screen |
+| Ctrl-b | Page backward one screen |
+| Ctrl-u | Scroll backward one-half screen |
+
+## Editing
+
+| Insert Characters and Lines |
+| --- |
+| a | Insert characters right of cursor |
+| A | Insert characters end of line |
+| i | Insert characters left of cursor |
+| I | Insert characters beginning of line |
+| o | Insert line below cursor |
+| O | Insert line above cursor |
+
+| Text Change Operations |
+| --- |
+| cc | Change line |
+| cw | Change characters in a word or entire word right of cursor |
+| C | Change from cursor cursor to end of line |
+| s | Substitute string for character(s) from cursor forward |
+| r | Replace character with other character at cursor |
+| r Return | Break line at cursor |
+| J | Join to current line line below |
+| xp | Transpose character cursor and character to right |
+| ~ | Change case of letter to uppercase or lowercase at cursor |
+| u | Undo previous command |
+| U | Undo all changes to current line |
+| :u | Undo previous line command |
+
+| Delete Text in file |
+| --- |
+| x | Delete character at the cursor |
+| X | Delete character to the left of the cursor |
+| dw | Delete word (or part of word to right of cursor) |
+| dd | Delete line containing the cursor |
+| D | Delete part of line to right of cursor |
+| dG | Delete to end of file |
+| d1G | Delete from beginning of file to cursor |
+| :1,4 d | Delete lines 1 to 4 |
+
+| Copy and Move lines |
+| --- |
+| yy | Yank or copy current line |
+| 4yy | Copy 4 lines |
+| Y | Yank or copy line |
+| p | Put yanked or deleted line below current line |
+| P | Put yanked or deleted line above current line |
+| :1,2 co 3 | Copy lines 1-2 and put after line 3 |
+| :4,6 m 7 | Move lines 4-6 and put after line 7 |
+
+| Inserting a File Into a File |
+| --- |
+| :r filename | Insert (read) file after cursor |
+| :34 r filename | Insert file after line 34 |
+
+## Operations
+
+| Show/hide Line Numbers |
+| --- |
+| :set nu | Show line numbers for all lines |
+| :set nonu | Hide numbers for all line |
+
+| set/ignore case for search |
+| --- |
+| :set ic | Searches should ignore case |
+| :set noic | Searches should be case sensitive |
+
+| go to line |
+| --- |
+| G | Go to last line of file |
+| 1G | Go to first line of file |
+| 21G | Go to line 21 |
+
+| Clearing the Screen |
+| --- |
+| Ctrl-L | Clear screen of std-io messages | screen |
+
+## Search and Replace
+
+| Search and Replace |
+| --- |
+| /string | Search for string anywhere in file |
+| ?string | Search backward for string |
+| n | Find next occurrence of string in search direction |
+| N | Find previous occurrence of string in search direction |
+| :%s/search/s/replace/g | Search and replace in file |

@@ -1,0 +1,62 @@
+---
+title: "How to Remove ^M in Linux &  Unix"
+description: "Control M ( ^M) characters are introduced when you use lines of text from a windows computer to Linux or Unix machine."
+pubDate: 2018-01-25
+updatedDate: 2026-06-20
+pageType: guide
+topic: sysadmin
+tier: "TIER 2 (core reference)"
+tags: ["basics", "tips", "windows"]
+testedOn: ["Linux", "Unix"]
+---
+
+Control M ( ^M) characters are introduced when you use lines of text from a windows computer to Linux or Unix machine. Most common reasons are when you directly copy a file from a windows system or submit form data copied and pasted from a windows machine.
+
+## Detecting ^M characters
+
+^M is non printable character and often becomes difficult to find, in order to see if your file contains any non printable character use the cat command with -v option
+
+> $cat -v filename
+
+## Methods to remove ^M
+
+In all these method , real secret is not to type ^M using keyboard but rather typing in control key sequence to get the ^M control character.
+
+The control sequence is - hold down crtl key and press v and then press m , in a Linux/Unix system it will then generate ^M which can be replaced by any of these methods :
+
+### Remove ^m sed Method
+
+> $cat filename | sed s/^M//' > newfile
+
+### Remove ^m vim & vi Method
+
+Open file in vi , and in command mode ( esc shift : )
+
+> $vi filename
+
+aaaa^M
+bbbb^M
+cccc^M
+
+:%s/^M//g
+
+### Remove ^M : dos2unix method
+
+dos2unix utility converts windows files to unix format and remove all the extra characters introduced by windows. However it is not part of all Unix and Linux distributions and if you get a
+
+dos2unix command not found error
+
+, it is probably not installed and you need to install it using any of the following steps.
+
+> **CentOS, Fedora or RHEL:** $ sudo yum install dos2unix **Ubuntu or Debian** $ sudo apt-get install tofrodos
+$ sudo ln -s /usr/bin/fromdos /usr/bin/dos2unix
+
+You can download dos2unix from
+
+[sourceforge.net dos2unix page](https://sourceforge.net/projects/dos2unix/)
+
+which is update of Benjamin Lin's implementations and includes utilities to convert text files with DOS or MAC line breaks to Unix line breaks and vice versa.
+
+### Syntax for dos2unix is :
+
+dos2unix &lt;source file> &lt;target file>

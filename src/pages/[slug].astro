@@ -1,0 +1,21 @@
+---
+import { getCollection } from 'astro:content';
+import GuideLayout from '../layouts/GuideLayout.astro';
+import ReferenceLayout from '../layouts/ReferenceLayout.astro';
+import Callout from '../components/Callout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await post.render();
+const Layout = post.data.pageType === 'reference' ? ReferenceLayout : GuideLayout;
+---
+<Layout frontmatter={post.data} headings={headings}>
+  <Content components={{ Callout }} />
+</Layout>

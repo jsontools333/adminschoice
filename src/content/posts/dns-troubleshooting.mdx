@@ -1,0 +1,88 @@
+---
+title: "DNS Troubleshooting"
+description: "DNS troubleshooting , this article describes some of the common dns problems and their solutions."
+pubDate: 2009-12-20
+updatedDate: 2026-06-20
+pageType: guide
+topic: networking
+tier: "TIER 2 (core reference)"
+tags: ["basics", "dns", "featured", "tips"]
+testedOn: ["Linux", "Unix"]
+---
+
+DNS troubleshooting , this article describes some of the common dns problems and their solutions.
+First phase of article describes dns errors relating to configuration , server setup and its basic functionality . Second phase talks about the nslookup related errors when the dns servers seems to be working correctly but names resolution fail .
+
+A. Configuration problems
+
+1) named fail to start
+2) Trailing dots
+3) Serial No. & Refresh Time
+4) Cname
+
+B. nslookup related errors
+
+1) No response from server.
+2) No Record is available.
+3) No Information.
+4) Unspecified Error
+5) Query Refused
+
+Configuration problems
+
+1. name server daemon - named fail to start
+
+This happens generally when the syntax in the configuration file is not correct . the named daemon will try to read named.conf file and if comes across any error it will abort and come out without starting named.
+start the named in debug mode ( #named -d )and look the output in the debug file - default is named.run. There are different debug level which can be used depending upon the nature of problem.
+It is always better to double check the configuration files for syntax etc. to avoid problems later on.
+
+2.Trailing dots
+
+Current domain name is automatically appended to the entries in the master data file. This might be correct for a entry like www to be read as www.yourdomain.com but it will be incorrect if www.yourdomain.com entry is read as www.yourdomain.com.yourdomain.com .So to avoid appending domain name a trailing dot is put on such names .
+
+3. Serial Number & Refresh time
+
+Serial number must be incremented after a change is made to zone file of a master server. The serial number is checked by the secondary dns server. After refresh time is over the transfer of zone files takes place only if serial number is incremented.
+Refresh time depends on the frequency of changes made to dns servers data and is in seconds.
+
+4. CNAME
+
+A CNAME record is not allowed to coexist with any other data record. The DNS server finds the cname entry & it ignores other entries .In the example below NS entries are ignored .
+
+```bash
+dnsserver      IN NS     ns1
+                   IN NS     ns2    
+                   IN CNAME  dnsmain
+dnsmain        IN A      10.20.30.40
+ 
+correct representation would be :-
+dnsserver      IN NS    ns1
+                   IN NS    ns2
+                   IN  A    10.20.30.40
+dnsmain        IN  A    10.20.30.40
+```
+
+nslookup related errors
+
+nslookup is very important troubleshooting tool & following are some of the most common problems.
+
+1. No Response from Server
+
+If nslookup does not give this response even for the local host name then it is possible that DNS server itself is not running. Check the named process and restart it in debug mode for clues about the problems .
+
+2. No record available
+
+This indicates that the default records types are not available in the target dns server. A better way would be to look for all type of records by mentioning "set type=any" in nslookup.
+
+3. No information
+
+nslookup did tried to find a host of the specified name but the name server did not have any information about that in its data files .
+Check spellings & trailing dots in data files of DNS server
+
+4. Unspecified error
+
+This is mainly caused when number of NS records exceeds the capacity of datagram packet so don't put too many NS records for a domain.
+
+5. Query Refused
+
+This can be caused due to security related options in configuration file. Make sure the network of nslookup host is mentioned in allow-transfer statement and also the address 127.0.0.1 if nslookup is being run on name server as host.

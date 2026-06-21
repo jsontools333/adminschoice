@@ -1,0 +1,328 @@
+---
+title: "find command : Top 14 Ways to find files in Unix and Linux"
+description: "This is the most common test in find command where full or partial file name is known."
+pubDate: 2021-02-01
+updatedDate: 2026-06-20
+pageType: guide
+topic: shell
+tier: "TIER 2 (core reference)"
+tags: ["basics", "top list"]
+testedOn: ["Linux", "Unix"]
+---
+
+find command can find files based on many file attributes besides just the file name here are 14 ways to find files in your Unix and Linux system when you don't have complete file information but only few clues to find it.
+
+find command is one of the important command in Unix and Linux used to locate the program, text, data , log config files for execution, viewing, editing renaming deleting etc.
+
+here are 14 ways to find files in your Unix and Linux system based on available file attribute or name information.
+
+Some Basic information about find command :
+
+Usage
+
+: find [path...] [expression]
+
+- default path is the current directory
+- default expression is -print, to print the output
+- Expression may consist of operators, options, tests, and actions.
+
+Numeric arguments can be specified as
+
+- +n for greater than number n ,
+- -n for less than number n,
+- n for exactly number n.
+
+Here are the 15 Ways to find files in Unix and Linux
+
+## By file name
+
+This is the most common test in find command where full or partial file name is known. Wild cards are accepted.
+
+-name pattern
+
+> Searches the base file names by removing directory names and slashes. ***find /var/log -name myserver*.log*** ; finds all files beginning with myserver and anything after that and ending in .log extension in /var log dir.. Case sensitive match.
+
+-iname pattern
+
+```bash
+find /var/log -name myserver*.log ; finds all files beginning with myserver and anything after that and ending in .log extension in /var log dir.. Case in-sensitive match. Ignoring case match for a pattern
+```
+
+## Using User/group identification
+
+-uid n
+
+> File's numeric user ID is n. ***find /home -uid 2001*** ; finds files belonging to user id 2001;
+
+-user uname
+
+> File is owned by user uname (numeric user ID allowed). ***find /home -user james*** ; find files with user james ***find /home -user 112*** ; Find files with uid 112
+
+-nouser
+
+> No user corresponds to file's numeric user ID.
+
+File does not belong to any configured users. ***find /home -nouser***
+
+-gid n
+
+```bash
+find files where file's numeric group ID matches n. find /home -gid 2002
+```
+
+-group gname
+
+```bash
+find files where file's group name or ID matches with gname. find /var -group admins ; find file with group name name admin in /var dir. find /var -group 2002 ; find files with group id 2002 in /var dir.
+```
+
+-nogroup
+
+> No group corresponds to file's numeric group ID.
+
+File does not belong to any configured groups . ***find -nogroups ;** find files in current dir which does not belong to any known group.*
+
+## By file Modified time
+
+-mmin n
+
+```bash
+find files where file was last modified n minutes ago. find /tmp -mmin 2 ; finds files modified 2 minutes ago in /tmp dir.
+```
+
+-mtime n
+
+```bash
+find files where file was last modified n*24 hours ago find -mtime 1 ; finds files modified 24 hours ago in current dir. ; no fractional calculation, a +1 or 2 means 24 hrs ago.
+```
+
+-newer file
+
+```bash
+find files which was modified more recently than file.for symbolic link the modification time of the file it points to is used. find -newer test.log ; finds files which were updated/modified after test.log file in the current dir..
+```
+
+## Using last accessed time :
+
+-amin n
+
+> Find file which was last accessed n minutes ago where access time is newer then modified time. ***find /home/james -amin 5*** ; file was accessed 5 minutes ago in /home/james dir.
+
+-anewer file
+
+> Finds files where Access time is newer then modified time,for symbolic link the access time of the file it points to is used. ***find -anewer httpd.com*** ; find files accessed after httpd.conf file.
+
+-atime n
+
+> Finds files which were accessed in last n*24 ago. any fractional part is ignored, so to match -atime +1( More than 24 hrs ) a file has to have been accessed at least two days ago. ***find -atime 3 ; finds files acccessed 72 hrs ago ( 3*24 )***
+
+## Using File Status Change time
+
+file's status Change time is newer than its modified time
+
+-cnewer file
+
+> finds files where file's status Change time is newer than its modified time , for symbolic link the access time of the file it points to is used. ***find -cnewer server.xml ;** lists files whose status( permissions/owner/group) was changed after server.xml in the current dir.*
+
+-ctime n
+
+```bash
+find files whose status changed time in last n*24 ago. any fractional part is ignored. find -ctime 2 ; finds files whose status was changed 48 hrs ago ( 2*24 )
+```
+
+-cmin n
+
+```bash
+find files whose status changed time n minutes ago. find -cmin 8 ; finds files whose status was changed 8 minutes ago.
+```
+
+-used n
+
+File was last accessed n days after its status was last changed.
+
+```bash
+find -used 1 ; finds file accessed after a day of its status change.
+```
+
+## Based on file Type
+
+-empty
+
+```bash
+find file empty file whicg is a regular file or a directory and not special device files which zero byte files. find -empty ; find 0 byte files in the current dir.
+```
+
+### -executable
+
+> Matches files which are executable and directories which are
+searchable (in a file name resolution sense). May not give correct results for NFS mounts which do UID
+mapping (or root-squashing) ***find /home/abc -execuatble ;** list files with execute bit set ion /home/abc dir. .*
+
+-readable
+
+> Matches files which are readable. May not give correct results for NFS mounts. ***find -readable*** ; find files with read bit set in current dir. .
+
+-writable
+
+> Matches files which are writable. May not give correct results for NFS mounts. ***find -writable*** ; list files with write bit set in current dir..
+
+## By file type
+
+-type &lt;file type>
+
+> Find files with following file types b block (buffered) special c character (unbuffered) special d directory p named pipe (FIFO) f regular file s socket D door (Solaris) ***find /dev . -type c ;*** *finds character device file* *in /dev dir.* ***find /dev -type b ;*** *finds block device files. in /dev dir.*
+
+To search for more than one type at once, you can supply the
+combined list of type letters separated by a comma `,' (GNU
+extension).
+
+## Using File Permissions
+
+-perm mode
+
+```bash
+find files with that matches exactly the file's permission bits mode specified in octal or symbolic notation. find -perm g=w ; only match files only group write permission set. Helpful if you are looking for very specific permissions. Multiple permissions can be specified using comma like perm g=w,o=x,o=r find . -perm -444 finds files which are writable by all in current dir.
+```
+
+-perm -mode
+
+> - option with mode match files with permission besides any other permissions ***find -perm -g=w or*** ; **find . -perm -444** It matches all files with write and other permissions ,You must specify `u', `g' or `o' if you use a symbolic mode.
+
+-perm /mode
+
+> / option with mode match files with permission besides any other permissions **find . -perm /555** , Search for files which are executable by their owner, or their group, or
+others.
+Other example **find . -perm /550** **find . -perm /u+x,g+x** **find . -perm /u=x,g=x**
+
+## Using File size
+
+-size n[cwbkMG]
+
+> File uses n units of space, rounding up. The following
+suffixes can be used:
+
+- `b' for 512-byte blocks (this is the default if no suffix
+is used)
+- `c' for bytes
+- `w' for two-byte words
+- `k' for Kibibytes (KiB, units of 1024 bytes)
+- `M' for Mebibytes (MiB, units of 1024 * 1024 = 1048576
+bytes)
+- `G' for Gibibytes (GiB, units of 1024 * 1024 * 1024 =
+1073741824 bytes)
+
+The + and - prefixes indicate size greater than and less than and the size is rounded up to the next unit.
+
+```bash
+find -size 1M ; Matches files with size up to 1 MB find -size -1M ; Matches files with size less than 1 MB, matches all files up to zero byte size. find -size +1M ; Matches files with size more than 1 MB
+```
+
+## By path name
+
+-ipath pattern
+
+case-insensitive path match
+
+-path pattern
+
+> - path matches File name that matches path arguments, it matches shell pattern & can use wild cards . **find . -path "./sr*sc";** will print an entry for a directory called `./src/misc' (if exists).
+
+To ignore a whole directory tree from the path , use -prune fter the directory name to be omitted. -o option omits printing for the excluded directory. **find . -path ./src/emacs -prune -o -print**
+
+## By number of hard & soft links
+
+-links n
+
+```bash
+find files with n hard links. find -links 10 ; find file with 10 links in current dir.
+```
+
+-lname pattern
+
+> finds files with specified symbolic link pattern **find -lname "*yum*"** ; shows file links with file having yum word .
+
+## By Inode number
+
+-inum n
+
+```bash
+find files with inode number n. find -inum 655541 ; finds files with inode number 655541
+```
+
+## File System type
+
+-fstype type
+
+> Find files on a particular file systems of the specified type like, ext, ext3 , ufs, 4.2, 4.3, nfs, tmp, mfs, S51K, S52K. **find / -name abc.conf -fstype ext3 ;** Trys to finds a file abc.conf on ext3 file system.
+
+## Using regex pattern
+
+-regex pattern
+
+> File name matches regular expression pattern. This is a match
+on the whole path, not just file name. **find /lib -regex '.*lib.*3'** ; finds file name ending in 3 and matching path or file name with word lib.
+
+-iregex pattern
+
+> Like -regex, but the match is case insensitive. **find /lib -regex '.*lib.*3'** ; matches file name ending in 3 and matching path or file name with case insensitive match for word lib matches LIB , Lib.
+
+## Find command actions:
+
+for all the files found by in any of the examples the default action is to print the name , however you can specify any of the following action instead of print
+
+-delete
+
+; deletes found file ;
+
+*find /tmp/*.log -delete* ,
+
+delete log files from /
+
+tmp
+
+-print0
+
+; print the full file name on the standard output, followed by a null
+character (instead of the newline character that -print uses)
+
+-prune
+
+; exclude the input directory from results. Example :
+
+find . -path ./src/emacs -prune -o -print
+
+-exec COMMAND &#123;&#125; \;
+
+```hcl
+execute a command on the find results,
+
+Example :  find -name a*.log -exec rm -f {} \;   Removes the a*.log find resulting file named.  Another option is to pipe find output to xargs followed by commands .
+
+for example
+
+find *.log | xargs ls -l  ,  to list full file information.
+
+find /tmp -name core -type f -print | xargs /bin/rm -f  ; delete the core file in /tmp dir.
+```
+
+```bash
+find command operators
+```
+
+(decreasing precedence; -and is implicit where no others are given):
+( EXPR ) ! EXPR -not EXPR EXPR1 -a EXPR2 EXPR1 -and EXPR2
+EXPR1 -o EXPR2 EXPR1 -or EXPR2 EXPR1 , EXPR2
+
+Find command positional options
+
+(always true): -daystart -follow -regextype
+
+Find command normal options
+
+(
+
+always true, specified before other expressions
+
+):
+-depth --help -maxdepth LEVELS -mindepth LEVELS -mount -noleaf
+--version -xdev -ignore_readdir_race -noignore_readdir_race

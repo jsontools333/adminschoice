@@ -1,0 +1,108 @@
+---
+title: "Booting Problems & Solutions in Solaris"
+description: "Booting problems poses serious challenge to the system administrators as system is down and no one can use it ."
+pubDate: 2009-12-20
+updatedDate: 2026-06-20
+pageType: guide
+topic: legacy
+tier: "TIER 4 (Solaris/legacy Unix)"
+tags: ["boot", "install"]
+testedOn: ["Linux", "Unix"]
+---
+
+Booting problems poses serious challenge to the system administrators as system is down and no one can use it . This article tries to cover some of the general booting problems and their possible solutions to enable understand the problem cause and bring the system up very quickly.
+
+Following are some of the booting issues ,error messages their meaning and possible solutions discussed in this article.
+
+1. Booting in single user mode and mounting root disk
+2. Making boot device alias
+3. Timeout waiting for ARP/RARP packet"? error message
+4. The file just loaded does not appear to be executable - error message
+5. bootblk: can't find the boot program - error message
+6. boot: cannot open kernel/unix - error message
+7. Error reading ELF header? - error message
+8. Cannot open /etc/path_to_inst error message
+9. Can't stat /dev/rdsk/c0t3d0s0 error message
+
+## Booting in single user mode and mounting root hard disk
+
+Most important step in diagnosing the booting problems is booting the system in single user mode and examining the hard disk for possible errors & work out the corrective measure. Single user mode can be achieved by any of the following methods :-
+
+> ok> boot -s ;from root disk
+ok> boot net -s ;from network
+
+ok>boot cdrom -s ;from cdrom
+
+Rebooting with command: cdrom -s
+Configuring the /devices directory
+Configuring the /dev directory |
+INIT: SINGLE USER MODE
+#
+# fsck /dev/rdsk/c0t3d0s0
+# mount /dev/dsk/c0t3d0s0 /mnt
+
+Perform the required operation on mounted disk , now accessible through /mnt ,& unmount the hard disk after you are done ;
+
+> # umount /mnt
+# reboot
+
+## Making boot device alias
+
+In case system can not boot from primary disk and it is needed to make another boot disk to access the data , nvalias command is used .
+nvalias command makes the device alias and assigns an alternate name to a physical disk. Physical address of target disk is required which can be had by show-disk command on ok>.
+
+> ok> nvalias disk7 /iommu@f,e0000000/sbus@f,e0001000/dma@3,81000/esp@3,80000/sd2,0
+The new aliased disk can be named as boot disk or can be used for booting by refering its name .
+ok> setenv boot-device disk7
+ok>reset
+or
+ok> boot disk7
+
+## Timeout waiting for ARP/RARP packet ?
+
+At ok> type printenv and look for these parameters .
+
+> boot-device disk
+mfg-switch? false
+diag-switch? false
+
+if you see "boot-device net " or true value for the other two parameter change it to the values above.
+In case you wants to boot from network make sure your client is properly configured in boot server and network connections & configuration are proper.
+
+## The file just loaded does not appear to be executable
+
+Boot block on the hard disk is corrupted .Boot the system in single user mode with cdrom and reinstall boot block .
+
+> #installboot /usr/platform/`uname -i`/lib/fs/ufs/bootblk /dev/rdsk/c0t3d0s0
+
+## bootblk: can't find the boot program
+
+boot block can not find the boot programe - ufsboot in Solaris .Either ufsboot is missing or corrupted . In such cases it can be restored from the cdrom after booting from cdrom & mounting the hard disk
+
+> # cp /platform/`uname -i`/ufsboot /mnt/platform/`uname -i`
+
+## boot: cannot open kernel/unix
+
+Kernel directory or unix kernel file in this directory is not found .Probably deleted during fsck or deleted by mistake. Copy it from the cdrom or restore from the backup tape.
+
+> # cp /platform/`uname -i`/kernel/unix /mnt/platform/`uname -i`/kernel
+
+## Error reading ELF header ?
+
+Kernel directory or unix kernel file in this directory is corrupted.Copy it from the cdrom or restore from the backup tape.
+
+> # cp /platform/`uname -i`/kernel/unix /mnt/platform/`uname -i`/kernel
+
+## Cannot open /etc/path_to_inst
+
+System can not find the /etc/path_to_install file .It might be missing or corrupted and needs to be rebuild.
+To rebuild this file boot the system with -ar option :
+
+> ok>boot -ar
+Press enter to select default values for the questions asked during booting and select yes to rebuild /etc/path_to_install
+The /etc/path_to_inst on your system does not exist or is empty. Do you want to rebuild this file [n]? y
+system will continue booting after rebuilding the file.
+
+## Can't stat /dev/rdsk/c0t3d0s0
+
+When booted from cdrom and done fsck the root partition comes out to be fine but on booting from root disk this error occurs. The device name for / is missing from /dev/dsk directory and to resolve the issue /dev & /devices directories has to be restored from root backup tapes .

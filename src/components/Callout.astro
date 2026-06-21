@@ -1,0 +1,13 @@
+---
+const { type = 'info', title } = Astro.props;
+const icon = {
+  info: '\u2139',      // info
+  tip: '\u2728',       // sparkle
+  warning: '\u26A0',   // warning triangle
+}[type] || '\u2139';
+const cls = type === 'warning' ? 'callout callout--warning' : 'callout';
+---
+<aside class={cls}>
+  {title && <div class="callout-title"><span aria-hidden="true">{icon}</span>{title}</div>}
+  <slot />
+</aside>

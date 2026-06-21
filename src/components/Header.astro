@@ -1,0 +1,19 @@
+---
+const nav = [
+  { label: 'Reference', href: '/topics/' },
+  { label: 'DevOps', href: '/topics/devops/' },
+  { label: 'Python', href: '/topics/python/' },
+  { label: 'Tools', href: '/topics/tools/' },
+];
+---
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="wordmark" href="/" aria-label="Admin's Choice home">
+      <span class="wordmark__name">Admin's Choice</span>
+      <span class="wordmark__rule" aria-hidden="true"></span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,380 @@
+---
+title: "Solaris Network Configuration"
+description: "Learn Solaris Network configuration for static , dhcp & wifi in Solaris 11 using netadm and ipadmp."
+pubDate: 2017-01-29
+updatedDate: 2026-06-20
+pageType: guide
+topic: networking
+tier: "TIER 4 (Solaris/legacy Unix)"
+tags: ["network"]
+testedOn: ["Linux", "Unix"]
+---
+
+Learn Solaris Network configuration for static , dhcp & wifi in Solaris 11 using netadm and ipadmp. Earlier versions are covered towards the end of this document. Continue reading for Solaris 11 & for prior versions, please turn to
+
+Page 5
+
+or
+
+click here
+
+## Solaris 11 Network Configuration
+
+here is the step for network configuration in Solaris 11 for configuring a static ipaddress and dhcp.
+This document covers following topics
+
+1. [Obsolete network files in Solaris 11](#Obsolete files)
+2. [MAC address conflict Resolution](#MAC address conflict Resolution)
+3. [Configure Network configuration Profiles (NCP) in Solaris 11](/solaris-network-configuration/) [Configure static ipaddress in Solaris 11](/solaris-network-configuration/) [dhcp configuration in Solaris 11](/solaris-network-configuration/)
+4. [Configuring Wireless Access for WiFi network in Solaris 11](/solaris-network-configuration/)
+5. [Troubleshooting Solaris 11 network
+interfaces](/solaris-network-configuration/)
+6. [Solaris Network configuration for earlier Solaris versions.](/solaris-network-configuration/)
+
+### Obsolete network files in Solaris 11
+
+Following network related files have become obsolete and replaced by Service managment Framework to manage and configure networks
+
+> /etc/defaultdomain
+/etc/dhcp.*
+/etc/hostname.*
+/etc/hostname.ip*
+/etc/nodename
+/etc/nsswitch.conf
+
+### MAC address conflict Resolution
+
+If the inteface cards are added manually later on in new system, they will use system MAC address and it is possible that multiple devices will have same MAC address .
+
+To address this and provide a unique mac address to each interface fiollow these steps
+
+#### Check if eeprom setting allows local mac address
+
+> # eeprom local-mac-address?
+local-mac-address?=false
+
+#### Change it to allow local mac address
+
+> # eeprom local-mac-address?=true
+
+#### List the interface and its mac address
+
+> # dladm show-linkprop -p mac-address
+
+#### Change mac address of the device have duplicate mac address
+
+> # dladm set-linkprop -p mac-address=06:05:04:03:02 net0
+
+NEXT PAGE -
+
+Configure Network configuration Profiles (NCP) in Solaris 11
+
+### Configure Network configuration Profiles (NCP) in Solaris 11
+
+Solaris 11 uses Network configuration Profiles to manage network setting
+
+1. 'Automatic' Network configuration Profiles is used for dynamic ip address configuration using DHCP
+2. 'DefaultFixed' Network configuration Profiles is used for static ip address configuration and it needs manually specification of ipaddress details.
+
+### i Configure static ipaddress in Solaris 11
+
+#### List Current profiles status
+
+> # netadm list
+TYPE PROFILE STATE
+ncp Automatic online
+ncp DefaultFixed disabled
+loc Automatic online
+loc NoNet offline
+loc DefaultFixed disabled
+
+#### In this case dhcp is configured so we have to disable Automatic NCP and enable DefaultFixed NCP
+
+> #netadm disable -p ncp Automatic
+#netadm enable -p ncp DefaultFixed
+
+#### Run dladm to find which device is up and available for ip configuration
+
+> # dladm show-phys
+LINK MEDIA STATE SPEED DUPLEX DEVICE
+net0 Ethernet up 100Mb full bge0
+
+dladm command without arguments can also be used but dladm show-phys shows device information also which ensures we are configuring correct device.
+
+> # dladm
+LINK CLASS MTU STATE OVER
+net0 phys 1500 up --
+
+#### Create new ipaddress for net0 interface ( net0 is the name of interface to be configured found by above commands )
+
+> #ipadm create-ip net0
+
+For Static Ip address
+
+> #ipadm create-addr -T static -a local=192.168.1.110/24 net0/v4
+
+For DHCP use
+
+> # ipadm create-addr -T dhcp net0
+
+Address object v4 is automatically added tag for IPv4 and v6 for IPv6 . for multiple intefaces it is named as net0/v4, net0/v4a, net0/v4b, net0/v6, net0/v6a. You can specify your own 32 character name like net0/external1 , net0/Internal2 etc.
+
+Find out the config and link state
+
+> # ipadm
+NAME CLASS/TYPE STATE UNDER ADDR
+lo0 loopback ok -- --
+l0/v4 static ok -- 127.0.0.1/8
+net0/v4 static ok -- 192.168.1.110/24
+
+#### Add Default route to allow it to communicate with others
+
+> # route -p add default &lt; your own router ip address >
+
+6. Add ip in /etc/hosts to give it a name
+# vi /etc/hosts
+# Internet host table
+# 127.0.0.1 localhost
+192.168.1.110 prodhost01
+
+### ii dhcp configuration in Solaris 11
+
+For dhcp process is same as static ip cobnfiguration except change in few commands
+
+#### Enable dchp network Configuration Profile
+
+if DefaultFixed is enabled, disable it and enable Automatic NCP
+
+> #netadm disable -p ncp DefaultFixed
+#netadm enable -p ncp Automatic
+
+#### Find network interface & define dhcp as protocol for net0 interface
+
+> # dladm show-phys
+LINK MEDIA STATE SPEED DUPLEX DEVICE
+net0 Ethernet up 100Mb full bge0
+
+# ipadm create-addr -T dhcp net0
+
+#### Check status using ipadm, the class/type will be shown as dhcp
+
+> # ipadm
+NAME CLASS/TYPE STATE UNDER ADDR
+lo0 loopback ok -- --
+l0/v4 static ok -- 127.0.0.1/8
+net0/v4 dhcp ok -- 192.168.1.114/24
+
+#### Add Default route to allow it to communicate with others
+
+> #route -p add default &lt; your own router ip address >
+
+To delete the existing route if needed
+
+> #route -p delete default 192.168.1.1
+
+NEXT PAGE -
+
+Configuring Wireless Access for WiFi network in Solaris 11
+
+### Configuring Wireless Access for WiFi network in Solaris 11
+
+First scan on the wireless interface wpi0 to get wireless network information.
+
+> #netadm scan-wifi wpi0
+
+> Choose WLAN to connect to from the list of ESSIDs
+# netadm select-wifi wpi0
+1: ESSID sunwifi BSSID 0:b:e:3f:c5:80
+2: ESSID sunwifi BSSID 0:b:e:39:1f:80
+3: Other
+Choose WLAN to connect to [1-3]: 1
+#
+
+if ESSID broadcast is diabled, choose others from the selection to use a custom ESSID
+
+> # netadm select-wifi wpi0
+1: ESSID sunwifi BSSID 0:b:e:3f:c5:80
+2: ESSID sunwifi BSSID 0:b:e:39:1f:80
+3: Other
+
+Choose WLAN to connect to [1-3]: 3
+
+Enter WLAN name: mywifi
+1: None
+2: WEP
+3: WPA
+Enter security mode: 2
+
+Enter WLAN key for ESSID mywifi 123456
+
+Enter key slot [1-4]: 1
+#
+
+NEXT PAGE -
+
+Troubleshooting Solaris 11 network intefaces
+
+### Troubleshooting Solaris 11 network intefaces
+
+#### List network config events in verbose mode to see changes in the state
+
+> $ netadm show-events -v
+EVENT DESCRIPTION
+OBJECT_ACTION ncp Automatic -> action enable
+OBJECT_STATE ncp Automatic -> state online, active
+OBJECT_STATE ncu link:net0 -> state offline*, (re)initialized but not config
+...
+OBJECT_STATE ncu interface:net0 -> state offline*, waiting for IP address to
+....
+OBJECT_STATE loc NoNet -> state offline*, method/service executing
+....
+IF_STATE net0 -> state flags 1004843 addr 10.153.125.198/24
+....
+OBJECT_STATE loc Automatic -> state offline*, method/service executing
+....
+
+#### Check on intefrace link state with eXtented stats , offline generally is connection or cable problem
+
+> $ netadm list -x
+TYPE PROFILE STATE AUXILIARY STATE
+ncp DefaultFixed offline disabled by administrator
+...
+ncu:phys net0 offline interface/link is down
+....
+loc DefaultFixed offline conditions for activation are unmet
+$
+
+#### Show inteface and its st
+
+ate
+
+> # ipadm show-if
+IFNAME CLASS STATE ACTIVE OVER
+lo0 loopback ok yes --
+net0 ip ok yes --
+
+#### Show ip address , type & status of network interface
+
+For all intefaces
+
+> # ipadm show-addr
+ADDROBJ TYPE STATE ADDR
+lo0/v4 static ok 127.0.0.1/8
+net0/v4 static ok 192.168.1.114/24
+
+for selected Inteface
+
+> # ipadm show-addr net0
+ADDROBJ TYPE STATE ADDR
+net0/v4 static ok 192.168.1.114/24
+net0/v4a static ok 10.0.1.1/24
+
+#### Show inteface properties with MTU details
+
+> # ipadm show-ifprop -p mtu net0
+IFNAME PROPERTY PROTO PERM CURRENT PERSISTENT DEFAULT POSSIBLE
+net0 mtu ipv4 rw 1500 -- 1500 68-1500
+
+#### Show interface properties
+
+# ipadm show-addrprop net0/v4
+ADDROBJ PROPERTY PERM CURRENT PERSISTENT DEFAULT POSSIBLE
+net1/v4 broadcast r- 192.168.1.255 -- 192.168.1.255 --
+net1/v4 deprecated rw off -- off on,off
+net1/v4 prefixlen rw 24 24 24 1-30,32
+net1/v4 private rw off -- off on,off
+net1/v4 transmit rw on -- on on,off
+net1/v4 zone rw global -- global --
+
+NEXT PAGE -
+
+Solaris Network configuration for earlier Solaris versions
+
+## Solaris Network Configuration for version older than Solaris 11
+
+Topics covered :
+1. Enable the network card
+2. Configuring ipaddress and netmask and making the interface status as up .
+3. Configuring Virtual interface :
+4. Ip-forwarding
+5. Router Configuration
+6. Network Terms
+7. Next Steps
+
+Ifconfig command is used in Solaris to configure the network interfaces . The following lines describes the activities needed to configure a freshly installed network card from the root prompt .
+
+### Enable the network card
+
+#ifconfig hme0 plumb
+
+ifconfig -a command should show following type of output which means device is enabled and is ready to configure ip address and netmask :
+
+hme0: flags=842&lt;BROADCAST,RUNNING,MULTICAST> mtu 1500
+inet 0.0.0.0 netmask 0
+ether 3:22:11:6d:2e:1f
+
+### Configuring ipaddress and netmask and making the interface status as up
+
+.
+
+#ifconfig hme0 192.9.2.106 netmask 255.255.255.0 up
+
+#ifconfig -a will now show the ip address , netmask and up status as follows :
+
+hme0: flags=843&lt;UP,BROADCAST,RUNNING,MULTICAST> mtu 1500
+inet 192.9.2.106 netmask ffffff00 broadcast 192.9.2.255
+ether 3:22:11:6d:2e:1f
+
+The file /etc/netmasks is used to define netmasks for ip addresses .
+
+127.0.0.1, is the standard loop back route and 127.0.0.0 is the default loopback ipaddress used by the kernel when no interface is configured this will be the only entry displayed by the system on invoking ifconfig -a command..
+
+### Configuring Virtual interface
+
+Virtual interface can be configured to enable hme0 reply to more then one ip addresses. This is possible by using hme0 alias which can be configured by ifconfig command only . The new alias device name now becomes hme0:1 hme:2 etc.
+
+#ifconfig hme0:1 172.40.30.4 netmask 255.255.0.0 up
+
+ifconfig -a will show the original hme0 and alias interface :
+
+hme0: flags=843&lt;UP,BROADCAST,RUNNING,MULTICAST> mtu 1500
+inet 192.9.2.106 netmask ffffff00 broadcast 192.9.2.255
+ether 3:22:11:6d:2e:1f
+hme0:1: flags=842&lt;BROADCAST,RUNNING,MULTICAST> mtu 1500
+inet 172.40.30.4 netmask ffff0000 broadcast 172.40.255.255
+
+### Ip-forwarding
+
+IP forwarding allows you to forward all requests coming for a certain port or URL to be redirected to a specified IP address.
+ip forwarding becomes enabled automatically when system detects more then one interface at the booting time . The file involved is /etc/rc2.d/S69inet .
+ipforwarding is on by default but can be turned off by following command :
+
+#ndd -set /dev/ip ip_forwarding 0
+
+### Router Configuration
+
+After interfaces and ipaddess have been configured the system needs a default router which will allow the machine to talk to world outside of local network .
+You can specify a particular route for a particular address as in following example
+
+#route add -net 10.0.0.0 -netmask 255.0.0.0 172.40.30.1 1
+
+if the the destination ipaddess is not defined in this manner system forwards all requests to the default router .
+default route is defined manually by editing /etc/defaultrouter file and putting router's ipaddress entry in it. This file is read by /etc/rc2.d/S69inet file during the booting process and entry added to the routing table .
+The route can be defined online also using routeadd command but the changes will be lost on reboot .To make changes permanent make sure to put an entry in /etc/defaultrouter.
+
+#route add default 205.100.155.2 1
+#route change default 205.100.155.2 1
+
+The 1 at the end is the number of hops to the next gateway.
+
+If an interface is not responding to the network, check to be sure it has the correct IP address and netmask , network cables are fine .
+
+### Network Terms
+
+### CIDR
+
+CIDR : Classless Inter-Domain Routing - the notation often used instead of writing the subnet mask along with ip-address . It has network prefix at the end of a address as / number of network bits.This means that the IP address 192.200.20.10 with the subnet mask 255.255.255.0 can also be expressed as 192.200.20.10/24. The /24 indicates the network prefix length, which is equal to the number of continuous binary one-bits in the subnet mask (11111111.11111111.11111111.000000). Zeros are for addressing the hosts on this network.
+
+VLSM
+
+network can be variably subnetted into smaller networks, each smaller network having a different subnet mask .This functionality is avaiable in Solaris 2.6 above. the ipaddresses

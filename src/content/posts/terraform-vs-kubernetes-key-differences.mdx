@@ -1,0 +1,54 @@
+---
+title: "terraform vs kubernetes - Key Differences that set them apart"
+description: "Kubernetes is focused on deploying and managing containerized applications on a cluster of servers."
+pubDate: 2023-03-03
+updatedDate: 2026-06-20
+pageType: guide
+topic: devops
+tier: "TIER 2 (core reference)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+Terraform and Kubernetes are very popular tools in the DevOps world which looks similar but they are quite different as
+
+1. **They Serve different purposes**
+2. **They have Different areas of focus**
+
+**Here are some of the key differences between Terraform and Kubernetes:**
+
+## Purpose
+
+**Terraform is an infrastructure-as-code tool** that allows you to manage cloud infrastructure resources such as virtual machines, databases and networking.
+
+**Kubernetes, on the other hand, is a container orchestration platform** that automates the deployment, scaling and management of containerized applications.
+
+## Scope
+
+Terraform is focused on managing infrastructure resources across multiple cloud providers,
+
+Kubernetes is focused on deploying and managing containerized applications on a cluster of servers.
+
+## Abstraction level
+
+**Terraform operates at a lower level of abstraction** , allowing you to define and manage infrastructure resources such as virtual machines, load balancers and databases.
+
+**Kubernetes operates at a higher level of abstraction** , allowing you to define and manage containerized applications and their associated resources such as deployments, pods and services.
+
+## State management
+
+**Terraform maintains a state file** that tracks the current state of the infrastructure it manages. This state file is used to ensure that changes to the infrastructure are made in a predictable and consistent manner.
+
+**Kubernetes maintains its state using etcd** , a distributed key-value store that stores the configuration and state of the Kubernetes cluster.
+
+## Community
+
+Both Terraform and Kubernetes have large and active communities that contribute to their development and support. However, the communities have different focuses and priorities.
+
+The **Terraform community is focused on managing infrastructure resources across multiple cloud providers** ,
+
+**Kubernetes community is focused on developing and improving the container orchestration platform** .
+
+## To Sum up :
+
+Terraform is an infrastructure-as-code tool that allows you to manage cloud infrastructure resources, while Kubernetes is a container orchestration platform that automates the deployment, scaling and management of containerized applications. Both tools have their strengths and are commonly used together in modern DevOps workflows.

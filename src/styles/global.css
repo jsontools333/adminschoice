@@ -1,0 +1,210 @@
+:root {
+  /* Brand */
+  --accent: #ff8a4c;
+  --accent-ink: #c25a1f;        /* darker orange for text on light bg */
+  --accent-wash: rgba(255, 138, 76, 0.08);
+
+  /* Light theme (default) */
+  --bg: #ffffff;
+  --bg-secondary: #fafafa;
+  --bg-code: #0d1117;            /* terminal dark — stays dark in both themes */
+  --text: #1a1a1a;
+  --text-secondary: #51596b;
+  --text-tertiary: #8b919e;
+  --border: #ececef;
+  --border-strong: #d7d9de;
+
+  /* Code accent inside dark blocks */
+  --code-green: #7ee787;
+  --code-purple: #d2a8ff;
+  --code-comment: #7d8590;
+
+  /* Type */
+  --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Rhythm */
+  --maxw-prose: 680px;
+  --radius: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15171a;
+    --bg-secondary: #1b1e22;
+    --text: #e6edf3;
+    --text-secondary: #9aa3b0;
+    --text-tertiary: #6e7681;
+    --border: #2a2e35;
+    --border-strong: #3a3f47;
+    --accent-ink: #ffa872;
+    --accent-wash: rgba(255, 138, 76, 0.12);
+  }
+}
+
+* { box-sizing: border-box; }
+
+html {
+  font-family: var(--font-sans);
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body { margin: 0; }
+
+/* ---------- Headings ---------- */
+h1, h2, h3, h4 {
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  font-weight: 600;
+  scroll-margin-top: 80px;   /* so anchor jumps clear the sticky header */
+}
+h1 { font-size: 2rem; margin: 0 0 0.5rem; }
+h2 { font-size: 1.4rem; margin: 2rem 0 0.75rem; }
+h3 { font-size: 1.15rem; margin: 1.6rem 0 0.6rem; }
+h4 { font-size: 1rem; margin: 1.4rem 0 0.5rem; }
+
+/* Anchor link affordance on headings */
+.heading-anchor {
+  color: var(--text-tertiary);
+  opacity: 0;
+  text-decoration: none;
+  margin-left: 0.4rem;
+  transition: opacity 0.15s;
+}
+h2:hover .heading-anchor, h3:hover .heading-anchor { opacity: 1; }
+
+/* ---------- Prose ---------- */
+p { margin: 0 0 1rem; }
+a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+
+ul, ol { margin: 0 0 1rem; padding-left: 1.4rem; }
+li { margin: 0.3rem 0; }
+
+strong { font-weight: 600; }
+
+/* ---------- Inline code ---------- */
+:not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--bg-secondary);
+  border: 0.5px solid var(--border);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--accent-ink);
+}
+
+/* ---------- Code blocks ---------- */
+pre {
+  background: var(--bg-code) !important;
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+  border: 0.5px solid #21262d;
+}
+pre code {
+  font-family: var(--font-mono);
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  color: #e6edf3;
+}
+
+/* ---------- Tables ---------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+}
+th, td {
+  text-align: left;
+  padding: 8px 12px;
+  border: 0.5px solid var(--border);
+}
+th { background: var(--bg-secondary); font-weight: 600; }
+
+/* ---------- Callouts ---------- */
+.callout {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-wash);
+  padding: 12px 16px;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  margin: 1.25rem 0;
+}
+.callout-title {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--accent-ink);
+  margin-bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.callout p:last-child { margin-bottom: 0; }
+.callout--warning { border-left-color: #f59e0b; }
+.callout--warning .callout-title { color: #b87309; }
+.callout--warning { background: rgba(245, 158, 11, 0.08); }
+
+/* ---------- Header ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg);
+  border-bottom: 0.5px solid var(--border);
+  backdrop-filter: saturate(180%) blur(8px);
+}
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.wordmark { display: flex; flex-direction: column; gap: 1px; text-decoration: none; }
+.wordmark__name { font-size: 15px; font-weight: 600; color: var(--text); }
+.wordmark__rule { width: 26px; height: 2.5px; background: var(--accent); margin-left: auto; }
+.nav { display: flex; gap: 18px; font-size: 13px; }
+.nav a { color: var(--text-secondary); text-decoration: none; }
+.nav a:hover { color: var(--text); }
+
+/* ---------- Footer ---------- */
+.site-footer {
+  border-top: 0.5px solid var(--border);
+  padding: 18px 24px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  max-width: 1100px;
+  margin: 3rem auto 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ---------- Meta strip on posts ---------- */
+.post-meta {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 0.5rem;
+}
+.post-updated {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .nav { display: none; }
+  h1 { font-size: 1.6rem; }
+}

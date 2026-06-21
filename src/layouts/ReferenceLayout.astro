@@ -1,0 +1,113 @@
+---
+import BaseLayout from './BaseLayout.astro';
+const { frontmatter, headings = [] } = Astro.props;
+const { title, description, pubDate, updatedDate, topic, readingTime, testedOn = [], tier } = frontmatter;
+
+const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) : '';
+const topicLabel = { scheduling:'Scheduling', shell:'Shell', sysadmin:'SysAdmin', devops:'DevOps', networking:'Networking', python:'Python', security:'Security', legacy:'Legacy' }[topic] || topic;
+
+// Only show h2s in the sidebar TOC (h3s would crowd it)
+const tocItems = headings.filter((h) => h.depth === 2);
+const crown = tier === 'crown-jewel';
+---
+<BaseLayout
+  title={title}
+  description={description}
+  pubDate={pubDate}
+  updatedDate={updatedDate}
+  topic={topic}
+  type="article"
+>
+  <main class="reference">
+    <aside class="toc" aria-label="On this page">
+      <div class="toc__label">On this page</div>
+      <nav>
+        {tocItems.map((h) => (
+          <a href={`#${h.slug}`} class="toc__link">{h.text}</a>
+        ))}
+      </nav>
+    </aside>
+
+    <article>
+      <div class="post-meta">
+        {topicLabel}{readingTime && ` · ${readingTime}`}{crown && ' · Crown Jewel'}
+      </div>
+      <h1>{title}</h1>
+      <p class="post-updated">
+        Updated {fmtDate(updatedDate ?? pubDate)}
+        {pubDate && ` · originally published ${fmtDate(pubDate)}`}
+        {testedOn.length > 0 && ` · Tested on ${testedOn.join(', ')}`}
+      </p>
+      <div class="prose">
+        <slot />
+      </div>
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  .reference {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 2.5rem;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 1rem;
+  }
+  .toc {
+    position: sticky;
+    top: 80px;
+    align-self: start;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+  .toc__label {
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 0.75rem;
+  }
+  .toc nav { display: flex; flex-direction: column; gap: 0.5rem; }
+  .toc__link {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding-left: 0.5rem;
+    border-left: 2px solid transparent;
+    line-height: 1.35;
+  }
+  .toc__link:hover { color: var(--text); }
+  .toc__link.is-active {
+    color: var(--text);
+    font-weight: 500;
+    border-left-color: var(--accent);
+  }
+  .article { min-width: 0; }
+
+  @media (max-width: 820px) {
+    .reference { grid-template-columns: 1fr; }
+    .toc { position: static; max-height: none; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 0.5px solid var(--border); }
+    .toc nav { flex-direction: row; flex-wrap: wrap; gap: 0.5rem 1rem; }
+  }
+</style>
+
+<script>
+  // Highlight the active section in the TOC as you scroll
+  const links = Array.from(document.querySelectorAll('.toc__link'));
+  const map = new Map();
+  links.forEach((l) => {
+    const id = l.getAttribute('href')?.slice(1);
+    if (id) { const el = document.getElementById(id); if (el) map.set(el, l); }
+  });
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        links.forEach((l) => l.classList.remove('is-active'));
+        map.get(e.target)?.classList.add('is-active');
+      }
+    });
+  }, { rootMargin: '-80px 0px -70% 0px' });
+  map.forEach((_, el) => obs.observe(el));
+</script>

@@ -1,0 +1,30 @@
+---
+title: "What is Load Balancer and How it works ?"
+description: "Traffic load balancing is a networking technique used to distribute incoming network traffic or requests across multiple servers, resources, or network paths."
+pubDate: 2023-10-03
+updatedDate: 2026-06-20
+pageType: guide
+topic: sysadmin
+tier: "TIER 2 (core reference)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+Traffic load balancing is a networking technique used to distribute incoming network traffic or requests across multiple servers, resources, or network paths. The primary purpose of load balancing is to optimize resource utilization, improve reliability, and ensure high availability for services and applications. Load balancing is commonly used in various networking scenarios, including web servers, application servers, and content delivery networks (CDNs).
+
+![figure](/images/)
+
+Here are some key concepts and methods related to traffic load balancing:
+
+1. **Load Balancer** : A load balancer is a dedicated hardware appliance or a software application that sits between the clients (such as web browsers) and a group of servers. Its role is to distribute incoming network traffic among the available servers based on a set of predefined rules or algorithms.
+2. **Server Pool** : A server pool, also known as a server farm or server cluster, consists of multiple backend servers that host the same service or application. These servers are collectively responsible for handling client requests.
+3. **Load Balancing Algorithms** : **Round Robin** : Requests are distributed sequentially to each server in the pool in a circular order. **Least Connections** : Traffic is sent to the server with the fewest active connections, helping to evenly distribute the load. **IP Hash** : The client's IP address is used to determine which server receives the request, ensuring that a specific client consistently connects to the same server. **Weighted Round Robin/Least Connections** : Servers are assigned different weights to influence the proportion of traffic they receive.
+4. **Session Persistence or Affinity** : Some applications require that all requests from a specific client during a session are directed to the same server. Session persistence ensures this by using techniques like cookies or source IP affinity.
+5. **Health Checks** : Load balancers continually monitor the health and status of backend servers. If a server becomes unresponsive or fails, the load balancer can automatically route traffic away from the failed server.
+6. **Scalability** : Load balancing enables easy scaling of resources. New servers can be added to the server pool to handle increased traffic, and load balancers can distribute traffic accordingly.
+7. **High Availability** : Load balancing can improve system reliability by ensuring that if one server fails, traffic is redirected to healthy servers, minimizing downtime.
+8. **Global Load Balancing** : In distributed and geographically dispersed systems, global load balancers route traffic to the nearest data center or server location, reducing latency and improving user experience.
+9. **Content Delivery Networks (CDNs)** : CDNs are a specialized form of load balancing used to distribute content (such as web pages, videos, and images) to users from servers located strategically around the world. CDNs cache content at edge locations to reduce latency and improve delivery speed.
+10. **Application Load Balancing** : Some load balancers are application-aware and can make routing decisions based on application-specific data, such as HTTP headers or the content of requests.
+
+Traffic load balancing is a crucial component in modern network architectures, ensuring that services and applications remain responsive, scalable, and highly available even in the face of increasing traffic loads and potential server failures. It plays a significant role in optimizing the performance and reliability of online services and applications.

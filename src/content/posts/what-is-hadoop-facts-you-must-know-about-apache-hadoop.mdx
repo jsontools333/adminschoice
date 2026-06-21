@@ -1,0 +1,109 @@
+---
+title: "What is Hadoop ? Facts you must know about Apache Hadoop"
+description: "Apache Hadoop is an open source software frame work developed by Apache Hadoop Project."
+pubDate: 2014-03-03
+updatedDate: 2026-06-20
+pageType: guide
+topic: sysadmin
+tier: "TIER 2 (core reference)"
+tags: ["basics", "hadoop"]
+testedOn: ["Linux", "Unix"]
+---
+
+## What Is Hadoop?
+
+Apache Hadoop is an open source software frame work developed by Apache Hadoop Project.
+The framework allows
+
+distributed data processing
+
+spread over a large number of computers.
+Hadoop 2.x is the latest version with major changes in its architecture & current release is 2.3.0 , released on 20 February, 2014.
+Hadoop classic, 1 Aug, 2013: Release 1.2.1 (stable)
+
+## Apache Hadoop project
+
+Apache Hadoop project includes these modules:
+* Hadoop Common: Common utilities which support other Hadoop modules.
+*
+
+Hadoop Distributed File System
+
+(HDFS™): Distributed file system which provides high-throughput access to application data over multiple host.
+* Hadoop YARN: Framework for job scheduling & cluster resources management.
+* Hadoop
+
+MapReduce
+
+: YARN-based system for parallel processing of large data sets.
+
+Here are facts you must know about Hadoop
+
+## Distributed batch processing
+
+Batch processing is collection of data and then processing it afterwards. Hadoop batch processes data distributed over a number of computers ranging in 100s and 1000s. Hadoop 2.0 allows live stream processing of real time data.
+
+## Huge Processing Capabilities
+
+Hardtop’s processing capabilities are huge and its real advantage lies in the ability to process terabytes & petabytes of data.
+
+## No Specialized Hardware
+
+Hadoop does not need any specialized hardware to process the data. Ordinary computers with sufficient processing capacity can be used as participating nodes in a Hadoop cluster.
+
+## Distributed file system & Parallel Processing
+
+Hadoop uses a distributed file system which is shared across all participating nodes. Data is broken in to smaller same sized blocks and sent to several computer nodes for processing in parallel.
+
+## Record Based data
+
+In Hadoop programming framework input files are divided in to lines or records. These records are then processed by node processes. The Hadoop frame work schedule process to run closer to the data location using information from the distributed file system.
+
+## Local data
+
+To make operations faster and efficient, most of the distributed data is read from the local hard drive of the node. Because distributed file system knows the location of data, processes can be run precisely on data local to the hosts.
+
+## Single Namespace
+
+Data is distributed over several nodes but the content is universally visible across all the nodes as they come under single name space. Processing is done in parallel but all belong to the same name space.
+
+## MapReduce Programming model
+
+Hadoop uses a programming model called "MapReduce", all the programs should confirms to this model in order to work on Hadoop platform.
+Under MapReduce model, You write Mappers tasks to process the records in isolation from other nodes. Reducer tasks are written to use the output of mappers and merge the results together. MapReduce NextGen or YARN or MapReduce 2.0 (MRv2) has split resource management and processing. There is a global ResourceManager and ApplicationMaster for each application doing single job as in map reduce jobs or DAG(Directed Acyclic Graph) of jobs.
+
+## Simplified programming Model
+
+The programming model, MapReduce, used by Hadoop is simple to write and test. Once programs are written and executed, Hadoop core automatically takes care of data distribution and utilizing processing capabilities of the available machine efficiently.
+
+## Failures are expected
+
+As the distributed environment consisting of hundreds and thousands of nodes, failures are expected and occur often. To counter failures data blocks are replicated among the nodes and a single failure does not impact the processing. Monitoring processes also dynamically replicate the data in case of failures.
+
+## Minimum Communication
+
+Communication is limited between the nodes, data records are processed in isolation from other nodes. In the event of a failure other nodes keeps on working as nothing has happened .Nodes don’t need to know about other nodes, Hadoop framework takes care of failures , replication and restarting the process in case of failures.
+
+## No security model
+
+Hadoop don’t have a security model to check and validate data for security considerations. It process whatever data is submitted to it.
+
+## Flat Scalability
+
+Hadoop provides a flat scalability curve. Processing can be scaled up very easily with little rework. Hadoop platform manages hardware and data according to the number of nodes available.
+
+## Query and manage with “Hive”
+
+Apache Hive is built on the top of Hadoop and it is used to query and manage datasets in distributed storage. It provides ETL tools , SQL like query execution via MapReduce and enable plugging in custom mapper and reducers
+
+## Analyzing with “Pig”
+
+Apache Pig
+
+is a platform for analyzing large data sets using its own high level language called “Pig Latin”. This enables users to write MapReduce tasks using Pig Latin , a high level SQL like language.
+
+### Related articles
+
+- [![figure](/images/369657985_150_150.jpg)](http://siliconangle.com/blog/2016/06/30/3-ways-yahoo-employed-hadoop-to-optimize-utilization-hs16sj/) [3 ways Yahoo employed Hadoop to optimize utilization | #HS16SJ](http://siliconangle.com/blog/2016/06/30/3-ways-yahoo-employed-hadoop-to-optimize-utilization-hs16sj/)
+- [![figure](/images/369427042_150_150.jpg)](http://blog.cloudera.com/blog/2016/06/untangling-apache-hadoop-yarn-part-4-fair-scheduler-queue-basics/) [Untangling Apache Hadoop YARN, Part 4: Fair Scheduler Queue Basics](http://blog.cloudera.com/blog/2016/06/untangling-apache-hadoop-yarn-part-4-fair-scheduler-queue-basics/)
+- [![figure](/images/369607872_150_150.jpg)](http://hortonworks.com/blog/llap-enables-sub-second-sql-hadoop/) [Hive LLAP Technical Preview enables sub-second SQL on Hadoop and more](http://hortonworks.com/blog/llap-enables-sub-second-sql-hadoop/)

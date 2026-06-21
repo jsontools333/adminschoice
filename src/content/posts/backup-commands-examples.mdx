@@ -1,0 +1,262 @@
+---
+title: "Backup Commands in Linux & Unix with Usage and Examples"
+description: "Any backup solution using these commands depends on the type of backup you are taking as these backup commands offers different capabilities."
+pubDate: 2009-12-20
+updatedDate: 2026-06-20
+pageType: reference
+topic: sysadmin
+tier: "TIER 2 (core reference)"
+tags: ["backup", "basics", "featured"]
+testedOn: ["Linux", "Unix"]
+---
+
+> Unix and Linux backup and restore can be done using backup commands tar, cpio ufsdump, dump and restore. Though these commands may be sufficient for small setups in order to take a enterprise backup you have to go in for some custom backup and restore solutions like Symatic netbackup, EMC networker or Amanda.
+Any backup solution using these commands depends on the type of backup you are taking as these backup commands offers different capabilities.
+
+### In this article learn about :
+
+1. backup command tar -
+
+How to use tar for backing up unix and linux files
+
+2. backup command cpio -
+
+How to use cpio for backing up unix and linux files
+
+3. backup commands ufsdump and restore -
+
+For Solaris filesystem
+
+4. backup commands dump and restore -
+
+For taking Linux file system backup.
+
+## Backup Restore using tar command
+
+### tar features:
+
+1. tar (
+
+t
+
+ape
+
+ar
+
+chive ) is used for single or multiple files backup and restore on/from a tape or file.
+2. tar can not backup special character & block device files , shows as 0 byte files with first letter of permissions as b or c for block or character.
+3. tar Works only on mounted file system, it can not access the files on unmounted file system.
+
+## Backing up all files in a directory including subdirectories to a tape device (/dev/rmt/0) or a file.
+
+Example 1 :
+
+> **$tar cvf /dev/rmt/0 ***
+
+In the command above Options are c -> create ; v -> Verbose ; f->file or archive device ; * -> all files and directories . Together the commands means create a tar file on /dev/rmt/0 from all file and directories s in the current directory.
+
+Example 2:
+
+> **$tar cvf /home/backup ***
+
+Create a tar called backup in home directory , from all file and directories s in the current directory.
+
+## Viewing a tar backup on a tape or file
+
+t option is used to see the
+
+t
+
+able of content in a tar file.
+
+> **$tar tvf /dev/rmt/0 ## view files backed up on a tape device.** **$tar tvf /home/backup ## view files backed up inside the backup** In the command above Options are c -> create ; v -> Verbose ; f->file or archive device ; * -> all files and directories . Together the commands means create a tar file on /dev/rmt/0 from all file and directories s in the current directory.
+
+## Extracting tar backup from the tape
+
+x option is used to e
+
+x
+
+tract the files from tar file.
+
+> **$tar xvf /dev/rmt/0 ##extract / restore files in to current directory.** **$tar xvf /home/backup ## extract / restore files in to current directory.**
+
+Note : Restoration will go to present directory or original backup path depending on
+relative or absolute path names used for backup.
+
+Some of useful tar options.
+
+> **Extract & keep the file permissions (default for superuser)** -p, --preserve-permissions **Filter the archive through gzip** -z, --gzip **Filter the archive through bzip2** -j, --bzip2 **Only append files newer than copy in archive** -u, --update **Append files to the end of an archive** -r, --append **Delete from the archive (not on mag tapes!)** --delete **Find differences between archive and file system** -d, --diff, --compare **Test the archive volume label and exit** --test-label **Change to directory DIR** -C, --directory=DIR
+
+Sometimes tar file or tar ball becomes big and it can compressed to copy or store with less space.
+
+### Compressing file/s
+
+compress -v file_name
+gzip filename
+
+### To uncompress a file
+
+uncompress file_name.Z
+or
+gunzip filename
+
+## Backup restore using cpio command
+
+### cpio features
+
+1. Used for single or multiple files backup .
+2. Can backup special character & block device files .
+3. Works only on mounted file system.
+4. Need a list of files to be backed up .
+5. Preserve hard links and time stamps of the files .
+
+### Using cpio command to backup all the files in current directory to tape.
+
+```bash
+find . -depth -print | cpio -ovcB > /dev/rmt/0
+```
+
+cpio expects a list of files and find command provides the list, cpio has to put these file on some destination and a > sign redirect these files to tape. This can be a file as well .
+
+### Viewing cpio files on a tape
+
+> **cpio -ivtB &lt; /dev/rmt/0** ## Options i -> input ; v->verbose; t-table of content; B-> set I/O block size to 5120 bytes
+
+### Restoring a cpio backup
+
+> **cpio -ivcB &lt; /dev/rmt/0** ## Options i -> input ; v->verbose; t-table of content; B-> set I/O block size to 5120 bytes
+
+### Compress/uncompress files :
+
+You may have to compress the files before or after the backup .
+
+click for full options and details of
+
+[GNU cpio](/cpio-gnu/)
+
+## Backup and Restore linux file system
+
+ext2 ext3 ext4 backup and restore can be easily done with a dump utility which allows you to take full and incremental file system backup. Backup can be taken on a tape , file or a remote system and restore full or selective files
+
+Dump is available at sourceforge.net http://dump.sourceforge.net/
+
+Here are complete steps to get started with complete linux file system backup and restore
+
+### Install dump package
+
+Dump package contains dump and restore utilities and it also installs tape device package rmt.
+
+> [root@localhost ~]# yum install dump
+...
+Installed:
+dump.x86_64 1:0.4-0.24.b44.fc20
+
+Dependency Installed:
+rmt.x86_64 2:1.5.2-9.fc20
+Complete!
+[root@localhost ~]#
+
+### Full file system backup
+
+After installation , dump can be used to take a file system backup
+In this example we will take full backup /dev/sda9 backup
+
+Numerical argument as 0 is full backup and susquent number represant the incrementatl backup corresponding to full back.
+
+Syntax is : dump - &lt; level number > -f &lt; source filesystem device >
+
+-u Update the file /etc/dumpdates
+
+> [root@localhost ~]# /sbin/dump -0u -f /dev/st0 /dev/sda9
+DUMP: Date of this level 0 dump: Wed Feb 8 22:10:13 2017
+DUMP: Dumping /dev/sda9 (/boot) to /dev/st0
+...
+DUMP: Writing 10 Kilobyte records
+DUMP: mapping (Pass I) [regular files]
+...
+DUMP: Volume 1 started with block 1 at: Wed Feb 8 22:10:13 2017
+DUMP: dumping (Pass III) [directories]
+...
+DUMP: 122150 blocks (119.29MB) on 1 volume(s)
+...
+DUMP: Average transfer rate: 61075 kB/s
+DUMP: DUMP IS DONE
+[root@localhost ~]#
+
+### Incremental backup
+
+Numerical argument as 2 is Incremental backup and subsequent number represent the incremental backup corresponding to full back.
+
+-u updates the /etc/dumpdates files
+
+> [root@localhost ~]# /sbin/dump -2u -f /dev/st0 /dev/sda9
+DUMP: Date of this level 2 dump: Wed Feb 8 22:14:13 2017
+DUMP: Date of last level 1 dump: Wed Feb 8 22:13:06 2017
+DUMP: Dumping /dev/sda9 (/boot) to /dev/st0
+...
+DUMP: Date of this level 2 dump: Wed Feb 8 22:14:13 2017
+...
+DUMP: DUMP IS DONE
+
+### Backup history
+
+> [root@localhost ~]# cat /etc/dumpdates
+/dev/sda9 0 Wed Feb 8 22:10:13 2017 -0800
+/dev/sda9 1 Wed Feb 8 22:13:06 2017 -0800
+/dev/sda9 2 Wed Feb 8 22:14:13 2017 -0800
+/dev/sda9 3 Wed Feb 8 22:15:27 2017 -0800
+/dev/sda9 4 Wed Feb 8 22:15:43 2017 -0800
+/dev/sda9 5 Wed Feb 8 22:15:34 2017 -0800
+
+### Important Files related to backup
+
+/dev/st0
+default tape unit to dump to
+/etc/dumpdates
+dump date records
+/etc/fstab
+dump table: file systems
+/etc/mtab
+dump table: mounted file systems
+/etc/group
+to find group operator
+
+### Exit Status
+
+Dump exits with zero status on success. Startup errors are indicated with an exit code of 1; abnormal termination is indicated with an exit code of 3.
+
+## Solaris File System Backup using ufsdump
+
+### ufsdump features
+
+1. Used for complete file system backup .
+2. It copies everything from regular files in a file system to special character and block device files.
+2. It can work on mounted or unmounted file systems.
+
+### Identifying the tape device in Solaris
+
+> dmesg | grep st
+
+### Checking the status of the tape drive
+
+> mt -f /dev/rmt/0 status
+
+### Backup restore and disk copy with ufsdump :
+
+### Backup file system using ufsdump
+
+> ufsdump 0cvf /dev/rmt/0 /dev/rdsk/c0t0d0s0
+or
+ufsdump 0cvf /dev/rmt/0 /usr
+
+### To restore a dump with ufsrestore
+
+> ufsrestore rvf /dev/rmt/0
+ufsrestore in interactive mode allowing selection of individual files and
+directories using add , ls , cd , pwd and extract commands .
+ufsrestore -i /dev/rmt/0
+
+### Making a copy of a disk slice using ufsdump
+
+> ufsdump 0f - /dev/rdsk/c0t0d0s7 |(cd /mnt/backup ;ufsrestore xf -)

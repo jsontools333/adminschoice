@@ -1,0 +1,58 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const posts = await getCollection('posts');
+const featured = posts.filter((p) => p.data.featured);
+const recent = posts.sort((a, b) => new Date(b.data.pubDate) - new Date(a.data.pubDate)).slice(0, 8);
+---
+<BaseLayout title="Admin's Choice" description="Tested Linux commands, real-world cron examples, shell scripting references, and DevOps guides. Trusted by sysadmins since 2001.">
+  <main class="home">
+    <section class="hero">
+      <span class="pill">Trusted since 2001 · rebuilt for 2026</span>
+      <h1>Practical Linux for sysadmins and SREs</h1>
+      <p>Tested commands, real-world examples, and honest comparisons. No fluff, no AI-generated filler — just the references your team's wiki should be.</p>
+    </section>
+
+    {featured.length > 0 && (
+      <section>
+        <h2>Most-bookmarked references</h2>
+        <div class="grid">
+          {featured.map((p) => (
+            <a class="card" href={`/${p.slug}/`}>
+              <div class="card__topic">{p.data.topic}</div>
+              <div class="card__title">{p.data.title}</div>
+              <div class="card__desc">{p.data.description}</div>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section>
+      <h2>Latest</h2>
+      <ul class="list">
+        {recent.map((p) => (
+          <li><a href={`/${p.slug}/`}>{p.data.title}</a> <span class="list__topic">{p.data.topic}</span></li>
+        ))}
+      </ul>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .home { max-width: 880px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+  .hero { margin-bottom: 2.5rem; }
+  .pill { display: inline-block; padding: 3px 10px; background: var(--accent-wash); color: var(--accent-ink); font-size: 11px; font-weight: 500; border-radius: 999px; margin-bottom: 14px; }
+  .hero h1 { font-size: 2rem; }
+  .hero p { font-size: 1.05rem; color: var(--text-secondary); max-width: 560px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+  .card { border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px; text-decoration: none; color: inherit; }
+  .card:hover { border-color: var(--border-strong); }
+  .card__topic { font-family: var(--font-mono); font-size: 10px; color: var(--accent-ink); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .card__title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .card__desc { font-size: 12px; color: var(--text-secondary); }
+  .list { list-style: none; padding: 0; }
+  .list li { padding: 8px 0; border-bottom: 0.5px solid var(--border); }
+  .list__topic { font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; }
+</style>

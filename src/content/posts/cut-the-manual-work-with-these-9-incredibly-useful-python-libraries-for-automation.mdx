@@ -1,0 +1,154 @@
+---
+title: "Cut the Manual Work With These 9 Incredibly Useful Python Libraries for Automation"
+description: "Welcome to this guide on Streamlining Your Workflow with These 9 Incredibly Useful Python Libraries for Automation."
+pubDate: 2023-01-11
+updatedDate: 2026-06-20
+pageType: guide
+topic: python
+tier: "TIER 2 (core reference)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+Welcome to this guide on Streamlining Your Workflow with These 9 Incredibly Useful Python Libraries for Automation.
+
+Automation is one of the most powerful ways to increase productivity and efficiency in any industry and with the help of Python, you can automate virtually any task, big or small.
+
+Python is known for its vast collection of libraries that offer an extensive array of functionalities, making it a perfect language for automation. In this guide, we will be discussing 9 such powerful Python libraries that can be used to streamline your workflow and automate your tasks.
+
+From file manipulation and web scraping to GUI automation and data analysis, these libraries have got you covered. Let's dive in and discover how these libraries can help you take your automation game to the next level!
+
+# os
+
+This built-in library provides a way to interact with the operating system and allowing you to perform tasks like working with files and directories, executing shell commands, and checking file permissions.
+
+Examples:
+
+### Create a directory called logs
+​import os
+os.mkdir('logs')
+### rename directory logs to logs.old
+​import os
+os.rename('logs', 'logs.old')
+
+### Delete directory:
+​import os
+os.rmdir('logs.old')
+
+### List all files in current directory:
+​import os
+for file in os.listdir():
+if os.path.isfile(file):
+print(file)
+
+# 
+
+# subprocess
+
+This library allows you to spawn new processes and connect to their input/output/error pipes, and obtain their return codes. This can be really useful for automating tasks which involve running external commands on the system or interacting with other processes.
+
+Example:
+
+​import subprocess
+output = subprocess.run(['ls', '-ltr'], capture_output=True)
+print(output.stdout.decode())
+
+# 
+
+# shutil
+
+This library offers a higher level interface on top of os and subprocess for operations like copying files and directories, moving files, etc
+
+Example :
+
+​import shutil
+shutil.copy("file.txt", "file2.txt")
+
+# 
+
+# schedule
+
+This library allows you to schedule tasks to run at specific intervals, such as running a script every day at a certain time.
+
+Example :
+
+​import schedule
+​import time
+def job():
+print("scheduled run...")
+schedule.every(10).seconds.do(job)
+while True:
+schedule.run_pending()
+time.sleep(1)
+
+# 
+
+# requests
+
+This library allows you to send HTTP requests and handle responses. This can be useful for automating tasks that involve interacting with web services, such as downloading files or scraping websites.
+
+Example:
+
+​import requests
+response = requests.get('https://someurl.com')
+print(response.json())
+
+# 
+
+# Selenium
+
+This python library allows you to automate browser interactions like clicking buttons, filling out forms and navigating pages. This can be very useful for automating tasks which involve interacting with web applications, such as web scraping, testing and automating form submission.
+
+Example to use Selenium library to automate browser interactions
+
+from selenium import webdriver
+driver = webdriver.Firefox() # Start a web driver instance
+driver.get("https://someurl.com") # Navigate to a website
+search_bar = driver.find_element_by_name("qs") #Find element named qs
+search_bar.send_keys("test") #send word test and submit
+search_bar.submit()
+driver.close()# Close the browser
+
+# 
+
+# openpyxl
+
+This python library allows you to read and write data in Microsoft Excel files. It is useful for automating tasks which involves working with excel spreadsheet data like data cleansing and data analysis.
+
+Example : Use openpyxl to read data from an Excel file
+
+from openpyxl import load_workbook
+file = load_workbook('mydata.xlsx') # Load the workbook
+s = file.active # Select the active sheet
+for row in s.iter_rows(values_only=True): # Print the data in the first column
+print(row[0])
+
+# 
+
+# pandas
+
+This python library is useful working with large data sets and allows you to perform complex data manipulation and analysis tasks. Pandas library is commonly used in tasks like data cleaning, data transformation and data visualization.
+
+Example: Use pandas to filter data from a CSV file
+
+​import pandas as pd
+df = pd.read_csv('mydata.csv') # Load the CSV file into a Data Frame
+filtered_df = df[df['Age'] > 30] # Filter the rows where 'Age'> 30
+print(filtered_df) # Print the filtered data
+
+# 
+
+# Beautiful Soup
+
+Beautiful Soup is a library that makes it easy to scrape information from web pages. It sits atop an HTML or XML parser, providing Pythonic idioms for iterating searching and modifying the parse tree.
+
+Example :Use beautifulsoup to fetch car details from a car listing page..
+
+from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup
+​import requests
+response = requests.get('https://www.somecars.com') # Send a GET request
+soup = BeautifulSoup(response.content, 'html.parser') # Parse HTML content
+cards = soup.find_all('div', &#123;'class': 'cars'&#125;) #Find `div` elements with class 'cars'
+for car in cars: # Print the text of each car div
+print(car.text)

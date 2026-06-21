@@ -1,0 +1,282 @@
+---
+title: "The Definitive list of AWS Terraform resource types"
+description: "Every AWS resource in Terraform is declared with the aws_ prefix and managed by the official AWS provider."
+pubDate: 2026-06-15
+updatedDate: 2026-06-20
+pageType: guide
+topic: devops
+tier: "TIER 3 (DevOps/Cloud)"
+tags: ["devops"]
+testedOn: ["Linux", "Unix"]
+---
+
+Every AWS resource in Terraform is declared with the `aws_` prefix and managed by the official AWS provider. Below is a quick reference of the most-used AWS resource types, grouped by category, with a one-line description and a minimal copy-paste example for each. For the command-line side of Terraform, see our guide on [Terraform – 7 Essential Commands for Managing Infrastructure](/terraform-7-essential-commands-for-managing-infrastructure/) .
+
+## Compute
+
+**`aws_instance`** — single EC2 VM
+
+```bash
+resource "aws_instance" "web" {
+  ami           = "ami-123"
+  instance_type = "t3.micro"
+}
+```
+
+**`aws_launch_template`** — reusable instance config
+
+```bash
+resource "aws_launch_template" "lt" {
+  image_id      = "ami-123"
+  instance_type = "t3.micro"
+}
+```
+
+**`aws_autoscaling_group`** — scales an EC2 fleet
+
+```bash
+resource "aws_autoscaling_group" "asg" {
+  min_size         = 1
+  max_size         = 5
+  desired_capacity = 2
+}
+```
+
+**`aws_lambda_function`** — serverless function
+
+```bash
+resource "aws_lambda_function" "fn" {
+  function_name = "myfn"
+  runtime       = "python3.12"
+  handler       = "main.handler"
+}
+```
+
+**`aws_ecs_service`** — runs containers on ECS
+
+```bash
+resource "aws_ecs_service" "svc" {
+  name          = "app"
+  cluster       = aws_ecs_cluster.c.id
+  desired_count = 2
+}
+```
+
+**`aws_eks_cluster`** — managed Kubernetes control plane
+
+```bash
+resource "aws_eks_cluster" "eks" {
+  name     = "prod"
+  role_arn = aws_iam_role.eks.arn
+}
+```
+
+New to orchestration vs provisioning? Read [Terraform vs Kubernetes – Key Differences](/terraform-vs-kubernetes-key-differences/) .
+
+## Networking
+
+**`aws_vpc`** — isolated virtual network
+
+```bash
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+}
+```
+
+**`aws_subnet`** — IP range within a VPC
+
+```bash
+resource "aws_subnet" "a" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.1.0/24"
+}
+```
+
+**`aws_security_group`** — virtual firewall rules
+
+```bash
+resource "aws_security_group" "web" {
+  vpc_id = aws_vpc.main.id
+}
+```
+
+**`aws_route_table`** — routing rules for subnets
+
+```bash
+resource "aws_route_table" "rt" {
+  vpc_id = aws_vpc.main.id
+}
+```
+
+**`aws_internet_gateway`** — public internet access
+
+```bash
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.main.id
+}
+```
+
+**`aws_nat_gateway`** — outbound access for private subnets
+
+```bash
+resource "aws_nat_gateway" "nat" {
+  subnet_id     = aws_subnet.a.id
+  allocation_id = aws_eip.n.id
+}
+```
+
+**`aws_lb`** — application/network load balancer
+
+```bash
+resource "aws_lb" "alb" {
+  name               = "app-lb"
+  load_balancer_type = "application"
+  subnets            = [aws_subnet.a.id]
+}
+```
+
+If load balancing is new to you, see [What is a Load Balancer and How it Works](/what-is-load-balancer-and-how-it-works/) .
+
+## Storage
+
+**`aws_s3_bucket`** — object storage bucket
+
+```bash
+resource "aws_s3_bucket" "b" {
+  bucket = "my-unique-bucket"
+}
+```
+
+**`aws_ebs_volume`** — block storage for EC2
+
+```bash
+resource "aws_ebs_volume" "vol" {
+  availability_zone = "us-west-1a"
+  size              = 20
+}
+```
+
+**`aws_efs_file_system`** — shared NFS file system
+
+```bash
+resource "aws_efs_file_system" "fs" {
+  creation_token = "my-efs"
+}
+```
+
+## Database
+
+**`aws_db_instance`** — managed RDS database
+
+```bash
+resource "aws_db_instance" "db" {
+  engine            = "postgres"
+  instance_class    = "db.t3.micro"
+  allocated_storage = 20
+}
+```
+
+**`aws_dynamodb_table`** — NoSQL key-value table
+
+```bash
+resource "aws_dynamodb_table" "t" {
+  name         = "users"
+  hash_key     = "id"
+  billing_mode = "PAY_PER_REQUEST"
+}
+```
+
+**`aws_elasticache_cluster`** — Redis/Memcached cache
+
+```bash
+resource "aws_elasticache_cluster" "c" {
+  cluster_id      = "redis"
+  engine          = "redis"
+  node_type       = "cache.t3.micro"
+  num_cache_nodes = 1
+}
+```
+
+## IAM / Security
+
+**`aws_iam_role`** — assumable role with permissions
+
+```bash
+resource "aws_iam_role" "r" {
+  name               = "eks-role"
+  assume_role_policy = data.aws_iam_policy_document.x.json
+}
+```
+
+**`aws_iam_policy`** — permission document
+
+```bash
+resource "aws_iam_policy" "p" {
+  name   = "s3-read"
+  policy = jsonencode({...})
+}
+```
+
+**`aws_iam_user`** — IAM user identity
+
+```bash
+resource "aws_iam_user" "u" {
+  name = "ci-bot"
+}
+```
+
+**`aws_kms_key`** — encryption key
+
+```bash
+resource "aws_kms_key" "k" {
+  description = "app encryption key"
+}
+```
+
+## DNS / CDN
+
+**`aws_route53_record`** — DNS record
+
+```bash
+resource "aws_route53_record" "www" {
+  zone_id = "Z123"
+  name    = "example.com"
+  type    = "A"
+}
+```
+
+**`aws_cloudfront_distribution`** — CDN distribution
+
+```bash
+resource "aws_cloudfront_distribution" "cdn" {
+  enabled = true
+  origin {...}
+}
+```
+
+## Monitoring
+
+**`aws_cloudwatch_metric_alarm`** — metric-based alarm
+
+```bash
+resource "aws_cloudwatch_metric_alarm" "cpu" {
+  alarm_name          = "high-cpu"
+  comparison_operator = "GreaterThanThreshold"
+  threshold           = 80
+}
+```
+
+**`aws_cloudwatch_log_group`** — log storage group
+
+```bash
+resource "aws_cloudwatch_log_group" "lg" {
+  name              = "/app/logs"
+  retention_in_days = 14
+}
+```
+
+## Related posts on Admin's Choice
+
+- [Terraform – 7 Essential Commands for Managing Infrastructure](/terraform-7-essential-commands-for-managing-infrastructure/)
+- [Terraform vs Kubernetes – Key Differences](/terraform-vs-kubernetes-key-differences/)
+- [Kubernetes Commands You Must Know](/kubernetes-commands-you-must-know/)

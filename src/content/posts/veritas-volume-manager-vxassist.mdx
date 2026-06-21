@@ -1,0 +1,373 @@
+---
+title: "Veritas Volume Manager - vxassist"
+description: "The default behavior of vxassist is to create volumes in the rootdg diskgroup if diskgroup is not specified ."
+pubDate: 2009-12-20
+updatedDate: 2026-06-20
+pageType: guide
+topic: legacy
+tier: "TIER 4 (Solaris/legacy Unix)"
+tags: ["volumes"]
+testedOn: ["Linux", "Unix"]
+---
+
+vxassist utility in veritas volume manager is used to create volumes, add mirrors and logs to existing volumes, extend and shrink existing volumes, provides for the migration of data from a specified set of disks, and provides facilities for the on-line back up of existing volumes.
+The default behavior of vxassist is to create volumes in the rootdg diskgroup if diskgroup is not specified . The default length is taken as number of blocks but this can be specified in Kilobytes or
+
+Megabytes
+
+or Gigabytes.
+
+```bash
+About Vxassist
+1. Creating a Volume
+    1.1 Creating a Concatenated Volume
+    1.2 Creating a Striped Volume
+    1.3 Creating a RAID-5 Volume
+2. Extending a Volume
+    2.1 Extending a volume up to certain length,
+    2.2 Extending by a Given Length
+3. Shrinking a Volume
+    3.1 Shrinking to a Given Length
+    3.2 Shrinking by a Given Length
+4. Removing a Volume
+5. Mirroring a Volume
+    5.1 Creating & Mirroring a New Volume
+    5.2 Mirroring an Existing Volume
+    5.3 Mirroring All Volumes
+6. Removing a Mirror
+7. Adding a RAID-5 Log
+8. Adding a DRL Log
+9.  Removing a RAID-5 Log
+10.Preparing a Volume for Online Backup
+11.Displaying Volume Configuration Information
+12.Next Steps
+```
+
+About vxassist
+
+vxassist command syntax :
+
+vxassist volume_name [attributes]
+
+Commonly used options are given below (See man vxassist for complete list of supported options)
+-g for specifying diskgroups
+-b for background operation
+-d file containing defaults for vxassist if not specified /etc/default/vxassist is used
+
+Keywords used are make , mirror , move , growto ,growby ,shrintto ,shirnkby ,snapstart , snapshot ,snapwait
+
+Attributes specify volumes layout disks controllar to include exclude etc
+
+Device Nodes
+
+Default rootdg disk group.
+Block Device Node /dev/vx/dsk/volume_name
+Raw Device Node /dev/vx/rdsk/volume_name
+Other DiskGroups
+Block Device Node /dev/vx/dsk/diskgroup_name/volume_name
+Raw Device Node /dev/vx/rdsk/diskgroup_name/volume_name
+
+1. Creating a Volume
+
+1.1 Creating a Concatenated Volume
+
+By default, vxassist creates a concatenated volume using the space available on a disk or on the number of disks in a diskgroup if the volume size specified is more then the one available on a single disk.
+
+Disks can be specified from a diskgroup for a
+
+volume group
+
+but if not mentioned available disks are selected by the
+
+volume manager
+
+.
+
+Command syntax :
+
+· #vxassist make volume_name volume_length
+
+To create a new volume appvol of 100 MB in the default disk group rootdg with available disks:
+· #vxassist make appvol 100m
+
+To create the volume appvol of 100MB on disk03
+· #vxassist make appvol 100m disk03
+
+1.2 Creating a Striped Volume
+
+A striped volume contains at least one plex that consists of two or more subdisks located on two or more physical disks.
+
+Command Syntax
+
+· vxassist make volume_name length layout=stripe
+
+To create a striped volume appvol2 with the default stripe unit size on the default number of disks
+· #vxassist make appvol2 100m layout=stripe
+
+To create a striped volume appvol2 100MB striped volume on three specific disks.
+· #vxassist make appvol2 100m layout=stripe disk04 disk05 disk06
+
+1.3 Creating a RAID-5 Volume
+
+A RAID-5 volume contains a RAID-5 plex that consists of two or more subdisks located on two or more physical disks. Only one RAID-5 plex can exist per volume. A RAID-5 volume may also contain one or more RAID-5 log plexes, which are used to log information about data and parity being written to the volume.
+
+Command Syntax :
+
+· vxassist make volume_name length layout=raid5
+
+To create the RAID-5 volume appvol4 with the default stripe unit size on the default number of disks with RAID-5 log,
+· #vxassist make appvol4 100m layout=raid5.
+
+2. Extending a Volume
+
+Caution : If you plan to use volume size change (grow or shrink ) on a volume with data make sure you have the good backup of the volume available before carrying out such operation .
+
+2.1 Extending a volume up to certain length,
+
+Command syntax
+
+· vxassist growto volume_name length
+
+To extend vol3 upto 8000 sectors, type:
+· #vxassist growto vol3 8000
+
+2.2 Extending by a Given Length
+
+Command Syntax
+· vxassist growby volume_name length
+
+To extend volapp by 1000 sectors, type:
+· #vxassist growby volapp 1000
+
+3. Shrinking a Volume
+Caution - Do not shrink a volume below the size of the file system. If you have a
+
+VxFS
+
+file system, you can shrink the file system and then shrink the volume. If you do not shrink the file system first, you risk unrecoverable data loss.
+
+Always make sure you have a good backup of the data volume to be shirnked.
+
+3.1 Shrinking to a Given Length
+
+Shrink a volume to a specific length as follows:
+
+· vxassist shrinkto volume_name length
+
+Make sure you do not shrink the volume below the current size of the file system or database using the volume. This command can be safely used on empty volumes.
+
+To shrink volcat to 1300 sectors, type:
+
+· #vxassist shrinkto volcat 1300
+
+3.2 Shrinking by a Given Length
+
+Shrink a volume by a specific length as follows:
+
+· vxassist shrinkby volume_name length
+
+To shrink volcat by 8000 sectors, type:
+
+· #vxassist shrinkby volapp2 8000
+
+4. Removing a Volume
+
+Removing a volume requires removing all references to the volumes to be removed like unmounting the volume if mounted and removing its reference from /etc/vfstab .
+
+An active volume has to be stopped first to stop all the activities to the volume only then it can be removed
+
+Stopping Volume
+
+Command Syntax
+
+· vxvol stop volume_name
+
+To stop appvol1
+
+· #vxvol stop appvol1
+
+Removing Volume
+
+Command Syntax
+
+· vxedit -rf rm volume_name
+
+To remove the volume appvol1
+
+· #vxedit -rf rm appvol11
+
+5. Mirroring a Volume
+
+Mirroring allow data to be written simultaneously to two disks so that in case of failure of one disk data is available from the other mirrored disk. Boot disks can be mirriored to provide alternate booting disk .
+
+5.1 Creating & Mirroring a New Volume
+
+Command Syntax :
+
+· vxassist make volume_name length layout=mirror
+
+To create the mirrored volume, appvol22 of 100mb
+· #vxassist make appvol22 100m layout=mirror
+
+To create a volume with Dirty Region Logging enabled
+· #vxassist make volume_name length layout=mirror,log
+
+5.2 Mirroring an Existing Volume
+
+Command syntax
+
+· vxassist mirror volume_name
+
+Creating a mirror of volume vol44:
+· #vxassist mirror vol44
+
+5.3 Mirroring All Volumes
+
+To mirror all existing volumes to available
+
+disk space
+
+· /etc/vx/bin/vxmirror -a
+
+6. Removing a Mirror
+
+Removing a mirror involves first dissociating the plex from its volume and then removing the plex and any associated subdisks completely.The last valid mirror plex associated with a volume cannot be removed.
+
+Dissociate and remove the plex from its volume
+
+as follows:
+
+· vxplex -o rm dis plex_name
+
+vxprint -h shows the volume and associated plexes :
+
+Disk group: rootdg TY NAME ASSOC KSTATE LENGTH PLOFFS STATE TUTIL0 PUTIL0 v volm fsgen ENABLED 10240 - ACTIVE - - pl volm-01 volm ENABLED 10240 - ACTIVE - - sd disk01-02 volm-01 - 10240 0 - - - pl volm-02 volm ENABLED 10240 - ACTIVE - - sd disk02-03 volm-02 - 10240 0 - - -
+
+To disassociate and remove volmir-02 from volmir, type:
+
+· #vxplex -o rm dis volm-02
+
+The output of vxprint -h for volm now shows volume volm with only one plex::
+
+Disk group: rootdg TY NAME ASSOC KSTATE LENGTH PLOFFS STATE TUTIL0 PUTIL0 v volm fsgen ENABLED 10240 - ACTIVE - - pl volm-01 volmir ENABLED 10240 - ACTIVE - - sd disk01-02 volmir-01 - 10240 0 - - -
+
+7. Adding a RAID-5 Log
+
+A RAID-5 log maintains a copy of the data and parity being written to the volume at any given time. If a system failure occurs, VxVM can replay the RAID-5 log to resynchronize the volume. This copies the data and parity that was being written at the time of failure from the log to the appropriate areas of the RAID-5 volume.
+
+RAID-5 log plexes are used to log information about data and parity being written to the raid volume. A log plex is created for the volume by default when a raid volume is created but additional ones can be added by following command .
+
+· vxassist addlog name_of_raid5_vol
+
+8. Adding a DRL Log
+
+Dirty region logging (DRL) is used with mirrored volume layouts. DRL keeps track of the regions that have changed due to I/O writes to a mirrored volume. Prior to every write, a bitmap is written to a log to record the area of the disk that is being changed. In case of system failure, DRL uses this information to recover only the portions of the volume that need to be recovered.
+
+To put Dirty Region Logging into effect for a volume, a log subdisk must be added to that volume and the volume must be mirrored. Only one log subdisk can exist per plex.
+
+The following example creates a log for the mirrored volume vol03:
+
+· #vxassist addlog vol03
+
+When vxassist is used to add a log subdisk to a volume, a log plex is also created to contain the log subdisk, by default.
+
+Once created, the plex containing a log subdisk can be treated as a regular plex. Data subdisks can be added to the log plex. The log plex and log subdisk can be removed using the same procedures used to remove ordinary plexes and subdisks.
+
+9. Removing a RAID-5 Log
+
+Removing a RAID-5 log involves first dissociating the log from its volume and then removing the log and any associated subdisks completely.
+
+Dissociate the log from its volume as follows:
+
+· #vxplex -o rm dis plex_name
+
+To identify the log plex, use the command:
+
+· vxprint -ht raid5_volume_name
+
+To disassociate the log plex volrd-02 from volrd, type:
+
+· #vxplex -o rm dis volrd-02
+
+The output of vxprint -h for volrd now shows:
+
+Disk group: rootdg TY NAME ASSOC KSTATE LENGTH PLOFFS STATE TUTIL0 PUTIL0 v volrd raid5 ENABLED 32 - ACTIVE - - pl volrd-01 volrd ENABLED 32 - ACTIVE - - sd disk01-02 volrd-01 - 32 0 - - - sd disk02-03 volrd-01 - 32 0 - - -
+
+10. Preparing a Volume for Online Backup
+
+Volume manager provides an easy way to take backup of the online data by creating an offline snapshot mirror of the volume .
+
+The vxassist snapstart operation creates a write-only backup mirror, which is attached to and synchronized with the volume to be backed up and later detached and made offline by vxassist snapshot command . The snapshot volume can be used by backup utilities while the original volume continues to be available for applications and users.
+
+The volume backup method described here does not apply to RAID-5 volumes.
+
+Backing up a volume with vxassist involves the following procedure
+
+Create a snapshot mirror
+
+snapstart starts creating a online snapshot mirror of the volume using the available disk space . The snapshot is completed with vxassist snapshot command when offline snapshot volume is created with a userdefined name .
+
+Command Syntax
+
+* vxassist snapstart volume_name
+
+To create a snapshot mirror of a volume called vol8, type
+
+* #vxassist snapstart vol8
+
+Create a snapshot volume
+
+Command Syntax
+
+vxassist snapshot volume_name new_volume_name
+
+To create a snapshot volume of vol8, type:
+#vxassist snapshot vol8 snapvol8
+
+You can now back up the snapshot volume by whatever means you prefer. To avoid wasting space, you can then remove the snapshot volume, which occupies as much space as the original volume
+
+11 Displaying Volume Configuration Information
+
+The vxprint command can be used to display information about how a volume is configured.
+
+Display the volume, mirror, and subdisk record information for all volumes as follows:
+
+#vxprint -ht
+
+Disk group: rootdg
+
+```bash
+  Disk group: rootdg  
+
+  DG  NAME        NCONFIG    NLOG      MINORS     GROUP-ID
+  DM  NAME        DEVICE     TYPE      PRIVLEN    PUBLEN     STATE
+  V   NAME        USETYPE    KSTATE    STATE      LENGTH     READPOL      PREFPLEX
+  PL  NAME        VOLUME     KSTATE    STATE      LENGTH     LAYOUT       NCOL/WID MODE
+  SD  NAME        PLEX       DISK      DISKOFFS LENGTH       [COL/]OFF    DEVICE     MODE  
+
+  dg  rootdg      759096729.1025.tweety  
+
+  dm  disk10      c1t0d0s2 sliced      559        1044400     -
+  dm  disk20      c2t0d0s2 sliced      559        1044400     -  
+
+  v   pubs        fsgen      ENABLED ACTIVE       2288       SELECT       -
+  pl  pubs-01     pubs       ENABLED ACTIVE       2288       CONCAT       -          RW
+  sd  disk10-01 pubs-01      disk10    0          2288       0            c0t0d0     ENA  
+
+  v   vol8      fsgen      ENABLED ACTIVE       20480      SELECT       -
+  pl  vol8-01   vol8       ENABLED ACTIVE       20480      CONCAT       -          RW
+  sd  disk10-02 vol8-0 disk10        2288       20480      0            c0t1d0     ENA
+```
+
+where dg is a disk group, dm is a disk, 
+v is a volume, 
+pl is a plex, 
+sd is a subdisk. 
+The top few lines indicate the headers that match each type of output line that follows. 
+Each volume is listed along with its associated plex(es) and subdisk(s). 
+Display volume-related information for a specific volume as follows:
+
+#vxprint -t volume_name
+To display information about vol8, type:
+
+#vxprint -t vol8

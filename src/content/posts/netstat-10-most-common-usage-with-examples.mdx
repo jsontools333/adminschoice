@@ -1,0 +1,523 @@
+---
+title: "netstat  - 10 Most common usage with examples"
+description: "By default, netstat displays a list of open sockets of all configured address families , tcp , udp etc."
+pubDate: 2021-07-19
+updatedDate: 2026-06-20
+pageType: reference
+topic: networking
+tier: "TIER 2 (core reference)"
+tags: ["basics", "linux", "monitoring", "network"]
+testedOn: ["Linux", "Unix"]
+---
+
+> netstat is one of the most commonly used command to print the network information, However the output of netstat may be difficult to understand with lots of rows and columns of data. With examples in this article you will be able to to use right option to get the right information along with complete understanding of the netstat command output.
+
+netstat is a powerful command line utility in Unix, Linux and Unix like systems to print information about network connections, routing tables, interface statistics, masquerade connections, and multicast memberships.
+
+By default, netstat displays a list of open sockets of all configured address families , tcp , udp etc.
+netstat provide very extensive network details and here are the top netstat usage with different options to get you the just the information you need.
+
+### netstat -a , netstat --all
+
+This is most common and widely used option and it show listening, non-listening. Sockets. For tcp sockets it shows listening ,established and waiting connections.
+
+Usually this option is used with grep to find out if an application is listening on a particular port and if a particular socket is open
+
+For example
+
+```bash
+$netstat -a
+ Active Internet connections (servers and established)
+ Proto Recv-Q Send-Q Local Address Foreign Address State
+ tcp 0 0 localhost.localdom:ipp 0.0.0.0:* LISTEN
+ tcp 0 1 localhost.localdo:59158 cdptpa-roadrunner-:smtp SYN_SENT
+ tcp 0 1 localhost.localdo:59159 cdptpa-roadrunner-:smtp SYN_SENT
+ tcp6 0 0 [::]:http [::]:* LISTEN
+ tcp6 0 0 localhost6.localdom:ipp [::]:* LISTEN
+ tcp6 0 0 localhost.localdo:34783 streamerapi1.fina:https ESTABLISHED
+ udp 0 0 0.0.0.0:45869 0.0.0.0:* 0
+
+Active UNIX domain sockets (servers and established)
+ Proto RefCnt Flags Type State I-Node Path
+ unix 2 [ ACC ] STREAM LISTENING 26063 @/tmp/.ICE-unix/1878
+ unix 2 [ ACC ] STREAM LISTENING 27048 @/tmp/dbus-l8k8jj8iie
+ unix 2 [ ACC ] STREAM LISTENING 11237 /run/lvm/lvmetad.socket
+ unix 2 [ ACC ] STREAM LISTENING 17941 /var/run/abrt/abrt.socket
+ unix 2 [ ACC ] STREAM LISTENING 20711 @/tmp/.X11-unix/X0
+ unix 2 [ ACC ] STREAM LISTENING 21513 @/tmp/dbus-CAKbkgq3
+ unix 2 [ ACC ] STREAM LISTENING 25640 /run/user/1000/keyring-tPMcRg/control
+ ...
+ ...
+ unix 3 [ ] STREAM CONNECTED 34145 /var/run/dbus/system_bus_socket
+ unix 3 [ ] STREAM CONNECTED 15302
+ unix 3 [ ] STREAM CONNECTED 17179
+ unix 3 [ ] STREAM CONNECTED 45922 @/tmp/.X11-unix/X0
+ unix 2 [ ] DGRAM 20568
+```
+
+To see only tcp details,
+
+use t option along with -a and it will show all tcp connection detail
+
+```bash
+$ netstat -at
+ Active Internet connections (servers and established)
+ Proto Recv-Q Send-Q Local Address Foreign Address State
+ tcp 0 0 localhost.localdoma:ipp 0.0.0.0:* LISTEN
+ tcp 0 1 localhost.localdo:59171 cdptpa-roadrunner-:smtp SYN_SENT
+ tcp 0 1 localhost.localdo:59170 cdptpa-roadrunner-:smtp SYN_SENT
+ tcp6 0 0 [::]:http [::]:* LISTEN
+ tcp6 0 0 localhost6.localdom:ipp [::]:* LISTEN
+ tcp6 0 0 localhost.localdo:34783 streamerapi1.fina:https ESTABLISHED
+```
+
+To see only udp details
+
+use u option along with -a and it will show all udp connection detail
+
+```bash
+$ netstat -au
+ Active Internet connections (servers and established)
+ Proto Recv-Q Send-Q Local Address Foreign Address State
+ udp 0 0 0.0.0.0:45869 0.0.0.0:*
+ udp 0 0 0.0.0.0:mdns 0.0.0.0:*
+ udp 0 0 0.0.0.0:55209 0.0.0.0:*
+ udp 0 0 0.0.0.0:bootpc 0.0.0.0:*
+ udp 0 0 0.0.0.0:ntp 0.0.0.0:*
+ udp 0 0 localhost.localdoma:323 0.0.0.0:*
+ udp6 0 0 [::]:filenet-rmi [::]:*
+ udp6 0 0 [::]:ntp [::]:*
+ udp6 0 0 localhost6.localdom:323 [::]:*
+```
+
+## netstat -l, netstat --listening
+
+-l, --listening option in netstat shows just the listening ports, very useful when debugging connectivity issues and you wants to check if a particular port is up and listening or not.
+
+```bash
+$ netstat -l
+ Active Internet connections (only servers)
+ Proto Recv-Q Send-Q Local Address Foreign Address State
+ tcp 0 0 localhost.localdoma:ipp 0.0.0.0:* LISTEN
+ tcp6 0 0 [::]:http [::]:* LISTEN
+ tcp6 0 0 localhost6.localdom:ipp [::]:* LISTEN
+ udp 0 0 0.0.0.0:45869 0.0.0.0:*
+ udp 0 0 0.0.0.0:mdns 0.0.0.0:*
+ udp 0 0 0.0.0.0:55209 0.0.0.0:*
+ udp 0 0 0.0.0.0:bootpc 0.0.0.0:*
+ udp 0 0 0.0.0.0:ntp 0.0.0.0:*
+ udp 0 0 localhost.localdoma:323 0.0.0.0:*
+ udp6 0 0 [::]:filenet-rmi [::]:*
+ udp6 0 0 [::]:ntp [::]:*
+ udp6 0 0 localhost6.localdom:323 [::]:*
+ raw6 0 0 [::]:ipv6-icmp [::]:* 7
+ Active UNIX domain sockets (only servers)
+ Proto RefCnt Flags Type State I-Node Path
+ unix 2 [ ACC ] STREAM LISTENING 26063 @/tmp/.ICE-unix/1878
+ unix 2 [ ACC ] STREAM LISTENING 27048 @/tmp/dbus-l8k8jj8iie
+ unix 2 [ ACC ] STREAM LISTENING 11237 /run/lvm/lvmetad.socket
+ unix 2 [ ACC ] STREAM LISTENING 17941 /var/run/abrt/abrt.socket
+ unix 2 [ ACC ] STREAM LISTENING 20711 @/tmp/.X11-unix/X0
+ unix 2 [ ACC ] STREAM LISTENING 21513 @/tmp/dbus-CAKbkgq3
+```
+
+Filter listening ports information by protocol
+
+using additional flag lets you see the listening port information for specific protocol only
+
+A. Display tcp sockets information only
+
+```bash
+$ netstat -lt
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address Foreign Address State 
+tcp 0 0 localhost.localdoma:ipp 0.0.0.0:* LISTEN 
+tcp6 0 0 [::]:http [::]:* LISTEN 
+tcp6 0 0 localhost6.localdom:ipp [::]:* LISTEN
+```
+
+B. Display Unix sockets information only
+
+```bash
+ $ netstat -lx
+ Active UNIX domain sockets (only servers)
+ Proto RefCnt Flags Type State I-Node Path
+ unix 2 [ ACC ] STREAM LISTENING 26063 @/tmp/.ICE-unix/1878
+ unix 2 [ ACC ] STREAM LISTENING 27048 @/tmp/dbus-l8k8jj8iie
+ unix 2 [ ACC ] STREAM LISTENING 11237 /run/lvm/lvmetad.socket
+ unix 2 [ ACC ] STREAM LISTENING 17941 /var/run/abrt/abrt.socket
+ unix 2 [ ACC ] STREAM LISTENING 20711 @/tmp/.X11-unix/X0
+```
+
+C. Display udp sockets information only
+
+```bash
+$ netstat -au
+ Active Internet connections (servers and established)
+ Proto Recv-Q Send-Q Local Address Foreign Address State
+ udp 0 0 0.0.0.0:45610 0.0.0.0:*
+ udp 0 0 0.0.0.0:4979 0.0.0.0:*
+ udp 0 0 0.0.0.0:mdns 0.0.0.0:*
+ udp 0 0 0.0.0.0:bootpc 0.0.0.0:*
+ udp 0 0 0.0.0.0:ntp 0.0.0.0:*
+ udp 0 0 localhost.localdoma:323 0.0.0.0:*
+ udp6 0 0 [::]:31159 [::]:*
+ udp6 0 0 [::]:ntp [::]:*
+ udp6 0 0 localhost6.localdom:323 [::]:*
+```
+
+# -s , --statistics
+
+-s or --statistics option display summary statistics for each protocol. Very important option to monitor the network health of a system or to debug network related issues. Few parameters to monitor are the number of packets , connections , timeout,time_wait, dropped
+
+```bash
+$ netstat -s
+ Ip:
+ 5749 total packets received
+ 1 with invalid addresses
+ 0 forwarded
+ 0 incoming packets discarded
+ 3315 incoming packets delivered
+ 3861 requests sent out
+ 16 outgoing packets dropped
+ Icmp:
+ 44 ICMP messages received
+ 0 input ICMP message failed.
+ ICMP input histogram:
+ destination unreachable: 44
+ 847 ICMP messages sent
+ 0 ICMP messages failed
+ ICMP output histogram:
+ destination unreachable: 847
+ IcmpMsg:
+ InType3: 44
+ OutType3: 847
+ Tcp:
+ 91 active connections openings
+ 0 passive connection openings
+ 0 failed connection attempts
+ 5 connection resets received
+ 0 connections established
+ 1987 segments received
+ 2019 segments send out
+ 24 segments retransmited
+ 0 bad segments received.
+ 47 resets sent
+ Udp:
+ 1318 packets received
+ 44 packets to unknown port received.
+ 0 packet receive errors
+ 761 packets sent
+ 0 receive buffer errors
+ 0 send buffer errors
+ UdpLite:
+ TcpExt:
+ 44 TCP sockets finished time wait in fast timer
+ 57 delayed acks sent
+ Quick ack mode was activated 10 times
+ 901 packet headers predicted
+ 448 acknowledgments not containing data payload received
+ 81 predicted acknowledgments
+ 1 congestion windows recovered without slow start after partial ack
+ 4 other TCP timeouts
+ TCPLossProbes: 13
+ TCPLossProbeRecovery: 4
+ 9 DSACKs sent for old packets
+ 3 DSACKs received
+ 21 connections reset due to unexpected data
+ 1 connections aborted due to timeout
+ TCPDSACKIgnoredNoUndo: 1
+ TCPRcvCoalesce: 783
+ TCPAutoCorking: 26
+ TCPSynRetrans: 1
+ TCPOrigDataSent: 505
+ IpExt:
+ InMcastPkts: 1553
+ OutMcastPkts: 462
+ InBcastPkts: 7
+ InOctets: 2131885
+ OutOctets: 460653
+ InMcastOctets: 260539
+ OutMcastOctets: 45631
+ InBcastOctets: 1784
+ InNoECTPkts: 5749
+```
+
+## -p, --program
+
+-p, --program option show the PID and name of the program to which each socket belongs. Superuser can see all the processes and others can see only the processes they own. Additionally to see only tcp or udp protocol information you can use -pt or -pu options.
+
+This is useful when you want to see the program associated ports and addresses
+
+```bash
+$ netstat -p
+
+Active Internet connections (w/o servers)
+ Proto Recv-Q Send-Q Local Address Foreign Address State PID/Program name
+ tcp 0 1 localhost.localdo:59184 cdptpa-roadrunner-:smtp SYN_SENT -
+ tcp 0 1 localhost.localdo:59187 cdptpa-roadrunner-:smtp SYN_SENT -
+ tcp6 0 0 localhost.localdo:56122 sfo07s13-in-x0e.1:https ESTABLISHED 2527/firefox
+ tcp6 0 0 localhost.localdo:56121 sfo07s13-in-x0e.1:https ESTABLISHED 2527/firefox
+ tcp6 0 0 localhost.localdo:34783 streamerapi1.fina:https ESTABLISHED 2527/firefox
+ Active UNIX domain sockets (w/o servers)
+ Proto RefCnt Flags Type State I-Node PID/Program name Path
+ unix 2 [ ] DGRAM 25650 1805/systemd @/org/freedesktop/systemd1/notify/1523525770317678118
+ unix 8 [ ] DGRAM 9044 - /run/systemd/journal/socket
+ unix 25 [ ] DGRAM 9046 - /dev/log
+ unix 2 [ ] DGRAM 10232 - @/org/freedesktop/systemd1/notify
+```
+
+# -n, --numeric
+
+--numeric , -n option show numerical addresses instead of trying to determine symbolic host, port or user names. In a busy network environment name resolution can slow down netstat output and this option can be used to skip name resolutions.
+
+There are some specific options for different requirements :
+
+```bash
+-n, --numeric don't resolve names
+ --numeric-hosts don't resolve host names
+ --numeric-ports don't resolve port names
+ --numeric-users don't resolve user names
+```
+
+```bash
+$ netstat -n
+ Active Internet connections (w/o servers)
+ Proto Recv-Q Send-Q Local Address Foreign Address State
+ tcp 0 1 192.168.10.118:59188 107.14.166.10:25 SYN_SENT
+ tcp 0 1 192.168.10.118:59189 107.14.166.10:25 SYN_SENT
+ tcp6 0 0 2601:641:8000:2fa:34783 2001:4998:c:e33::51:443 ESTABLISHED
+ Active UNIX domain sockets (w/o servers)
+ Proto RefCnt Flags Type State I-Node Path
+ unix 2 [ ] DGRAM 25650 @/org/freedesktop/systemd1/notify/1523525770317678118
+ unix 8 [ ] DGRAM 9044 /run/systemd/journal/socket
+ unix 25 [ ] DGRAM 9046 /dev/log
+ unix 2 [ ] DGRAM 10232 @/org/freedesktop/systemd1/notify
+ unix 2 [ ] DGRAM 21565 @/org/freedesktop/systemd1/notify/962567391553538543
+ unix 2 [ ] DGRAM 29662 @/org/freedesktop/systemd1/notify/8538180728495578430
+ unix 2 [ ] DGRAM 11200 /run/systemd/shutdownd
+```
+
+## -I , --interfaces=iface , -I=iface
+
+-I , --interfaces=iface , -I=iface option in netstat display a table of all network interfaces and connections, or the specified interface .
+
+A. Display all network interfaces
+
+```bash
+$netstat -I
+ Kernel Interface table
+ Iface MTU RX-OK RX-ERR RX-DRP RX-OVR TX-OK TX-ERR TX-DRP TX-OVR Flg
+ enp1s0 1500 0 0 0 0 0 0 0 0 BMU
+ lo 65536 274 0 0 0 274 0 0 0 LRU
+ wlp2s0 1500 20317 0 0 0 7477 0 0 0 BMRU
+```
+
+B. Display specific network interfaces
+
+```bash
+$netstat -I=wlp2s0
+ Kernel Interface table
+ Iface MTU RX-OK RX-ERR RX-DRP RX-OVR TX-OK TX-ERR TX-DRP TX-OVR Flg
+ wlp2s0 1500 21016 0 0 0 7581 0 0 0 BMRU
+```
+
+## -r , --route
+
+-r, --route options display the kernel routing tables. netstat -r and route -e produce the same output.
+
+Useful in finding default route for interfaces and network mask.
+
+```bash
+$ netstat -r
+ Kernel IP routing table
+ Destination Gateway Genmask Flags MSS Window irtt Iface
+ default TEW-731BR 0.0.0.0 UG 0 0 0 wlp2s0
+ 192.168.10.0 0.0.0.0 255.255.255.0 U 0 0 0 wlp2s0
+```
+
+## -v, --verbose
+
+-v , --verbose options in netstat shows Active Internet connections and Active UNIX domain sockets without server information.
+
+This option is useful in printing out information about un-configured address families.
+
+```bash
+$netstat -v
+ Active Internet connections (w/o servers)
+ Proto Recv-Q Send-Q Local Address Foreign Address State
+ netstat: no support for `AF INET (sctp)' on this system.
+ Active UNIX domain sockets (w/o servers)
+ Proto RefCnt Flags Type State I-Node Path
+ unix 2 [ ] DGRAM 10093 /run/systemd/shutdownd
+ unix 2 [ ] DGRAM 11274 @/org/freedesktop/systemd1/notify
+ unix 2 [ ] DGRAM 36823 @/org/freedesktop/systemd1/notify/6818248509316349566
+ unix 8 [ ] DGRAM 7836 /run/systemd/journal/socket
+ unix 26 [ ] DGRAM 7838 /dev/log
+
+...
+ ...
+ ...
+ netstat: no support for `AF INET (sctp)' on this system.
+ netstat: no support for `AF IPX' on this system.
+ netstat: no support for `AF AX25' on this system.
+ netstat: no support for `AF X25' on this system.
+ netstat: no support for `AF NETROM' on this system
+```
+
+## -c, --continuous
+
+-c, --continuous option will cause netstat to print the selected information every second continuously.
+
+Default value of one second can be changed by specifying a number after c
+
+```bash
+$netstat -c
+```
+
+Continuous display with a delay of 5 seconds.
+
+```bash
+$netstat -c 5
+```
+
+## -e -ee -extend
+
+-e . -ee , -extend options when used along with other options provides additional information.
+
+-ee option provides maximum available information for the option
+
+Examples :
+
+Normal output
+
+```bash
+$ netstat -a
+ Active Internet connections (servers and established)
+ Proto Recv-Q Send-Q Local Address Foreign Address State
+ tcp 0 0 localhost.localdoma:ipp 0.0.0.0:* LISTEN
+ tcp6 0 0 [::]:http [::]:* LISTEN
+ tcp6 0 0 localhost6.localdom:ipp [::]:* LISTEN
+ udp 0 0 0.0.0.0:50121 0.0.0.0:*
+ udp 0 0 0.0.0.0:mdns 0.0.0.0:*
+ udp 0 0 0.0.0.0:40351 0.0.0.0:*
+```
+
+Extended information
+
+```bash
+$ netstat -ae
+ Active Internet connections (servers and established)
+ Proto Recv-Q Send-Q Local Address Foreign Address State User Inode
+ tcp 0 0 localhost.localdoma:ipp 0.0.0.0:* LISTEN root 28015
+ tcp6 0 0 [::]:http [::]:* LISTEN root 20222
+ tcp6 0 0 localhost6.localdom:ipp [::]:* LISTEN root 28014
+ udp 0 0 0.0.0.0:50121 0.0.0.0:* avahi 19614
+```
+
+Another example to get the routing information
+
+This is a normal output
+
+```bash
+$ netstat -r
+ Kernel IP routing table
+ Destination Gateway Genmask Flags MSS Window irtt Iface
+ default TEW-731BR 0.0.0.0 UG 0 0 0 wlp2s0
+ 192.168.10.0 0.0.0.0 255.255.255.0 U 0 0 0 wlp2s0
+```
+
+maximum information output with -ee option
+
+```bash
+$ netstat -ree
+ Kernel IP routing table
+ Destination Gateway Genmask Flags Metric Ref Use Iface MSS Window irtt
+ default TEW-731BR 0.0.0.0 UG 1024 0 0 wlp2s0 0 0 0
+ 192.168.10.0 0.0.0.0 255.255.255.0 U 0 0 0 wlp2s0 0 0 0
+```
+
+## Adiitional netstat information with usage , syntax and explanation
+
+usage:
+
+netstat [-vWeenNcCF] [] -r netstat &#123;-V|--version|-h|--help&#125;
+netstat [-vWnNcaeol] [ ...]
+netstat &#123; [-vWeenNac] -I[] | [-veenNac] -i | [-cnNe] -M | -s [-6tuw] &#125; [delay]
+
+-r, --route display routing table
+-I, --interfaces= display interface table for
+-i, --interfaces display interface table
+-g, --groups display multicast group memberships
+-s, --statistics display networking statistics (like SNMP)
+-M, --masquerade display masqueraded connections
+
+-v, --verbose be verbose
+-W, --wide don't truncate IP addresses
+-n, --numeric don't resolve names
+--numeric-hosts don't resolve host names
+--numeric-ports don't resolve port names
+--numeric-users don't resolve user names
+-N, --symbolic resolve hardware names
+-e, --extend display other/more information
+-p, --programs display PID/Program name for sockets
+-o, --timers display timers
+-c, --continuous continuous listing
+
+-l, --listening display listening server sockets
+-a, --all display all sockets (default: connected)
+-F, --fib display Forwarding Information Base (default)
+-C, --cache display routing cache instead of FIB
+-Z, --context display SELinux security context for sockets
+
+=&#123;-t|--tcp&#125; &#123;-u|--udp&#125; &#123;-U|--udplite&#125; &#123;-w|--raw&#125; &#123;-x|--unix&#125;
+--ax25 --ipx --netrom
+=Use '-6|-4' or '-A ' or '--'; default: inet
+
+List of possible address families (which support routing)
+
+inet (DARPA Internet), inet6 (IPv6), ax25 (AMPR AX.25), netrom (AMPR NET/RO
+
+The state of the socket.
+
+Since there are no states in raw mode and usually no
+states used in UDP and UDPLite, this column may be left blank. Normally this can
+be one of several values:
+
+ESTABLISHED
+The socket has an established connection.
+
+SYN_SENT
+The socket is actively attempting to establish a connection.
+
+SYN_RECV
+A connection request has been received from the network.
+
+FIN_WAIT1
+The socket is closed, and the connection is shutting down.
+
+FIN_WAIT2
+Connection is closed, and the socket is waiting for a shutdown from the
+remote end.
+
+TIME_WAIT
+The socket is waiting after close to handle packets still in the network.
+
+CLOSE The socket is not being used.
+
+CLOSE_WAIT
+The remote end has shut down, waiting for the socket to close.
+
+LAST_ACK
+The remote end has shut down, and the socket is closed. Waiting for
+acknowledgement.
+
+LISTEN The socket is listening for incoming connections. Such sockets are not
+included in the output unless you specify the --listening (-l) or --all
+(-a) option.
+
+CLOSING
+Both sockets are shut down but we still don't have all our data sent.
+
+UNKNOWN
+The state of the socket is unknown.

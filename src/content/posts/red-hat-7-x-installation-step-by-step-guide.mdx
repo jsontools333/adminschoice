@@ -1,0 +1,215 @@
+---
+title: "Red Hat 7.x Installation : Step by Step Guide"
+description: "Learn about Installation and initial configuration of Red Hat Enterprise Linux, RHEL 7."
+pubDate: 2021-01-15
+updatedDate: 2026-06-20
+pageType: guide
+topic: sysadmin
+tier: "TIER 2 (core reference)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+> You can try Red hat Linux on your laptop or desktop at home or office. Red hat Linux is a paid product but you can get a 60 day trial version of their Enterprise Linux server to try it out and learn. Here are the complete steps to guide you through the installation process if you are installing it for the first time.
+
+Installation and Configuration of RHEL 7.x
+
+Learn about Installation and initial configuration of Red Hat Enterprise Linux, RHEL 7.3
+For this Linux step by step installation guide we will use RHEL 7.3 64Bit iso image, the installation procedure is same for all RHEL 7.x releases in case you want to use a different RHEL version to install.
+
+Here are the 10 Steps to Install RHEL 7.x distribution.
+
+## Step 1 Download the distribution
+
+Download the RHEL 7.x ISO image from access.redhat.com
+Write this ISO image to a create a bootable DVD or USB.
+
+## Step 2 Boot with Media
+
+Use DVD/USB to boot and install RHEL 7.x
+
+Make sure boot from CD/DVD or USB option is enabled in the CMOS setup of your computer. Different computers have different key sequences to press to enter setup at boot; you have to know the key sequence for your computer if you want to make any CMOS changes.
+
+Installer screen is displayed after booting
+Press &lt;Up Arrow> to go to “Install Red Hat Enterprise Linux 7.x” and press &lt;Enter>.
+
+![rhel-7x-install-screen](/images/rhel-7x-install-screen-2.png)
+
+## Step 3. Setting Language
+
+The graphical installer starts after a few seconds presenting a Language selection screen.
+Select your language and click on “Continue”. Based on your selection your RHEL language and keyboard language will be selected.
+
+![rhel-7x-welcome](/images/rhel-7x-welcome.png)
+
+Pressing continue gets you to next Screen presenting configuration options for localization, Software and System.
+From this window, you can do most of the configuration.
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-2.png)
+
+## Step 4. Setting Date & Time
+
+In the main configuration screen, Click on “DATE & TIME” to select your time zone following window.
+
+You can select a Region and City from the drop down menu, select the date and time as applicable to your location time zone. You can enable “Network Time” from the top right corner to allow time sync from NTP servers over the internet but this option needs network to be up and you can leave it off here.
+Once you’re done click on “Done”.
+
+![figure](/images/RHEL-7x-installation-3.png)
+
+Once you click “Done”, it will take you to the main configuration window again.
+
+## Step 5. Setting Network and Host Name
+
+5.1 Configuring Host Name:
+
+Click on “NETWORK & HOST NAME” in the configuration window to start configuring network and the host name .
+
+Following window is displayed indicating network status and host name config option at the bottom .
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-5.png)
+
+Change the “Host name” field on the bottom right to name of your choice or something like “server.yourdomain.com”.
+Once you’re done, click on “Apply”
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-6.png)
+
+5.2 Configuring network
+
+click on “Configure” to configure your network adapter. If your router uses DHCP to give an IP address there’s no additional configuration required. You can assign ip address and subnet mast if you want, at this step.
+Once you’re done setting up your network adapter, just enable the adapter from the top right corner.
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-7.png)
+
+you can see that, it’s connected to the internet.
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-8.png)
+
+Now click on “Done” on the top left corner .
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-5.png)
+
+Clicking "Done" leads you to main screen.
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-9.png)
+
+## Step 6. Installing OS
+
+You can do a minimal install of RHEL 7.x where minimal package are installed and it does not have any GUI after the installation. You have to manage the server from the terminal.
+If you need GUI, you can click on “SOFTWARE SELECTION” to change by clicking on “Server with GUI” and click on “Done”.
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-10.png)
+
+Setting Installation Destination
+
+To select the installation destination, click on “INSTALLATION DESTINATION” from the main window.
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-11.png)
+
+Next screen allows you to select the installation destination.
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-12.png)
+
+Select the disk and click on “Done”.
+If you need, you can do other disk configuration such as, installing RHEL on Network Disk etc.
+For this tutorial we will select local hard drive in this tutorial.
+
+## Step 7. Beginning Installation
+
+Once everything is configured, your configuration window looks like this. Now click on “Begin Installation” to start installation with selected configurations.
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-13.png)
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-14.png)
+
+7.1 Setting root (super user) password.
+
+The installation starts with option to create user and set root (super user) password. Click on "ROOT PASSWORD" to set the password.
+
+![figure](/images/RHEL-7x-installation-15.png)
+
+Enter your root password and keep it somewhere safe, so you won’t lose it.
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-16.png)
+
+7.2 Creating a new User :
+
+Now click on “USER CREATION” and create a user. This can be alternate user name with super user access.
+
+Make sure to mark “Make this user administrator”, otherwise you won’t be able to use ‘sudo command to use root privileges ’. Click on “Done” and wait till the installation finishes.
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-17.png)
+
+7.3 Finishing up with System Reboot.
+
+Once it’s finished, click on “Reboot”
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-18.png)
+
+## Post Reboot Steps:
+
+## Step 8. Verify subscription.
+
+After restart, A window to add our RHEL credentials to verify subscription.
+
+![figure](/images/RHEL-7x-installation-19.png)
+
+First, click on “LICENSE INFORMATION”
+
+Mark “I accept the license agreement” and click on “Done”.
+Now from the main window, click on “Subscription Manager”
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-20.png)
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-21.png)
+
+8.1 Using activation key
+
+You can use an activation key or your Red Hat username & password to verify your purchase of Red Hat license.
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-22.png)
+
+To use activation key, mark “I will use an Activation Key” and click on “Next”.
+If you want to use the username and password, just click on “Next”, no need to mark “I will use an Activation Key”.
+
+8.2
+
+Using username and password
+
+We will use username and password here.
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-23.png)
+
+8.3 Completing RHEL Registration
+
+After you provide the details and click on “Register” you will see the following window, It may be a different product depending on your purchase. Click on “Attach” to complete RHEL registration step.
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-24.png)
+
+On successful registration, you will see this window.
+Click on “Done”.
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-25.png)
+
+## Step 9. Finishing Installation
+
+To finish the installation click on “FINISH CONFIGURATION”
+
+![RHEL-7x-installation](/images/RHEL-7x-installation-26.png)
+
+## Step 10. Logging in to the system
+
+Login screen is presented and you can login using the username, created earlier.
+
+![figure](/images/RHEL-7x-installation-27.png)
+
+After successful login, your Linux installation is ready to use
+
+![figure](/images/RHEL-7x-installation-28.png)
+
+You can start exploring the system by using installed applications by using Applications drop down menu.
+
+As Red hat is a paid product , there are many opensource Linux distributions you can download and try
+
+More details in the article -
+
+- [Linux Download : Top 10 Free Linux Distributions for Desktop and Servers](/download-linux-top-10-free-linux-distributions-for-desktop-and-servers/)

@@ -1,0 +1,184 @@
+---
+title: "Securing Solaris"
+description: "Solaris security broadly falls under two groups - one is where the system is accessible using local area network/vlan and it has to be secured against unauthori"
+pubDate: 2009-12-20
+updatedDate: 2026-06-20
+pageType: guide
+topic: security
+tier: "TIER 4 (Solaris/legacy Unix)"
+tags: ["security"]
+testedOn: ["Linux", "Unix"]
+---
+
+Protect your system from internal & external security vulnerabilities
+
+Introduction
+
+Solaris security broadly falls under two groups - one is where the system is accessible using local area network/vlan and it has to be secured against unauthorized access. Second is system is accessible over the Internet to a number of persons and it has to be protected against unauthorized access using network or security loopholes.
+This document details some of the focus areas for security and provides suggestions to make it strong. 
+
+Following topics are covered in this article for securing Solaris .
+ 1. Latest patches
+ 2. Access to the system.
+ 3. Run level and network services
+ 4. ip module
+ 5. System file , /etc/system
+ 6. sadmind daemon
+ 7. root kit & srload hack
+
+1. Latest patches
+
+Any operating system might have security bugs, which are detected only when system is used in a real time environment. Apply whatever patches are available as of to date to plug the already discovered security loopholes and look for the information about new security related bugs.
+Generally it takes some time when security loophole is discovered and its patch is developed . So the best strategy against such situations is to keep informed by reading security related bulletin of the OS vendor and disabling the affected service or constantly monitoring it and applying patches whenever its available .
+
+A perl script - patchk - is available at sunsolve.sun.com which can be used to identify & compare the existing patches and download the latest ones.
+
+2. Access to the system
+
+Limit Root Access
+
+Limit the direct root access by making sure console entry in /etc/default/login is not commented out .
+
+If secure shell is being used to access the systems edit sshd.config and ssh.config to disable root access
+
+sshd.config
+
+Permit root login no
+Permit empty password no
+Allow hosts
+Allow users
+
+ssh.config
+
+Forward x11 no
+Password authentication no
+
+Host based authentication is more secure as it is based on private keys and public keys and only user with the keys are allowed to connect . Password authentication is less secure as they can be guessed or cracked by some programs .
+
+Limit su capabilities
+
+Allow only a few selected members of a group to use su to prevent any unauthorized access by guessing the root password . Create a system administrator’s group and change su owner to root and group to administrator’s group . Change su permissions to allow only member of this group an execute permission .
+
+Remote Access files
+
+.rhosts ,.netrc hosts.equivalent are the files that provides access to the remote systems and should be monitored carefully .They should be checked regularly for any unauthorized entry or if not needed can be made with zero permission - chmod 0 . This will not allow creation of new file by the same name and put entries to gain access.
+
+Keep access log
+
+sulog file gives information about su login attempts to the system similarly a loginlog file can be created by touching /etc/loginlog which keeps all the login information . Besides last command also give useful information about the persons accessing the system.
+
+3. Run level and network services
+
+Stop unnecessary services at run levels:
+/etc/rc2.d and /etc/rc3.d directories have scripts starting at the booting time or when run level is changed . By default a number of services are started out of which only a few might be required . In most of the cases , particularly in production environment certain services are not required at all but provides various ports for gaining entry to the system
+Evaluate your system requirements and look at the rc scripts , disable the files that are not required by making letter capital in the beginning as ‘s’ . System requirements may vary from system to system but you should check if you don’t need following services & can disable them.
+
+| Enabled | Disabled |
+| --- | --- |
+| S71ldap.client S72autoinstall
+S72slpd S88sendmail S72nfs.client S74autofs S99dtlogin S15nfs.server | s71ldap.client s72autoinstall
+s72slpd s88sendmail s73nfs.client s1574autofs s99dtlogin s15nfs.server |
+
+Stop unnecessary and insecure network services
+
+/etc/inetd.conf has entry for about fifty network services and most of them are started by default . While some of these services are not secure -telnet,ftp ,some of it are not required at all . These services can allow a intruder to get in by providing system information and ports.
+Services such as finger ,sysstat & netstat provide useful information about the users , system and network. Depending on the applications requirement some of these services should be stopped by commenting out corresponding entry in /etc/inetd.conf
+
+ftp should be disabled and secure copy ,scp ,sftp should be used instead . But if you must use ftp then limit the users which can do a ftp to the system . /etc/ftpusers file can be created to keep the ftp user list .
+
+4. ip module
+
+Control the IP Behavior :
+IP module can be tuned to prevent forwarding , redirecting of packets and request for information from the system . These parameters can be set using ndd with the given value to limit these features .
+
+#ndd -set /dev/ip ip_forward_directed_broadcasts 0
+#ndd -set /dev/ip ip_forward_src_routed 0
+#ndd -set /dev/ip ip_ignore_redirect 1
+#ndd -set /dev/ip ip_ire_flush_interval 60000
+#ndd -set /dev/ip ip_ire_arp_interval 60000
+#ndd -set /dev/ip ip_respond_to_echo_broadcast 0
+#ndd -set /dev/ip ip_respond_to_timestamp 0
+#ndd -set /dev/ip ip_respond_to_timestamp_broadcast 0
+#ndd -set /dev/ip ip_send_redirects 0
+
+To see a list of all parameter for a particular driver
+
+#ndd /dev/ip
+name to get/set ? ?
+
+To get value of a particular parameter :
+
+#ndd -get /dev/ip ip_respond_to_timestamp_broadcast
+
+5. System file , /etc/system
+
+Add the following lines to /etc/system file to prevent the buffer overflow in a possible attack to execute some malicious code on your machine.
+
+set noexec_user_stack=1
+set noexec_user_stack_log=1
+
+Depending upon the requirement all or a combination of all the above suggestions can be implemented . Certain application software, web servers etc have there own parameters for securing access and data . So besides solaris those parameters may have to be taken in consideration in addition to solaris parameters to secure system completely.
+
+6. sadmind daemon vulnerability
+
+The sadmind daemon is used for distributed system administration operations in the Solstice AdminSuite applications. In its default configuration sadmind uses a set of clear text Remote Procedure Calls (RPC) to authenticate between two machines. An attacker can construct RPC packets that allow them r to forge a valid client identity and get it validated . Once the sadmind client has authenticated, the hacker can perform any command on the remote system even with root privileges .
+
+Protecting against sadmind vulnerability
+
+sadmind is controlled through the file /etc/inetd.conf as per the following entry :
+
+100232/10 tli rpc/udp wait root /usr/sbin/sadmind sadmind
+
+In this configuration, sadmind uses cleartext hostnames and authentication credentials as the security level is default no security level .
+
+There are two ways to deal with this situation :
+
+1. Completely disable the sadmind in the inted.conf if not required by commenting out the sadmind line or removing it altogather .
+
+#100232/10 tli rpc/udp wait root /usr/sbin/sadmind sadmind
+
+Restart inetd:
+
+# /usr/bin/pkill -HUP inetd
+
+2. Increase the level of security by requiring DES encryption for your authentication mechanism by adding the '-S 2' flag to the end of the sadmind line in inetd.conf:
+
+100232/10 tli rpc/udp wait root /usr/sbin/sadmind sadmind -S 2
+
+Restart inetd:
+
+# /usr/bin/pkill -HUP inetd
+
+7. Root Kit
+
+The hackers in some cases installs a "root" kit which changes various files in the system in order to gain super user privileges and to conceal the compromise.
+You can determine with pkgchk command if certain files have changed :
+
+/bin/su
+/usr/sbin/ping
+/usr/bin/du
+/usr/bin/passwd
+/usr/bin/find
+/bin/ls
+/bin/netstat
+/usr/bin/strings
+
+If there is any error reported on any of these files then system is compromised . The best resort in these cases is to take system off the network and do a fresh operating system installation .
+
+srload
+
+:
+srload is a part of root kit which is used to get the non-standard SSH port access by the attackers . Compromised systems have a entry in /etc/inittab of following line
+
+SV:23:respawn:/usr/bin/srload -D -q
+
+and may have the following file modified along with other files :
+
+/etc/rcS.d/S30rootusr.sh
+
+The immediate action for this is to disable the srload command by removing it from /etc/inittab after booting in single user mode and removing srload command binary from /usr/bin or any other location .
+
+click here
+
+to read 
+Belorussian translation of Securing Solaris

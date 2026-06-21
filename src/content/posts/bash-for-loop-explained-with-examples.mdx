@@ -1,0 +1,225 @@
+---
+title: "bash for loop Explained with Examples"
+description: "The loop progresses by taking one item at a time from the list, perform some action and then pick up the next item, until all items in the list are processed."
+pubDate: 2021-02-21
+updatedDate: 2026-06-20
+pageType: reference
+topic: shell
+tier: "TIER 2 (core reference)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+> bash for loop is one of the most popular used function for the data processing . Learn more about bash for loop basic construction , how to process a range of data, define increments, using command outputs as inputs to for loop and
+
+bash ,
+
+b
+
+ourne
+
+a
+
+gain
+
+sh
+
+ell, provides shell scripting features in Linux and Unix /Unix like environments. bash off lots of functions and commands and bash for loop is one of the most popular used function for the data processing . Learn more about bash for loop basic construction , how to process a range of data, define increments, using command outputs as inputs to for loop and more.
+
+## bash for loop construction
+
+a bash for loop in its basic construction takes a input list of items, which can be numbers, letter or list derived from the output of a command.
+
+Basic structure of a bash for loop is
+
+**for** &lt;variable name to hold the value > **in** &lt; list of items to be processed >
+
+**do**
+
+&lt;perform some action on variable name to holding the values >
+
+**done**
+
+The loop progresses by taking one item at a time from the list, perform some action and then pick up the next item, until all items in the list are processed.
+
+List of items can be a static list or items
+
+list of numbers - 1 2 3 4 as in,
+
+for i in 1 2 3 4 5
+
+List of alphabetic characters - a b c d as in,
+
+for i in a b c d
+
+Output of a command
+
+like - ls *.log ,as in,
+
+for i in $(ls *.log)
+
+Content of a file
+
+like cat &lt;filename> as in,
+
+for i in $(cat /logs/ipaddress)
+
+A variable name
+
+like a="abc def ghi jkl mno " as in
+
+for i in $a
+
+## bash for loop examples
+
+To process the list of five numbers and print their values.
+
+for i in 1 2 3 4 5
+do
+echo "Value is $i"
+done
+
+Value is 1
+Value is 2
+Value is 3
+Value is 4
+Value is 5
+
+In this example:
+
+i is used as variable name, a short name for index value, most commonly used in bash loops.
+1 2 3 4 5 is the list of items
+echo command prints the list item.
+
+Same way for list of non numeric values.
+
+for i in AA BB CC DD EE
+do
+echo "Value is $i"
+done
+
+Value is AA
+Value is BB
+Value is CC
+Value is DD
+Value is EE
+
+## bash for loop one liner
+
+for loop can be written on a single line as by using ; as line breaks separating for and do lines.
+
+for i in AA BB CC DD EE ; do echo "Value is $i" ; done
+
+## bash for loop - specify range
+
+Specifying a range
+
+Specify and range from to 5 .
+
+for i in ( 1..5 )
+do
+echo "Value is $i"
+done
+
+Value is 1
+Value is 2
+Value is 3
+Value is 4
+Value is 5
+
+## Specify range start, end & incremental value
+
+Specify start value as one , increment by one and final value as 5.
+
+for i in ( c=1,c++,c=5 )
+do
+echo "Value is $i"
+done
+
+Value is 1
+Value is 2
+Value is 3
+Value is 4
+Value is 5
+
+## Using a command as input list
+
+1. Use ls as input list of file, you can perform any operation on these files based on name, size, permission etc.
+
+in the following example the for loop just prints the file name.
+
+for i in $(ls)
+do
+echo "Name is $i "
+done
+
+2. To find and kill all the httpd processes
+
+for i in $(ps -ef | grep httpd |awk '&#123; print $2 &#125;'
+do
+kill -9 $i
+done
+
+## Processing for loop output at once
+
+if you have a big file with number of ip addresses and you want to filter and count the select pattern;
+
+for i in $(cat /tmp/ipaddresses )
+do
+
+```bash
+ if [[ $i =~ 192 ]]
+then 
+echo $i 
+fi
+```
+
+done | sort -u ### This will print a unique list of matching ips
+
+**and to get the count of matches**
+
+for i in $(cat /tmp/ipaddresses )
+do
+
+```bash
+ if [[ $i =~ 192 ]]
+then 
+echo $i 
+fi
+```
+
+done | sort -u | wc -l ### This will print a total number of unique matching ips
+
+## Break and continue, for loop operation
+
+For example if you want to scan a huge number of file and find the first empty file, you can use following bash for loop.
+
+for i in $( ls /tmp/log*)
+do
+echo "Name is $i "
+
+if [ -s $i ] ## file not empty
+then
+continue
+else ## file is empty
+echo "Empty file found $i"
+break
+
+done
+
+Bash versions
+
+Current GNU bash version is bash 5.0 , latest and older versions also can be downloaded from GNU ftp site
+
+&lt;http://gnu.mirrors.pair.com/bash/>
+
+$bash --version
+
+tells the bash version installed, if you have older bash version it may not support newer features or newer may not support deprecated functions.
+
+More bash and related readings:
+
+- **[Bash Positional Parameters, Arguments](/bash-positional-parameters/)**
+- **[Bash in Windows 10 : Ten Facts You Must Know](/bash-in-windows-10-ten-facts-you-must-know/)**
+- **[Top 10 Bash Programming Guides, Reference & Tools](/top-10-bash-programming-guides-reference-tools/)**
+- **[awk Commands, Examples & Meaning](/awk/)**

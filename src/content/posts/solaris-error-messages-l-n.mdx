@@ -1,0 +1,1176 @@
+---
+title: "Solaris error messages L-N"
+description: "Solaris / Unix error messages are very short and often we need some more information about the origin of an error and a possible steps to fix the issues."
+pubDate: 2009-12-20
+updatedDate: 2026-06-20
+pageType: reference
+topic: legacy
+tier: "TIER 4 (Solaris/legacy Unix)"
+tags: ["errors"]
+testedOn: ["Linux", "Unix"]
+---
+
+Solaris / Unix error messages are very short and often we need some more information about the origin of an error and a possible steps to fix the issues.
+
+Here is a list of Solaris / Unix error messages for your reference, most of the error messages are generic Unix error messages but many are specific Solaris Error Messages. Please comment if you can provide some more details about these errors.
+
+This is a multi part document , this part covers error messages starting from L to N 
+Please scroll down to related posts section for other parts of this document.
+
+104.
+
+last message repeated N times
+
+105.
+
+ld.so.1:variable: fatal: relocation error: symbol not found:variable
+
+106.
+
+ld.so.1: variable: fatal: variable: can't open file: errno=2
+
+107.
+
+le0: Memory error!
+
+108.
+
+le0: No carrier-- cable disconnected or hub link test disabled?
+
+109.
+
+le0: No carrier-- transceiver cable problem?
+
+110.
+
+LINK COUNT FILE I=i OWNER=o MODE=m SIZE=s MTIME=t COUNT... ADJUST?
+
+111.
+
+LL105W: Protocol error detected.
+
+112.
+
+ln: cannot create /dev/fb: Read-only file system
+
+113.
+
+lockd[N]: create_client: no name forinet address 0xN
+
+114.
+
+Login incorrect
+
+115.
+
+lp hang
+
+[]() M
+
+116.
+
+mailtool: Can't create dead letter: Permission denied
+
+117.
+
+mailtool: Could not initialize the Classing Engine
+
+118.
+
+Mail Tool is confused about the state of your Mail File.
+
+119.
+
+mail: Your mail file was found to be corrupted (Content-length mismatch).
+
+120.
+
+Memory address alignment
+
+121.
+
+memory leaks
+
+122.
+
+mount: /dev/dsk/variable is already mounted, /variable is busy, or...
+
+123.
+
+mount: giving up on: /variable
+
+124.
+
+mount: mount-point /variable does not exist.
+
+125.
+
+mount: the state of /dev/dsk/variable is not okay
+
+[]() N
+
+126.
+
+/net/variable: No such file or directory
+
+127.
+
+Network is down
+
+128.
+
+Networkis unreachable
+
+129.
+
+NFS getattr failed for server variable: RPC: Timed out
+
+130.
+
+nfs mount: Couldn't bind to reserved port
+
+131.
+
+nfs mount: mount: variable: Device busy
+
+132.
+
+NFS mount: /variable mounted OK
+
+133.
+
+NFS read failed for server variable
+
+134.
+
+nfs_server: bad getargs for N/N
+
+135.
+
+NFS server variable not responding still trying
+
+136.
+
+NFS server variable ok
+
+137.
+
+nfs umount:variable: is busy
+
+138.
+
+NFS write error on host variable: No space left on device.
+
+139.
+
+NFS write failed for server variable: RPC: Timed out
+
+140.
+
+NIS+ authentication failure
+
+141.
+
+No buffer space available
+
+142.
+
+No child processes
+
+143.
+
+No default media available
+
+144.
+
+No directory! Logging in with home=/
+
+145.
+
+No message of desired type
+
+146.
+
+No recipients specified
+
+147.
+
+No record locks available
+
+148.
+
+No route to host
+
+149.
+
+No shell Connection closed
+
+150.
+
+No space left on device
+
+151.
+
+No such device
+
+152.
+
+No such device or address
+
+153.
+
+No such file or directory
+
+154.
+
+no such map in server's domain
+
+155.
+
+No such process
+
+156.
+
+No such user as variable-- cron entries not created
+
+157.
+
+Not a directory
+
+158.
+
+Not enough space
+
+159.
+
+not found
+
+160.
+
+NOTICE: /variable: out of inodes
+
+161.
+
+Not login shell
+
+162.
+
+Not on system console
+
+163.
+
+Not owner
+
+164.
+
+Not supported
+
+[]() last message repeated N times
+
+> This message comes from syslog(1M), the facility that prints
+messages on the console and records them in /var/adm/messages. To
+reduce the log size and minimize buffer usage, syslog collapses
+any identical messages it sees during a 20 second period, then
+prints this message with the number of repetitions.
+
+Look above this message to see which message was repeated so
+often. Then consider the repeated message and take action
+accordingly. If repeated log entries such as "su ... failed"
+appear, consider the possibility of a security breach.
+
+[]() ld.so.1: variable: fatal: relocation error: symbol not found:variable
+
+> This message from the run-time linker ld.so.1 indicates that in
+trying to execute the application
+given after the first colon,
+the specified symbol could not be found for relocation. The
+message goes on to say in what file the symbol was referenced.
+Since this is a fatal error, the application terminates with this
+message.
+
+Run the ldd -d command on the application to show its shared
+object dependencies and symbols that aren't found. Probably your
+system contains an old version of the shared object that should
+contain this symbol. Contact the library vendor or author for an
+update.
+
+This error does not necessarily occur when you first bring up an
+application. It could take months to develop, if ordinary use of
+the application seldom references the undefined symbol.
+
+[]() ld.so.1: variable: fatal: variable: can't open file:
+errno=2
+
+> This message indicates that the run-time linker, ld.so.1, while
+running the program specified after the first colon, could not
+find the shared object specified after the third colon. (A shared
+object is sometimes called a dynamically linked library.) Error
+number 2 translates to "No such file or directory" (ENOENT).
+
+As a workaround, set the environment variable LD_LIBRARY_PATH to
+include the location of the shared object in question, for
+example:
+
+/usr/dt/lib:/usr/openwin/lib
+
+Better yet, if you have accessto source code, recompile the
+program using the -Rpath loader option. Using LD_LIBRARY_PATH is
+discouraged because it slows down performance.
+
+[]() le0: Memory error!
+
+> This message indicates that the network interface encountered an
+access time-out from the CPU's main memory. There is probably
+nothing wrong except system overload.
+
+If the system is busy with other processes, this error can occur
+frequently. If possible, try to reduce the system load by
+quitting applications or killing some processes.
+
+The Lance Ethernet chip timed out while trying to acquire the bus
+for a DVMA transfer. Most network applications wait for a
+transfer to occur, so generally no data gets lost. However, data
+transfer might fail after too many time-outs.
+
+For more information about the Lance Ethernet chip, see the
+le(7D) man page.
+
+[]() le0: No carrier-- cable disconnected or hub link test
+disabled?
+
+> Standalone machines with no Ethernet port connection get this
+error when the system triesto access the network. If the
+Ethernet cable is disconnected, SPARC machines with the sun4m
+architecture usually display this message, whereas machines with
+the sun4c architecture usually display the "le0: No carrier--
+transceiver cable problem" message instead. If the Ethernet cable
+is connected, this message could result from a mismatch between
+the machine's NVRAM settings and the Ethernet hub settings.
+
+If this message is continuous, try to save any workto local
+disk.
+
+When a machine is configured as a networked system, it must be
+plugged into the Ethernet with a twisted pair J45 connector.
+
+If the Ethernet cable is plugged in, find out whether or not the
+Ethernet hub does a Link Integrity Test. Then become superuser to
+check and possibly set the machine's NVRAM. If the hub's Link
+Integrity Test is disabled, set this variable to false.
+
+# eeprom | grep tpe tpe-link-test?=true # eeprom 'tpe-link-
+test?=false'
+
+The default setting is true. If for some reason tpe-link-test?
+was set to false,and the hub's Link Integrity Test is enabled,
+set this variable to true.
+
+[]() le0: No carrier-- transceiver cable problem?
+
+> Standalone machines with no Ethernet port connection get this
+error when the system tries to access the network.
+
+If this message is continuous, try to save any work to local
+disk.
+
+When a machine is configured as a networked system, it must be
+plugged into the Ethernet with either a twisted pair J45
+connector or thicknet 10Base-T connector (depending on the
+building's Ethernet cable type).
+
+Older workstations
+have a thicknet connection on the back instead
+of a twisted pair Ethernet connection, so they require a thicknet
+to twisted pair transceiver to translate between cabling types.
+
+[]() LINK COUNT FILE I=i OWNER=o MODE=m SIZE=s MTIME=t
+COUNT... ADJUST?
+
+> During phase 4, fsck(1M) determined that the inode's link count
+for the specified file is wrong, and asks if you want to adjust
+it to the value given.
+
+Generally you can answer yes to this question without harming the
+filesystem.
+
+[]() LL105W: Protocol error detected.
+
+> This error message comes from Lifeline Mail, an unbundled PC
+compatibility application.
+
+The likeliest cause for this problem is that someone set up a
+user account without a password. Assign the user a password to
+solve this problem.
+
+[]() ln: cannot create /dev/fb: Read-only file system
+
+> During device reconfiguration at boot time, the system cannot
+link to the frame buffer because /dev is on a read-only
+filesystem.
+
+Check that /dev/fb is a symbolic link to the hardware frame
+buffer, such as cgsix or tcx. Ensure that the filesystem
+containing /dev is mounted read-write.
+
+[]() lockd[N]: create_client: no name forinet address 0xN
+
+> This lock daemon message usually indicates that the NIS
+hosts.byname and hosts.byaddr maps are not coordinated.
+
+Wait a short time for the maps to synchronize. If they don't,
+takesteps to coordinate them.
+
+[]() Login incorrect
+
+> This message from the login(1) program indicates an incorrect
+combination of login name and password. There is no way to tell
+whether what's wrong is the login name, the password, or both.
+Other programs such as ftp(1), rexecd(1M), sulogin(1M), and
+uucp(1C) alsogive this error under similar conditions.
+
+Check the /etc/passwd file and the NIS or NIS+ passwd map on the
+local system to see if an entry exists for this user. If a user
+has simply forgotten the password, su and set a new one with the
+passwd usernamecommand. This command automatically updates the
+NIS+ passwd map, but with NIS you'll need to coordinate the
+update with the passwd map.
+
+The "Login incorrect" problem can also occur with older versions
+of NIS when the user name has more than eight characters. If this
+is the case, edit the NIS password file, change the user name to
+have eight or fewer characters, and then remake the NIS passwd
+map.
+
+If you cannot log in to the system as root, despite knowing the
+proper password, it is possible that the /etc/passwd file is
+corrupted. Try to log in as a regular user and su to root.
+
+If that doesn't work, see the message "su: No shell" and follow
+most of the instructions given there. Instead of changing the
+default shell however, make the password field blank in
+/etc/shadow.
+
+[]() lp hang
+
+> On a print server, the queue continues to grow but nothing comes
+out of the printer. The printer daemon is hung.
+
+Here is a simple procedure for flushing a hung printing queue:
+
+1. Login or switch user to root.
+2. Issue the reject printername command to make sure no one
+sends any job to the
+printer.
+3. Turn off power to the printer.
+4. If the active job appears to be causing the hang, remove it
+from the print queue
+with the cancel jobnumber command, and ask the owner to
+requeue that print
+job.
+5. Shut down the print queue with the /usr/lib/lpshut command.
+6. Remove the lock file /var/spool/lp/SCHEDLOCK and the
+temporary files
+/var/spool/lp/tmp/*/*.
+7. Turn the printer back on.
+8. Restart the print queue with the /usr/lib/lpsched command.
+
+[]() mailtool: Can't create dead letter: Permission denied
+
+> An attempt was made to send a message with mailtool(1) from a
+directory where the user does not have write permission, and the
+user's home directory is currently unavailable.
+
+Change to another directory and start mailtool again, or use
+chmod(1) to change permissions for the directory (if possible).
+
+[]() mailtool: Could not initialize the Classing Engine
+
+> When a user runs mailtool(1) on a remote machine, setting the
+DISPLAY environment back to the local machine, this message might
+appear inside a dialog box window. The dialog box goes on to say
+that the Classing Engine must be installed to use Attachments.
+This problem occurs because rlogin(1) does not propagate the
+user's environment.
+
+Exit mailtool and set your OPENWINHOME environment variable to
+/usr/openwin. Then run mailtool again. The error message will
+not appear, and you will be able to use Attachments.
+
+Classing Engine is a new name for Tool Talk. Earlier versions of
+mailtool said "Tool Talk: TT_ERR_NOMP" instead of Classing
+Engine.
+
+[]() Mail Tool is confused about the state of your Mail
+File.
+
+> This message appears in a pop-up dialog box whenever you ask
+mailtool(1) to access messages after another mail reader has
+modified your inbox. A request follows: "Please Quit this Mail
+Tool."
+
+Click "Continue" to close the dialog box, then exit mailtool. If
+you continue trying to read mail, messages deleted by the other
+mail reader will never appear, and mailtool will fail to see any
+new messages.
+
+[]() mail: Your mailfile was found to be corrupted
+(Content-length mismatch).
+
+> This message comes from mail(1) or mailx(1) whenever it detects
+messages with a different content length than advertised. The
+mail program tells you which message might be truncated or might
+have another message concatenated to it.
+
+Two common causes of content length mismatches are the
+simultaneous use of different mail readers (such as mail and
+mailtool), or using a mail reading program (or an editor) that
+does not update the Content-Length field after altering a
+message.
+
+The mailx program can usually recover from this error and
+delineate mail message boundaries correctly. Pay close attention
+to the message that might be truncated or combined with another
+message, and to all messages after that one. If a mail file
+becomes hopelessly corrupted, run it through a text editor to
+eliminate all Content-Length lines, and ensure that each message
+has a From (no colon) line for each message, preceded by a blank
+line.
+
+To avoid mailfile corruption, exit from mailtool without saving
+changes when you are currently running mail or mailx.
+
+[]() Memory address alignment
+
+> This message can occur when printing large files on a
+SPARCprinter attached to a SPARCstation 2.
+
+Replace the SPARCstation 2 CPU with one that isat the most
+recent dash level.
+
+[]() memory leaks
+
+> An application uses up more and more memory, until all swap space
+is exhausted.
+
+Many developers have found that third party software (such as
+Purify) can help identify memory leaks in their applications. If
+you suspect that you have a memory leak, you can use sar(1) to
+check on the Kernel Memory Allocation (KMA). Any driver or module
+that uses KMA resources, but does not specifically return the
+resources before it exits, can create a memory leak.
+
+[]() mount: /dev/dsk/variable is already mounted, /variable
+is busy, or...
+
+> While trying to mount a filesystem, the mount(1M) command
+received a "Device busy" (EBUSY) error code.There are several
+possible reasons: this /dev/dsk filesystem is already mounted on
+a different directory, the busy path name is the working
+directory of an active process, or the system has exceeded its
+maximum number of mount points (unlikely).
+
+Run /etc/mount to see if the filesystem is already mounted. If
+not, check to see if any shells are active in the busy directory
+(did the user cd into the directory?), or if any processes in the
+ps(1) listing are active in that directory. If the reason for the
+error message isn't obvious, try using a different directory for
+the mount point.
+
+[]() mount: giving up on: /variable
+
+> An existing server did not respond to an NFS mount request, so
+after retrying a number of times (default1000), the mount(1M)
+command has given up. Nonexistent servers or bad mount points
+produce different messages.
+
+If the "RPC: Program not registered" message precedes this one,
+the requested mount serverprobably did not share (export) any
+filesystems, so it has no NFS daemons running. Have the superuser
+on the mount server share(1M) the filesystem, then run
+/etc/init.d/nfs.server start to begin NFS service.
+
+If the requested mount server is down or slow to respond, check
+to see whether the machine needs repair or rebooting.
+
+[]() mount: mount-point /variable does not exist.
+
+> Someone tried to mount a filesystem onto the specified directory,
+but there is no suchdirectory.
+
+If this is the directory name you want,run mkdir(1) to create
+this directory as a mount point.
+
+[]() mount: the state of /dev/dsk/variable is not okay
+
+> The system was unable to mount the filesystem that was specified
+because the super-block indicates that the filesystem might be
+corrupted. This is not an impediment for read-only mounts.
+
+If you don't need to write on this filesystem, mount(1M) it using
+the -o ro option. Otherwise, do as one of the message
+continuation lines suggests and run fsck(1M) to correct the
+filesystem state and update the super-block.
+
+[]() /net/variable: No such file or directory
+
+> A user tried to change directory (for example with cd) to a
+network partition on the system specified after /net/, but this
+host either does not exist or has not shared (exported) any
+filesystem.
+
+To gain access to files on this system, try rlogin(1).
+
+To export filesystems from the remote system, become superuser on
+that system and run the share(1M) command with the appropriate
+options. If that system is sharing filesystems for the first
+time, also run /etc/init.d/nfs.server start to begin NFS service.
+
+[]() Network is down
+
+> A transport connection failed because it encountered a dead
+network.
+
+Report this error to the system administrator for the network. If
+you are the person responsible for this network, check to see why
+the network is dead and what repairs are necessary.
+
+This error results from status information delivered by the
+underlying communication interface.
+
+The symbolic name for this error is ENETDOWN, errno=127.
+
+[]() Network is unreachable
+
+> An operational error occurred either because there was no route
+to the network or because negative status information was
+returned by intermediate gateways or switching nodes.
+
+The returned status is not always sufficient to distinguish
+between a network that is down and a host that is down. See the
+"No route to host" message.
+
+Check the network routers and switches to see if they are
+disallowing these packet transfers. If they areallowing all
+packet transfers, check network cablingand connections.
+
+The symbolic name for this error is ENETUNREACH, errno=128.
+
+[]() NFS getattr failed for server variable: RPC: Timed out
+
+> This message appears on an NFS client that requested a service
+from an NFS server whose hardware is failing. Often the message
+"NFS read failed" appears along with this message. If the server
+were merely down or slow to respond, the "NFS server not
+responding" message would appear instead. Data corruption on the
+server system is possible.
+
+Because this message usually indicates server hardware failure,
+initiate repair procedures as soon as possible. Check the memory
+modules, disk controllers, and CPU board.
+
+[]() nfs mount: Couldn't bind to reserved port
+
+> This message appears when a client attempts to NFS mount a
+filesystem from a server that has more than one Ethernet
+interface configured on the same physical subnet.
+
+Always connect multiple Ethernet interfaces on one router system
+to different physical subnetworks.
+
+[]() nfs mount: mount: variable: Device busy
+
+> This message appears when the superuser attempts to NFS mount on
+top of an active directory. The busy device is actually the
+working directory of a process.
+
+Determine which shell on the workstation is currently located
+below the mount point, and change out of that directory. Be wary
+of subshells (such as su shells) that could be in different
+working directories while the parents remain below the mount
+point.
+
+[]() NFS mount: /variable mounted OK
+
+> While booting, the system failed to mount the directory specified
+after the first colon, probably because the NFS server involved
+was down or slow to respond. The mount ran in the background and
+successfully contacted the NFS server.
+
+This is a purely informative message to let you know that the
+mount process has completed.
+
+[]() NFS read failed for server variable
+
+> This is generally a permissions problem. Perhaps a directory or
+file permission was changed while the client held the file open.
+Perhaps the filesystem's share or netgroup permissions changed.
+If the server were down or the network saturated, the "NFS server
+not responding" message would appear instead.
+
+Log in to the NFS server and check the permissions of directories
+leading to the file. Make certain that the filesystem is shared
+with (exported to) the client experiencing an NFS read failure.
+
+[]() nfs_server: bad getargs for N/N
+
+> This message comes from the NFS server when it gets a request
+with unrecognized or incorrect arguments. Typically, it means the
+request could not be XDR decoded properly. This can result from
+corruption of the packet over the network, or from an
+implementation bug causing the NFS client to improperly encode
+its arguments.
+
+If this message originates from a single client, investigate that
+machine for NFS client software bugs. If this message appears all
+over a network, especially accompanied by other networking
+errors, investigate the network cabling and connectors.
+
+[]() NFS server variable not responding still trying
+
+> In mostcases this very common message indicates that the system
+has requested a service from an NFS server that is either down or
+extremely slow to respond. In some cases this message indicates
+that the network link to this NFS server is broken, although
+usually that condition generates other error messages as well. In
+a few cases this message indicates NFS client set-up problems.
+
+Check the non-responding NFS server to see whether the machine
+needs repair or rebooting. Encourage your user community to
+report such problems quickly but only once.
+
+Should this message appear when booting a diskless client, make
+sure that the client's /etc/hosts file and the network naming
+service (NIS, NIS+, or other /etc/hosts files on the network)
+have been updated.
+
+[]() NFS server variable ok
+
+> This message is the follow-up to the "NFS server not responding"
+error. It indicates that the NFS server is back in operation.
+
+When an NFS server first comes up, it will be busy fulfilling
+client requests for a while. Be patient and wait for your client
+system to respond. Making many extraneous requests only further
+slows the NFS server response time.
+
+[]() nfs umount:variable: is busy
+
+> This message appears when the superuser attempts to unmount an
+active NFS filesystem. The busy point is the working directory of
+a process.
+
+Determine which shell (or process) on the workstation is
+currently located in the remotely mounted filesystem, and change
+(cd) out of that directory. Be wary of subshells (such as su
+shells) that could be in different directories while the parent
+shells remain in the NFS filesystem.
+
+[]() NFS write error on host variable: No space left on
+device.
+
+> This console message indicates that an NFS-mounted partition has
+filled up and cannot accept writing of new data. Unfortunately,
+software that attempts to overwriteexisting files will usually
+zero out all data in these files. This is particularly
+destructive on NFS-mounted /home partitions.
+
+Find the user or process that is filling up the filesystem, and
+get the out-of-control process stopped as soon as you can. Then
+delete files as necessary to create more space on the filesystem
+(large core files are good candidates for deletion). Have users
+write any modified files to local disk if possible. If this error
+occurs often, redistribute directories to ease demandon this
+partition.
+
+For more information on disk usage, see the System Administration
+Guide, Volume II. If you are using the AnswerBook, "managing
+disk use" is a good search string.
+
+[]() NFS write failed for server variable: RPC: Timed out
+
+> This error can occur when a file system is soft-mounted, and
+server or network response time lags. Any data written to the
+server during this period could be corrupted.
+
+If you intend to write on a filesystem, never specify the soft
+mount option. Use the default hard mount for all the filesystems
+that are mounted read-write.
+
+[]() NIS+ authentication failure
+
+> This is a Federated Naming Service message. The operation could
+not be completed because the principal making the request could
+not be authenticated with the name service involved.
+
+Run the nisdefaults(1) command to verify that you are identified
+as the correct NIS+ principal. Also check that the system has
+specified the correct public key source.
+
+[]() No buffer space available
+
+> An operation on a transport endpoint or pipe was not performed
+because the system lacked sufficient buffer space or because a
+queue was full. The target system probably ran out of memory or
+swap space. Any data written during this condition will probably
+be lost.
+
+To add more swap area, use the swap -a command on the target
+system. Alternatively, reconfigure the target system to have
+more swap space. As a general rule, wwap space should be two to
+three times as large as physical memory.
+
+The symbolic name for this error is ENOBUFS,errno=132.
+
+[]() No child processes
+
+> This message can appear when an application tries to communicate
+with cooperating process that do not exist.
+
+Restart the parent process so it can create the child processes
+again. If that doesn't help, this could be the result of
+programming error; contact the vendor or author of the program
+for an update.
+
+A wait(2) system call was executed by a process that had no
+existing or unwaited-for child processes. The child processes
+could have exited prematurely, or might never have been created.
+
+The symbolic name for this error is ECHILD, errno=10.
+
+[]() No default media available
+
+> The volume manager issues this message if a user makes an
+eject(1) request when the drives containno diskette or CDROM to
+eject.
+
+Insert a diskette or CDROM. If the volume manager is confused and
+there actually is a diskette or CDROM in a drive, run volcheck to
+update the volume manager. If the system remains confused, try
+booting with the -r option to reconfigure devices.
+
+[]() No directory! Logging in with home=/
+
+> The login(1) program could not find the home directory listed in
+the password file or NIS passwd map, so it deposited the user in
+the root directory.
+
+Check that the user's home directory is mounted and is owned by
+and accessible to that user. Perhaps the automounter tried to
+mount the home directory, but the NFS server did not respond
+quicklyenough. Try listing the files in /home/username. If the
+NFS server responds to this request, have the user log out and
+log in again.
+
+It is possible that the automounter daemon is not running. Run
+the ps command to see if automountd is present. If not,run the
+second command; if it appears to be wedged, run both these
+commands:
+
+# /etc/init.d/autofs stop # /etc/init.d/autofs start
+
+When the automounter daemon is running, verify that the
+/etc/auto_master file has a line like this:
+
+/home auto_home
+
+Verify that the /etc/auto_home file has a line like this:
+
++auto_home
+
+These entries depend on the NIS auto_home map.
+
+It is also possible that the NFS server has not shared (exported)
+this /home directory, or that the NFS daemons on the server have
+disappeared.
+
+[]() No message of desired type
+
+> An attempt was made to receive a message of a type that does not
+exist on the specified message queue. See the msgop(2) man page
+for details.
+
+This indicates an error in the System V IPC message facility.
+Generally the message queue is empty or devoid of the desired
+message type, while IPC_NOWAIT is set.
+
+The symbolic name for this error is ENOMSG, errno=35.
+
+[]() No recipients specified
+
+> This message comes from the mailx(1) command whenever a user
+doesn't provide an address in the To: field.
+
+See the message "Recipient names must be specified" for details.
+
+[]() No record locks available
+
+> No more record locks are available. The system lock table is
+full.
+
+The symbolic name for this error is ENOLCK, errno=46.
+
+Perhaps a process called fcntl(2) with the F_SETLK or F_SETLKW
+option, and the system maximum was exceeded. The system contains
+several different locking subsystems, including fcntl,the NFS
+lock daemon, and mail locking, all of which can produce this
+error.
+
+Try again later, when more locks might be available.
+
+[]() No route to host
+
+> An operational error occurred because there was no route to the
+destination host, or because of status information returned by
+intermediate gateways or switching nodes.
+
+The returned status is not always sufficient to distinguish
+between a host that is down and a network that isdown. See the
+"Network is unreachable" message.
+
+Check the network routers and switches to see if they are
+disallowing these packet transfers. If they are allowing all
+packet transfers, check network cabling and connections.
+
+The symbolic name for thiserror is EHOSTUNREACH, errno=148.
+
+[]() No shell Connection closed
+
+> A user has attempted to remote login to the system, and has a
+valid account name and password, but the shell specified for
+their account is not available on that system. For example, the
+seventh field could request the GNUBourne-again shell /bin/bash,
+which does not exist on standard Solaris distributions.
+
+If you have a copy of the requested shell, become superuser and
+install the missing shell on that system. Otherwise, change the
+user's password file entry (perhaps only in the NIS+ or NIS
+passwd map) to specify an available shell such as /bin/csh or
+/bin/ksh.
+
+[]() No space left on device
+
+> While writing an ordinary file or creating a directory entry,
+there was no free space left on the device. The disk, tape, or
+diskette is full of data. Any data written to that device during
+this condition will be lost.
+
+Remove unneeded files from the hard disk or diskette until there
+is space for all the data you are writing. It might be advisable
+to move some directories onto another filesystem and create
+symbolic links accordingly. When a tape is full, continue on
+another one, use a higher density setting, or obtain a higher-
+capacity tape.
+
+To create multi-volume tapes or diskettes, use the pax(1) or
+cpio(1) command; tar(1) is still limited to a single volume.
+
+The symbolic name for this error is ENOSPC, errno=28.
+
+[]() No such device
+
+> An attempt was made to apply an operation to an inappropriate
+device, such as writing to a nonexistent device.
+
+Look in the /devices directory to see why this device does not
+exist, or why the program expects it to exist. The similar "No
+such device or address" message tends to indicate I/O problems
+with an existing device, whereas this message tends to indicate a
+device that does not exist at all.
+
+The symbolic name for this error is ENODEV, errno=19.
+
+[]() No such device or address
+
+> This can occur when a tape drive is off-line or when a device has
+been powered off or removed from thesystem.
+
+For tape drives, make sure the device is connected, powered on,
+and toggled on-line (if applicable). For disk and CDROM drives,
+check that the device is connected and powered on.
+
+With all SCSI devices, ensure that the target switch or dial is
+set to the number where the system originally mounted it. To
+inform the system of a change to the target device number, reboot
+using the -r (reconfigure) option.
+
+This message results from I/O to a special file's subdevice that
+either does not exist or that exists beyond the limit of the
+device.
+
+The symbolic name for this error is ENXIO, errno=6.
+
+[]() No such file or directory
+
+> The specified file or directory does not exist. Either the file
+name or path name was entered incorrectly.
+
+Check the file name and path name for correctness and try again.
+If the specified file or directory is a symbolic link, it
+probably points to a nonexistent file or directory.
+
+The symbolic name for this error is ENOENT, errno=2.
+
+[]() no such map in server's domain
+
+> A user or an application tried to look up something using Network
+Information
+Services (NIS), but NIS has no corresponding database
+for this request.
+
+Make sure the NIS map name is spelled correctly. To see a list of
+nicknames for the various NIS maps, run the ypcat -x command. To
+see a full list of the various NIS maps (databases), run the
+ypwhich -m command. If the NIS service were not running on the
+current machine, these commands would result in a "can't
+communicate with ypbind" message.
+
+[]() No such process
+
+> This process cannot be found. The process could have finished
+execution and disappeared, or it might still be in thesystem
+under a different numeric ID.
+
+Use the ps(1) command tocheck that the process ID you're
+supplying is correct.
+
+No process corresponds to the specified process ID (PID), light-
+weight process ID, or thread_t.
+
+The symbolic name for this error is ESRCH, errno=3.
+
+[]() No such user as variable-- cron entries not created
+
+> A file exists in /var/spool/cron/crontabs for the specified user,
+but this user is not in /etc/passwd or the NIS passwd map. The
+system cannot create cron entries for nonexistent users.
+
+To eliminate this message at boot time, remove the cron file for
+the nonexistent user, or rename it if the user's login name has
+changed. If this is a valid user, create an appropriate password
+entry for this name.
+
+[]() Not a directory
+
+> A non-directory was specified where a directory is required, such
+as in a path prefix or as an argument to the chdir(2) system
+call.
+
+Look at a listing of all the files in the current directory and
+try again, specifying a directory instead of a file.
+
+The symbolic name for this error is ENOTDIR, errno=20.
+
+[]() Not enough space
+
+> This message indicates that the system is running many large
+applications simultaneously, and has run out ofswap space
+(virtual memory). It could also indicate that applications failed
+without freeing pages from the swap area. Swap space is an area
+of disk set aside to store portions of applications and data not
+immediately required in memory. Any data written during this
+condition will probably be lost.
+
+Reinstall or reconfigure the system to have more swap space. A
+general rule of thumb is that swap space should be two to three
+times as large as physical memory. Alternatively, use mkfile(1M)
+and swap(1M) to add more swap area. This example shows how to add
+16 MB of virtual memory in the /usr/swap file (any filesystem
+with enough free space would work):
+
+# mkfile 16m /usr/swap # swap -a /usr/swap
+
+To make this automatic at boot time, add the following line to
+the /etc/vfstab file:
+
+/usr/swap - - swap -
+no -
+
+In calling the fork(2), exec(2), sbrk(2), or malloc(3C) routine,
+a program asked for more memory than the system could supply.
+This is not a temporary condition; swap space is a system
+parameter.
+
+The symbolic name for this error is ENOMEM, errno=12.
+
+[]() not found
+
+> This message indicates that the Bourne shell could not find the
+program name given as a command.
+
+Check the form and spelling of the command line. If that looks
+correct, echo $PATH to see if the user's search path is correct.
+When communications are garbled, it is possible to unset a search
+path to such an extent that only built-in shell commands are
+available. Here is a command to reset a basic search path:
+
+$ PATH=/usr/bin:/usr/ccs/bin:/usr/openwin/bin:.
+
+If the search path looks correct, check the directory contents
+along the search path to see if programs are missing or if
+directories are not mounted.
+
+[]() NOTICE: /variable: out of inodes
+
+> The filesystem specified after the first colon probably contains
+many small files, exceeding the per-filesystem limit for inodes
+(file information nodes).
+
+If many small files were created unintentionally, removing them
+will resolve the problem.
+
+Otherwise, follow these steps to increase filesystem capacity for
+small files. Make several backup copies of the filesystem on
+different tapes (for safety), then bring the machine down to
+single-user mode. Use the newfs(1M) command with the -i option to
+increase inode density for this filesystem. Here is an example:
+
+# newfs -i 1024 /dev/rdsk/partition
+
+Finally, restore the filesystem from a backup tape. Note that
+increasing the inode density slightly reduces total filesystem
+capacity.
+
+[]() Not login shell
+
+> This message results when a user triesto logout(1) from a shell
+other than the one started at login time.
+
+To quit a non-login shell, use the exit(1) command. Continue
+doing so until you have logged out.
+
+For more general information on the login shell, see the section
+on customizing your work environment in the Solaris Advanced
+User's Guide.
+
+[]() Not on system console
+
+> A user tried to login(1) to a system as the superuser (uid=0,
+which is not necessarily root) from a terminal other than the
+console.
+
+Login to that system as a normal user, then run su(1M) to become
+superuser. To allow superuser logins from any terminal, comment
+out the CONSOLE line in /etc/default/login (this is not
+recommended for security reasons).
+
+[]() Not owner
+
+> Either an ordinary user tried to do something reserved for the
+superuser, or the user tried to modify a file in a way restricted
+to the file's owner or to the superuser.
+
+Switch user to root and try again.
+
+The symbolic name for this error is EPERM, errno=1.
+
+[]() Not supported
+
+> This version of the system does not support the feature
+requested, although future versions of the system might provide
+support.
+
+This is generally not a system message from the kernel, but an
+error returned by an application. Contact the vendor or author of
+the application for an update.
+
+The symbolic name for this error is ENOTSUP, errno=48.

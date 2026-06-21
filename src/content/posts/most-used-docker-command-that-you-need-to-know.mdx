@@ -1,0 +1,209 @@
+---
+title: "Most Used Docker Command that You need to Know!"
+description: "Docker is a set of platform as a service products ( PaaS) that use OS-level virtualization to deliver software in packages called containers."
+pubDate: 2023-03-01
+updatedDate: 2026-06-20
+pageType: guide
+topic: devops
+tier: "TIER 3 (DevOps/Cloud)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+Docker is a set of platform as a service products ( PaaS) that use OS-level virtualization to deliver software in packages called containers. Developers can build, share, and run modern applications using docker.
+
+Here are top 20 most used docker commands that you must know.
+
+## docker version
+
+Displays the Docker version information.
+
+Example: To display the Docker version information in your terminal, run the following command:
+
+```bash
+docker version
+```
+
+## docker search
+
+Searches the Docker Hub registry for an image.
+
+Example: To search for the nginx image on Docker Hub, run the following command in your terminal:
+
+```bash
+docker search nginx
+```
+
+## docker pull
+
+Pulls an image from a registry to the local machine.
+
+Example: To pull the nginx image from Docker Hub, run the following command in your terminal:
+
+```bash
+docker pull nginx
+```
+
+## docker run
+
+Runs a command in a new container.
+
+Example: To start a new container using the nginx image and map port 80 of the container to port 8080 of the host, run the following command in your terminal:
+
+```bash
+docker run -p 8080:80 nginx
+```
+
+## docker ps
+
+Lists the running containers.
+
+Example: To list all the running containers on your system, run the following command in your terminal:
+
+```bash
+docker ps
+```
+
+## docker stop
+
+Stops one or more running containers.
+
+Example: To stop a running container with the ID 123456, run the following command in your terminal:
+
+```bash
+docker stop 123456
+```
+
+## docker restart
+
+Restarts one or more containers.
+
+Example: To restart a container with the ID 123456, run the following command in your terminal:
+
+```bash
+docker restart 123456
+```
+
+## docker kill
+
+Sends a SIGKILL signal to a running container, killing it.
+
+Example: To kill a running container with the ID 123456, run the following command in your terminal:
+
+```bash
+docker kill 123456
+```
+
+## docker exec
+
+Runs a command in a running container.
+
+Example: To run a command ls inside a running container with the ID 123456, run the following command in your terminal:
+
+```bash
+docker exec 123456 ls
+```
+
+## docker login
+
+Logs in to a Docker registry.
+
+Example: To log in to Docker Hub, run the following command in your terminal:
+
+```bash
+docker login
+```
+
+## docker commit
+
+Creates a new image from a containers changes.
+
+Example: To create a new image from a container with the ID 123456, run the following command in your terminal:
+
+docker commit 123456 myimage:v1.0
+
+## docker push
+
+Pushes an image to a registry.
+
+Example: To push the myimage:v1.0 image to Docker Hub, run the following command in your terminal:
+
+docker push myusername/myimage:v1.0
+
+## docker network
+
+Manages Docker networks.
+
+Example: To create a new network called mynetwork, run the following command in your terminal:
+
+```bash
+docker network create mynetwork
+```
+
+## docker history
+
+Shows the history of an image.
+
+Example: To display the history of the nginx image, run the following command in your terminal:
+
+```bash
+docker history nginx
+```
+
+## docker rmi
+
+Removes one or more images.
+
+Example: To remove an image with the ID 123456, run the following command in your terminal:
+
+```bash
+docker rmi 123456
+```
+
+## docker ps -a
+
+Lists all containers, including stopped containers.
+
+Example: To list all the containers, including the stopped ones, run the following command in your terminal:
+
+```bash
+docker ps -a
+```
+
+## docker copy
+
+Copies files or folders between a container and the local filesystem.
+
+Example: To copy a file myfile.txt from a container with the ID 123456 to your local filesystem, run the following command in your terminal:
+
+docker cp 123456:/path/to/myfile.txt /path/to/destination
+
+## docker logs
+
+Shows the logs of a container.
+
+Example: To show the logs of a container with the ID 123456, run the following command in your terminal:
+
+```bash
+docker logs 123456
+```
+
+## docker volume
+
+Manages Docker volumes.
+
+Example: To create a new volume called myvolume, run the following command in your terminal:
+
+```bash
+docker volume create myvolume
+```
+
+## docker logout
+
+Logs out from a Docker registry.
+
+Example: To log out from Docker Hub, run the following command in your terminal:
+
+```bash
+docker logout
+```

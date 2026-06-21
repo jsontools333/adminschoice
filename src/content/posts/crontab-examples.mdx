@@ -1,0 +1,685 @@
+---
+title: "75+ Crontab Examples for Real-World Tasks"
+description: "Using crontab sometimes can get little confusing due to the field names, values, syntax, redirection."
+pubDate: 2021-09-02
+updatedDate: 2026-06-20
+pageType: reference
+topic: scheduling
+tier: "TIER 2 (core reference)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+Using crontab sometimes can get little confusing due to the field names, values, syntax, redirection. Learn crontab with different examples for each fields, you can use with minor modifications or create new ones based off these examples
+This is a working cookbook of 75+ crontab expressions for real-world tasks — backups, monitoring, log management, web maintenance, database jobs, business-hours patterns, and edge cases. Every entry has the expression, a plain-English explanation, the exact use case, and gotchas where they apply.
+
+For the underlying syntax, see the [crontab quick reference](/crontab-quick-reference/) . If your job isn't running, see the [cron debugging checklist](/cron-job-not-running/) .
+
+## Jump to a category
+
+- [Backups & archives](#backups) (10 examples)
+- [Log management](#logs) (8 examples)
+- [Monitoring & health checks](#monitoring) (10 examples)
+- [Web & application tasks](#web) (10 examples)
+- [Database jobs](#database) (8 examples)
+- [Reporting & analytics](#reports) (8 examples)
+- [Business-hours patterns](#business-hours) (10 examples)
+- [Edge cases & tricks](#edge-cases) (8 examples)
+- [Multi-server coordination](#multi-server) (5 examples)
+
+Before you copy-paste: Replace `/path/to/script.sh` and similar placeholders with your actual paths. Use absolute paths for binaries — cron's PATH is minimal. Find paths with `which command-name` . Add output redirection ( `>> /var/log/job.log 2>&1` ) so failures aren't silent.
+
+## Backups & archives
+
+### Nightly database dump at 2:30 AM
+
+```bash
+30 2 * * * /usr/bin/mysqldump -u backup mydb > /backups/mydb-$(date +\%Y\%m\%d).sql 2>> /var/log/db-backup.log
+```
+
+Runs every day at 02:30. The escaped `\%` is required — unescaped `%` characters in cron are treated as newlines and will truncate the command.
+
+### Full system backup every Sunday at 3:00 AM
+
+```bash
+0 3 * * 0 /usr/local/bin/full-backup.sh >> /var/log/backup.log 2>&1
+```
+
+Day-of-week `0` is Sunday. Use this for a weekly full backup that complements daily incrementals.
+
+### Incremental backup every 6 hours
+
+```bash
+0 */6 * * * /usr/local/bin/incremental-backup.sh >> /var/log/backup.log 2>&1
+```
+
+Runs at 00:00, 06:00, 12:00, 18:00. The `*/6` in the hour field means "every 6th hour starting at 0."
+
+### Rsync to a remote server nightly
+
+```bash
+15 1 * * * /usr/bin/rsync -az --delete /data/ backup@remote:/backups/data/ >> /var/log/rsync.log 2>&1
+```
+
+Requires SSH key authentication set up between the servers. See our [SSH without password](/ssh-without-password/) guide.
+
+### Compress and archive yesterday's logs at midnight
+
+```bash
+5 0 * * * /usr/bin/tar -czf /archives/logs-$(date -d yesterday +\%Y\%m\%d).tar.gz /var/log/myapp/ 2>> /var/log/archive.log
+```
+
+The 5-minute offset avoids competing with logrotate, which typically runs at midnight.
+
+### Snapshot a directory with restic every hour
+
+```bash
+0 * * * * /usr/local/bin/restic -r /backups/restic backup /home --tag hourly >> /var/log/restic.log 2>&1
+```
+
+Modern alternative to tar/rsync. Restic handles deduplication and encryption automatically.
+
+### Borgbackup nightly with pruning
+
+```bash
+30 3 * * * /usr/local/bin/borg-backup-and-prune.sh >> /var/log/borg.log 2>&1
+```
+
+Keep the cron entry simple — put the borg create, borg prune, and borg compact commands in the wrapper script.
+
+### S3 sync every 4 hours during business hours
+
+```bash
+0 8-20/4 * * 1-5 /usr/local/bin/aws s3 sync /data s3://mybucket/data >> /var/log/s3-sync.log 2>&1
+```
+
+Runs at 08:00, 12:00, 16:00, 20:00 on weekdays only. The `8-20/4` means "every 4 hours between 8 and 20."
+
+### Backup only if disk usage is below 80%
+
+```bash
+0 2 * * * [ $(df / | awk 'NR==2 {print int($5)}') -lt 80 ] && /usr/local/bin/backup.sh
+```
+
+Prevents the backup from running on a nearly-full disk. The `df` command checks root partition usage.
+
+### Verify backup integrity weekly
+
+```bash
+0 4 * * 1 /usr/local/bin/verify-backups.sh | /usr/bin/mail -s "Backup verification" admin@example.com
+```
+
+Runs every Monday at 04:00 and emails the result. Don't trust a backup you haven't verified.
+
+## Log management
+
+### Rotate application logs daily at midnight
+
+```bash
+0 0 * * * /usr/sbin/logrotate -f /etc/logrotate.d/myapp >> /var/log/logrotate.log 2>&1
+```
+
+Force-runs logrotate even if size thresholds aren't met. Useful for time-based rotation.
+
+### Delete log files older than 30 days
+
+```bash
+0 5 * * * /usr/bin/find /var/log/myapp -name "*.log" -mtime +30 -delete
+```
+
+The `-mtime +30` matches files modified more than 30 days ago. Test with `-print` instead of `-delete` first.
+
+### Compress logs older than 7 days
+
+```bash
+15 5 * * * /usr/bin/find /var/log/myapp -name "*.log" -mtime +7 ! -name "*.gz" -exec gzip {} \;
+```
+
+The `! -name "*.gz"` prevents re-compressing already-gzipped files.
+
+### Truncate a fast-growing log file every hour
+
+```bash
+0 * * * * /usr/bin/truncate -s 0 /var/log/debug.log
+```
+
+Use sparingly — destroys log history. Better long-term solution is to fix whatever's filling the log.
+
+### Archive web server logs to S3 weekly
+
+```bash
+0 4 * * 0 /usr/local/bin/archive-nginx-logs.sh >> /var/log/log-archive.log 2>&1
+```
+
+Sunday at 04:00. Pair with logrotate's `delaycompress` so the previous week's logs are stable when archived.
+
+### Alert if any log file is over 1 GB
+
+```bash
+0 9 * * * /usr/bin/find /var/log -size +1G -exec ls -lh {} \; | /usr/bin/mail -s "Large log files" admin@example.com
+```
+
+Catches runaway logs before they fill the disk.
+
+### Clean systemd journal weekly
+
+```bash
+0 4 * * 0 /usr/bin/journalctl --vacuum-time=30d >> /var/log/journal-vacuum.log 2>&1
+```
+
+Keeps the journal at 30 days. Alternatives: `--vacuum-size=2G` for size-based, or `--vacuum-files=10` for file-count.
+
+### Parse error logs and email a daily digest
+
+```bash
+0 8 * * * /usr/bin/grep -i "error\|critical" /var/log/myapp/app.log | /usr/bin/tail -100 | /usr/bin/mail -s "Daily error digest" ops@example.com
+```
+
+Sends the last 100 error/critical lines from yesterday's log. Adjust the path and patterns for your app.
+
+## Monitoring & health checks
+
+### Ping a healthcheck URL every 5 minutes
+
+```bash
+*/5 * * * * /usr/bin/curl -fsS --retry 3 https://hc-ping.com/your-uuid > /dev/null
+```
+
+For services like Healthchecks.io, Cronitor, or Dead Man's Snitch. Sends a heartbeat so you're alerted when the job *stops* running.
+
+### Check website is up every minute, alert on failure
+
+```bash
+* * * * * /usr/bin/curl -fsS --max-time 10 https://example.com/health || /usr/bin/mail -s "Site DOWN" oncall@example.com
+```
+
+The `-f` flag makes curl exit non-zero on HTTP errors. The `||` only runs the mail command if curl failed.
+
+### Disk space alert when over 85% full
+
+```bash
+0 */2 * * * /usr/local/bin/check-disk.sh 85 >> /var/log/disk-check.log 2>&1
+```
+
+Runs every 2 hours. Put the threshold logic in the script — keeps the crontab readable.
+
+### Memory usage check every 15 minutes
+
+```bash
+*/15 * * * * /usr/bin/awk '/MemAvailable/ {if ($2 < 500000) print "Low memory: " $2 " kB"}' /proc/meminfo | /usr/bin/mail -E -s "Memory alert" ops@example.com
+```
+
+The `mail -E` flag only sends if there's input — no email when memory is fine.
+
+### SSL certificate expiry check, weekly
+
+```bash
+0 9 * * 1 /usr/local/bin/check-ssl-expiry.sh example.com 14 >> /var/log/ssl-check.log 2>&1
+```
+
+Monday at 09:00. Script should alert if the cert expires within 14 days. With Let's Encrypt auto-renewal this is a safety net, not a primary mechanism.
+
+### Process check every 5 minutes, restart if missing
+
+```bash
+*/5 * * * * /usr/bin/pgrep -x myservice > /dev/null || /usr/bin/systemctl restart myservice
+```
+
+If `myservice` isn't running, restart it. Use sparingly — systemd's `Restart=on-failure` in a unit file is usually better.
+
+### Load average check, alert if over threshold
+
+```bash
+*/10 * * * * /usr/bin/awk '{if ($1 > 4.0) print "High load: " $1}' /proc/loadavg | /usr/bin/mail -E -s "High load" ops@example.com
+```
+
+The threshold (4.0) should be tuned to your server's CPU count. Rule of thumb: alert when load exceeds 1× the core count sustained.
+
+### Network connectivity check to a critical dependency
+
+```bash
+*/2 * * * * /usr/bin/nc -z -w 5 api.partner.com 443 || echo "Partner API unreachable at $(date)" >> /var/log/connectivity.log
+```
+
+`nc -z` tests connectivity without sending data. Useful for tracking upstream API availability.
+
+### Backup age check — alert if no backup in 25 hours
+
+```bash
+0 9 * * * /usr/bin/find /backups -name "*.tar.gz" -mtime -1 | /usr/bin/grep -q . || /usr/bin/mail -s "No recent backup" ops@example.com
+```
+
+If find returns nothing (no backup younger than 1 day), send an alert. Catches silent backup failures.
+
+### Database connection check every minute
+
+```bash
+* * * * * /usr/bin/mysql -u monitor -e "SELECT 1" >/dev/null 2>&1 || /usr/local/bin/db-alert.sh
+```
+
+Fast, cheap check that the database accepts connections. Configure the `monitor` user with minimal privileges.
+
+## Web & application tasks
+
+### Regenerate sitemap nightly at 1:00 AM
+
+```bash
+0 1 * * * /usr/bin/wget -q -O /dev/null https://example.com/wp-sitemap.xml >> /var/log/sitemap.log 2>&1
+```
+
+For WordPress, hitting the sitemap URL forces regeneration. Adjust for your CMS.
+
+### Clear application cache every morning at 5:00 AM
+
+```bash
+0 5 * * * /usr/local/bin/php /var/www/myapp/artisan cache:clear >> /var/log/cache-clear.log 2>&1
+```
+
+Laravel example. For other frameworks, replace with the equivalent CLI command.
+
+### Warm up cache by hitting key URLs
+
+```bash
+15 5 * * * /usr/local/bin/cache-warmer.sh >> /var/log/cache-warm.log 2>&1
+```
+
+Runs after the 05:00 cache clear. Put a list of important URLs in the script and curl each one.
+
+### Email queue processor every minute
+
+```bash
+* * * * * /usr/bin/php /var/www/myapp/artisan queue:work --stop-when-empty >> /var/log/queue.log 2>&1
+```
+
+The `--stop-when-empty` flag exits when the queue is drained, preventing overlapping workers.
+
+### Search index rebuild weekly
+
+```bash
+0 4 * * 0 /usr/bin/php /var/www/myapp/artisan scout:import "App\Models\Post" >> /var/log/scout.log 2>&1
+```
+
+Sunday at 04:00. For Elasticsearch, Algolia, or Meilisearch integrations.
+
+### Trigger a webhook every hour
+
+```bash
+0 * * * * /usr/bin/curl -X POST -H "Content-Type: application/json" -d '{"trigger":"hourly"}' https://example.com/webhooks/hourly
+```
+
+Useful for self-hosted apps that need a heartbeat or scheduled event trigger.
+
+### Renew Let's Encrypt certificates twice daily
+
+```bash
+0 0,12 * * * /usr/bin/certbot renew --quiet --post-hook "systemctl reload nginx"
+```
+
+Certbot only renews certs nearing expiry, so running twice daily is safe and recommended. The post-hook reloads nginx after renewal.
+
+### Restart PHP-FPM weekly to flush memory leaks
+
+```bash
+0 4 * * 0 /usr/bin/systemctl restart php8.3-fpm >> /var/log/fpm-restart.log 2>&1
+```
+
+Quiet hours, weekly. Helps with apps that have memory growth over time. Not a fix — investigate the leak — but useful as a stopgap.
+
+### Refresh stale CDN content
+
+```bash
+0 3 * * * /usr/local/bin/aws cloudfront create-invalidation --distribution-id ABCDEF --paths "/*" >> /var/log/cdn-invalidate.log 2>&1
+```
+
+Forces CloudFront to re-fetch from origin. Use sparingly — invalidations cost money beyond a free tier.
+
+### Auto-deploy from git every 5 minutes
+
+```bash
+*/5 * * * * cd /var/www/myapp && /usr/bin/git pull --quiet && /usr/bin/systemctl reload myapp
+```
+
+Simple GitOps for small projects. For anything production-grade, use a proper CI/CD pipeline instead.
+
+## Database jobs
+
+### Optimize MySQL tables weekly
+
+```bash
+30 3 * * 0 /usr/bin/mysqlcheck -o --all-databases >> /var/log/mysql-optimize.log 2>&1
+```
+
+Sunday at 03:30. Reclaims space from deleted rows and rebuilds indexes. Locks tables — schedule during low-traffic hours.
+
+### PostgreSQL VACUUM ANALYZE daily
+
+```bash
+0 3 * * * /usr/bin/psql -U postgres -c "VACUUM ANALYZE" mydb >> /var/log/pg-vacuum.log 2>&1
+```
+
+Modern PostgreSQL has autovacuum, but a manual nightly run is good belt-and-braces for write-heavy databases.
+
+### Drop old partitions monthly
+
+```bash
+0 4 1 * * /usr/local/bin/drop-old-partitions.sh >> /var/log/partitions.log 2>&1
+```
+
+First of each month at 04:00. For time-partitioned tables — drop partitions older than your retention window.
+
+### Run scheduled SQL reports
+
+```bash
+0 7 * * 1-5 /usr/bin/psql -U reports -d analytics -f /opt/sql/daily-report.sql | /usr/bin/mail -s "Daily report" team@example.com
+```
+
+Weekdays at 07:00. Output gets emailed directly.
+
+### Refresh materialized views every 4 hours
+
+```bash
+0 */4 * * * /usr/bin/psql -U postgres -d mydb -c "REFRESH MATERIALIZED VIEW CONCURRENTLY sales_summary" >> /var/log/mv-refresh.log 2>&1
+```
+
+The `CONCURRENTLY` flag avoids locking the view during refresh. Requires a unique index on the view.
+
+### Archive old records monthly
+
+```bash
+30 4 1 * * /usr/local/bin/archive-old-records.sh >> /var/log/db-archive.log 2>&1
+```
+
+Moves rows older than N months from hot tables to archive tables. Keep the SQL in the script for clarity.
+
+### Replication lag check every minute
+
+```bash
+* * * * * /usr/local/bin/check-replication-lag.sh 60 >> /var/log/replication.log 2>&1
+```
+
+Alert if replica is more than 60 seconds behind primary. Critical for read-replica architectures.
+
+### Redis snapshot to S3 every 6 hours
+
+```bash
+0 */6 * * * /usr/local/bin/redis-cli BGSAVE && /usr/bin/sleep 30 && /usr/local/bin/aws s3 cp /var/lib/redis/dump.rdb s3://mybucket/redis/dump-$(date +\%Y\%m\%d-\%H).rdb
+```
+
+The 30-second sleep lets BGSAVE complete before copying. For large datasets, increase the sleep or check completion via `LASTSAVE` .
+
+## Reporting & analytics
+
+### Daily sales report at 7:00 AM weekdays
+
+```bash
+0 7 * * 1-5 /usr/local/bin/daily-sales-report.sh | /usr/bin/mail -s "Daily sales - $(date +\%Y-\%m-\%d)" sales@example.com
+```
+
+The escaped dates in the subject line give each email a unique, searchable subject.
+
+### Weekly KPI digest, Monday at 8:00 AM
+
+```bash
+0 8 * * 1 /usr/local/bin/weekly-kpi.sh > /tmp/kpi.html && /usr/bin/mailx -a 'Content-Type: text/html' -s "Weekly KPIs" leadership@example.com < /tmp/kpi.html
+```
+
+Sends as HTML for nicer formatting. The two-step approach (generate file, then send) keeps the cron entry clean.
+
+### Monthly invoice generation on the 1st
+
+```bash
+0 1 1 * * /usr/bin/php /var/www/billing/artisan invoices:generate --month=$(date -d "last month" +\%Y-\%m) >> /var/log/invoices.log 2>&1
+```
+
+Runs at 01:00 on the 1st of each month, generating invoices for the previous month. The `date -d "last month"` trick handles the rollover correctly.
+
+### Quarterly report on the 1st of Jan/Apr/Jul/Oct
+
+```bash
+0 6 1 1,4,7,10 * /usr/local/bin/quarterly-report.sh >> /var/log/quarterly.log 2>&1
+```
+
+Month field uses a list: 1, 4, 7, 10. Day-of-month is 1. Runs at 06:00.
+
+### End-of-month report
+
+```bash
+0 23 28-31 * * [ "$(date -d tomorrow +\%d)" = "01" ] && /usr/local/bin/eom-report.sh
+```
+
+The classic "last day of the month" trick. Runs on the 28th–31st but only executes if tomorrow is the 1st. Handles February correctly.
+
+### Hourly metrics scrape
+
+```bash
+0 * * * * /usr/local/bin/scrape-metrics.sh | /usr/local/bin/post-to-statsd.sh
+```
+
+Cheap, simple alternative to running a full metrics agent for non-critical metrics.
+
+### Weekly capacity planning report
+
+```bash
+0 8 * * 1 /usr/local/bin/capacity-report.sh | /usr/bin/mail -s "Capacity report" infra@example.com
+```
+
+Disk growth, memory trends, request volumes. Run before Monday standup so it's fresh in the team's mind.
+
+### Annual archive on January 2nd at 5:00 AM
+
+```bash
+0 5 2 1 * /usr/local/bin/year-end-archive.sh $(date -d "last year" +\%Y) >> /var/log/annual-archive.log 2>&1
+```
+
+The 2nd, not the 1st, to avoid competing with new-year-rollover jobs. Passes the previous year as an argument.
+
+## Business-hours patterns
+
+### Every hour on weekdays during business hours
+
+```bash
+0 9-17 * * 1-5 /path/to/script.sh
+```
+
+Runs at 09:00, 10:00, ..., 17:00, Monday through Friday. The `9-17` is inclusive on both ends.
+
+### Every 15 minutes during business hours
+
+```bash
+*/15 9-17 * * 1-5 /path/to/script.sh
+```
+
+09:00, 09:15, 09:30, ... 17:45, weekdays. Common for sales-pipeline syncs.
+
+### Every weekday lunch hour
+
+```bash
+*/5 12 * * 1-5 /usr/local/bin/check-inventory.sh
+```
+
+Every 5 minutes during the 12:00 hour, weekdays. The minute field `*/5` with hour `12` gives 12:00, 12:05, 12:10, etc.
+
+### After-hours batch job, weekdays only
+
+```bash
+0 22 * * 1-5 /usr/local/bin/nightly-batch.sh >> /var/log/batch.log 2>&1
+```
+
+10:00 PM weekdays. Avoids weekend runs when no one is around to handle failures.
+
+### Weekend-only maintenance
+
+```bash
+0 3 * * 6,0 /usr/local/bin/weekend-maintenance.sh >> /var/log/maint.log 2>&1
+```
+
+03:00 on Saturday (6) and Sunday (0). Day-of-week list separates with commas.
+
+### Monday morning sync at 6:00 AM
+
+```bash
+0 6 * * 1 /usr/local/bin/monday-sync.sh >> /var/log/sync.log 2>&1
+```
+
+Day-of-week `1` is Monday. Gives systems time to settle before the workday starts.
+
+### Friday afternoon cleanup at 5:00 PM
+
+```bash
+0 17 * * 5 /usr/local/bin/friday-cleanup.sh >> /var/log/cleanup.log 2>&1
+```
+
+End-of-week tidy-up. Day-of-week `5` is Friday.
+
+### Quarterly review reminder on the first Monday of each quarter
+
+```bash
+0 9 1-7 1,4,7,10 1 /usr/local/bin/quarterly-reminder.sh
+```
+
+Runs on days 1–7 of January, April, July, October, but only if it's also a Monday. Day-of-month and day-of-week with both restricted means OR — so this fires on every day in 1–7 *or* every Monday. To get true AND, use the trick in example 65.
+
+### Twice daily, but only on Mondays and Wednesdays
+
+```bash
+0 9,15 * * 1,3 /path/to/script.sh
+```
+
+09:00 and 15:00 on Mondays and Wednesdays. Comma-separated lists in both fields.
+
+### Hourly during a defined launch window
+
+```bash
+0 9-17 1-7 6 * /usr/local/bin/launch-monitor.sh
+```
+
+Hourly, 09:00–17:00, on June 1–7. Useful for a product launch monitoring window.
+
+## Edge cases & tricks
+
+### First Monday of every month (true AND logic)
+
+```bash
+0 9 1-7 * 1 [ "$(date +\%u)" = "1" ] && /usr/local/bin/first-monday.sh
+```
+
+Day-of-month 1–7 AND day-of-week Monday. The shell test verifies it's actually Monday — without this, cron's OR logic would fire on any day in 1–7 or any Monday.
+
+### Last Friday of every month
+
+```bash
+0 17 22-28 * * [ "$(date -d "+7 days" +\%m)" != "$(date +\%m)" ] && [ "$(date +\%u)" = "5" ] && /usr/local/bin/last-friday.sh
+```
+
+Checks two conditions: 7 days from now is a different month (so this is the last week), and today is Friday. The 22–28 range is the earliest window where the last Friday can fall.
+
+### Every 30 seconds (cron's minimum is 1 minute)
+
+```bash
+* * * * * /path/to/script.sh
+* * * * * /usr/bin/sleep 30; /path/to/script.sh
+```
+
+Two entries — one at :00, one at :30. Cron can't schedule sub-minute, so this is the workaround. For truly precise timing, use a systemd timer with `OnUnitActiveSec=30s` .
+
+### Run only on the 13th if it's also a Friday
+
+```bash
+0 0 13 * * [ "$(date +\%u)" = "5" ] && /usr/local/bin/spooky.sh
+```
+
+The day-of-month is fixed at 13. The shell test confirms Friday (day-of-week 5).
+
+### Once at system reboot
+
+```bash
+@reboot /usr/local/bin/startup.sh >> /var/log/startup.log 2>&1
+```
+
+Runs once when cron starts (usually at boot). For modern systems, a systemd unit with `After=network.target` is more reliable.
+
+### Run with a random delay to avoid thundering herd
+
+```bash
+0 3 * * * /usr/bin/sleep $((RANDOM \% 600)) && /usr/local/bin/script.sh
+```
+
+Adds a random 0–600 second delay before running. Useful when many servers run the same cron — staggers them to avoid overwhelming a shared resource.
+
+### Skip if previous run is still going (flock)
+
+```bash
+* * * * * /usr/bin/flock -n /tmp/myjob.lock /path/to/script.sh
+```
+
+The `-n` flag exits immediately if the lock is held. Prevents overlapping runs of a long-running job scheduled at short intervals.
+
+### Run only on days the file exists
+
+```bash
+0 9 * * * [ -f /var/run/enable-job ] && /usr/local/bin/conditional.sh
+```
+
+Simple toggle: create the file to enable, delete it to disable. Useful for jobs you want to pause without editing the crontab.
+
+## Multi-server coordination
+
+### Run only on the elected leader
+
+```bash
+*/5 * * * * /usr/local/bin/is-leader.sh && /usr/local/bin/leader-only-job.sh
+```
+
+For HA clusters where one task should run on exactly one node. The `is-leader.sh` script checks etcd/Consul/ZooKeeper or a database lock.
+
+### Distributed lock via Redis
+
+```bash
+0 * * * * /usr/local/bin/redis-cli SET cron-lock-$(date +\%H) 1 EX 3500 NX | /usr/bin/grep -q OK && /usr/local/bin/hourly-job.sh
+```
+
+Only one node can SET the key (because of `NX` ); others fail and skip. The 3500-second expiry ensures the lock clears before the next hour.
+
+### Stagger by hostname hash
+
+```bash
+$((($(hostname | cksum | cut -d' ' -f1) \% 60))) * * * * /usr/local/bin/staggered-job.sh
+```
+
+Each host runs at a different minute based on its hostname hash. Spreads load across hosts in a fleet.
+
+### Only run if pingable from another server
+
+```bash
+*/5 * * * * /usr/bin/ping -c 1 -W 2 primary-server && /usr/local/bin/secondary-task.sh
+```
+
+Skips the task if the primary is unreachable. Useful for read-replica jobs that should pause when the primary is down.
+
+### Coordinate via shared NFS lock file
+
+```bash
+* * * * * /usr/bin/flock -n /shared/nfs/jobs/myjob.lock /usr/local/bin/job.sh
+```
+
+If multiple servers mount the same NFS share, flock works across them. One server gets the lock and runs the job; others skip.
+
+## Useful patterns to remember
+
+A few cron-isms that come up repeatedly across these examples:
+
+- **Escape `%` as `\%` .** Unescaped percent signs become newlines.
+- **Use absolute paths for commands.** Find them with `which` .
+- **Always redirect output** with `>> /path/to/log 2>&1` for debugging.
+- **Set MAILTO=""** at the top of the crontab to suppress cron mail when you're handling logging yourself.
+- **Set SHELL=/bin/bash** if you're using bash features (cron defaults to `/bin/sh` ).
+- **For complex commands, put them in a script.** Crontabs should be readable at a glance.
+- **For overlap prevention, use `flock` .** For monitoring, use Healthchecks.io or similar.
+- **For sub-minute precision or anything needing retries, use systemd timers instead.**
+
+## Related references
+
+- [Crontab quick reference](/crontab-quick-reference/) — syntax, fields, operators
+- [Cron job not running? Complete debugging checklist](/cron-job-not-running/)
+- [What does `2>&1` mean in shell?](/what-does-2-1-mean-in-shell/)
+- [SSH without password](/ssh-without-password/) — for the rsync and remote-server examples

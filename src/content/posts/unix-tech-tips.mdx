@@ -1,0 +1,227 @@
+---
+title: "Unix Tech Tips"
+description: "Edit /platform/platform-name/boot.conf uncomment line with the variable named ALLOW_64BIT_KERNEL_ON_UltraSPARC_1_CPU set to the value true ."
+pubDate: 2009-12-20
+updatedDate: 2026-06-20
+pageType: guide
+topic: sysadmin
+tier: "TIER 2 (core reference)"
+tags: ["basics", "tips"]
+testedOn: ["Linux", "Unix"]
+---
+
+1. **Running Sol
+aris in 32 or 64 bit mode** - Page 1
+2. **Removing ^M from Unix text files** - Page 2
+3. **Backup commands - ufsdump , tar , cpio** - Page 3
+4. **Setting up Ethernet card speed & duplex mode** - Page 4
+5. **One Line scripts** - Page 4
+
+1. Running Solaris in 32 or 64 Bit mode
+
+Finding the running mode
+___________________
+
+#isainfo -v
+64-bit sparcv9 applications
+32-bit sparc applications
+
+Booting in 32 bit
+mode
+_________________
+
+ok> boot kernel/unix
+# eeprom boot-file=kernel/unix
+
+Booting in 64 bit mode
+__________________
+OK>boot kernel/sparcv9/unix
+
+# eeprom boot-file=kernel/sparcv9/unix
+
+...reboot the system
+
+Edit /platform/platform-name/boot.conf uncomment line with the variable named ALLOW_64BIT_KERNEL_ON_UltraSPARC_1_CPU set to the value true .
+
+ALLOW_64BIT_KERNEL_ON_UltraSPARC_1_CPU=true
+
+... reboot the system .
+
+If diag switch is set to true following needs to be set
+_______________________________________
+
+for 32 bit
+# /usr/sbin/eeprom diag-file="kernel/unix"
+
+for 64 bit
+# /usr/sbin/eeprom diag-file="kernel/sparcv9/unix"
+
+2. Removing ^M from UNIX text files
+
+Using Perl :
+Following command will change the orginal file itself so keep a backup copy .
+
+perl -pi -e "s:^V^M::g" existing_file_name
+
+You won't see the Control V on typing but it is needed to generate control
+
+character ^M.
+
+Using sed :
+sed -e `s/^V^M//g` existing_file_name > new_file_name
+
+Using vi :
+Open file in vi and enter the following at : prompt in command mode .
+
+:%s/^V^M//g
+
+3. Backup commands - ufsdump , tar , cpio
+
+ufsdump
+1. Used for complete file system backup .
+2. It copies every thing from regular files in a file system to special character and block device files.
+2. It can work on mounted or unmounted file systems.
+
+Tar:
+1. Used for single or multiple files backup .
+2. Can't backup special character & block device files .
+3. Works only on mounted file system.
+
+Identifying the tape device
+dmesg | grep st
+
+Checking the status of the tape drive
+mt -f /dev/rmt/0 status
+
+4. Backup file system using ufsdump
+
+ufsdump 0cvf /dev/rmt/0 /dev/rdsk/c0t0d0s0
+or
+ufsdump 0cvf /dev/rmt/0 /usr
+
+To restore a dump with ufsrestore
+ufsrestore rvf /dev/rmt/0
+
+ufsrestore in interactive mode allowing selection of individual files and directories using add , ls , cd , pwd and extract commands .
+ufsrestore -i /dev/rmt/0
+
+Making a copy of a disk slice using ufsdump
+ufsdump 0f - /dev/rdsk/c0t0d0s7 |(cd /mnt/backup ;ufsrestore xf -)
+
+Backing up all files in a directory including subdirectories to a tape device (/dev/rmt/0),
+tar cvf /dev/rmt/0 *
+
+Viewing a tar backup on a tape
+tar tvf /dev/rmt/0
+
+Extracting tar backup from the tape
+tar xvf /dev/rmt/0
+(Restoration will go to present directory or original backup path depending on relative or absolute path names used for backup )
+
+Backup using cpio
+find . -depth -print | cpio -ovcB > /dev/rmt/0
+
+Viewing cpio files on a tape
+cpio -ivtB &lt; /dev/rmt/0
+
+Restoring a cpio backup
+cpio -ivcB &lt; /dev/rmt/0
+
+Compressing a file
+compress -v file_name
+
+gzip filename
+To uncompress a file
+uncompress file_name.Z
+or
+gunzip filename
+
+4. Setting up ethernet card speed , duplex mode in Solaris
+
+Command Line : Changes are lost on system reboots .
+
+- set the device instance (for multiport cards)
+ndd -set /dev/hme instance 0
+this makes the next commands apply to hme0.
+
+- query parameters for the set instance:
+ndd -get /dev/hme link_status 0 = link up, 1 = link down
+ndd -get /dev/hme link_speed 0 = 10MBit, 1 = 100MBit
+ndd -get /dev/hme link_mode 0 = half duplex, 1 = full duplex
+ndd -get /dev/hme adv_autoneg_cap 0 = no autonegotiation, 1 = autoneg. enabled
+
+- set parameters, e.g.
+ndd -set /dev/hme instance 0
+ndd -set /dev/hme adv_autoneg_cap 1 to enable autonegotiation for hme0
+
+2. Permanant Changes : changes are not lost on reboot.
+edit the /etc/system file and add these parameters .The sequence number matters.
+
+set hme:hme_adv_autoneg_cap=0
+set hme:hme_adv_100T4_cap=0
+set hme:hme_adv_100fdx_cap=1
+set hme:hme_adv_100hdx_cap=0
+set hme:hme_adv_10fdx_cap=0
+set hme:hme_adv_10hdx_cap=0
+
+Ehthernet mode setting in x86 is done in drivers .conf file.
+
+100Mb Full Duplex on elxl0 in Solaris x86
+__________________________________________
+
+edit /kernel/drv/elxl.conf :
+
+#ident "@(#)elxl.conf 1.3 98/02/23 SMI"
+#
+# Copyright (c) 1998, by Sun Microsystems, Inc.
+# All rights reserved.
+#
+# Driver.conf file for the 3Com 3C90x
+#
+# To force full duplex operation, uncomment the following line:
+full-duplex=1;
+#
+# To force half duplex operation, uncomment the following line:
+#full-duplex=0;
+#
+# To force 10Mbps operation, uncomment the following line:
+#speed=10;
+#
+# To force 100Mbps operation, uncomment the following line:
+speed=100;
+#
+
+5. One Line Scripts
+
+Finding out the memory information on a HP Unix system
+
+Total Memory :
+-------------------
+echo "selclass qualifier memory;info;wait;infolog"|cstm | grep "Total Configured Memory"
+
+All Memory Information , slots, modules etc.
+---------------------------------------------
+echo "selclass qualifier memory;info;wait;infolog"|cstm
+
+List highest diskspace users in /home directory
+sort -nr sorts the output in numerical reverse order giving highest at the top .
+
+du -k /home | sort -nr | pg
+
+*Find and list the core files in /app01 directory . Replace directory name(/app01 ) , file name (core) and command (ls -l ) to customize .
+Print option prints the output . 2>/dev/null is to supress the error messages in the output .
+
+```bash
+find /app01 -name core -print -exec ls -l &#123;&#125; ; 2>/dev/null
+```
+
+Removing core files :
+find /app01 -name core -print -exec rm -f &#123;&#125; ; 2>/dev/nul
+
+compressing Log files
+find /logdir -name *.log -print -exec gzip &#123;&#125; ; 2>/dev/null
+
+List the partitions using more than 70% of disk partition space .
+$5 represants column number to be compared and 70 is the value to be compared .
+
+df -k | awk '$5 > 70'

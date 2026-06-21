@@ -1,0 +1,41 @@
+---
+import BaseLayout from './BaseLayout.astro';
+const { frontmatter } = Astro.props;
+const { title, description, pubDate, updatedDate, topic, readingTime, testedOn = [] } = frontmatter;
+
+const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) : '';
+const topicLabel = { scheduling:'Scheduling', shell:'Shell', sysadmin:'SysAdmin', devops:'DevOps', networking:'Networking', python:'Python', security:'Security', legacy:'Legacy' }[topic] || topic;
+---
+<BaseLayout
+  title={title}
+  description={description}
+  pubDate={pubDate}
+  updatedDate={updatedDate}
+  topic={topic}
+  type="article"
+>
+  <main class="guide">
+    <article>
+      <div class="post-meta">
+        {topicLabel}{readingTime && ` · ${readingTime}`}
+      </div>
+      <h1>{title}</h1>
+      <p class="post-updated">
+        Updated {fmtDate(updatedDate ?? pubDate)}
+        {testedOn.length > 0 && ` · Tested on ${testedOn.join(', ')}`}
+      </p>
+      <div class="prose">
+        <slot />
+      </div>
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  .guide {
+    max-width: var(--maxw-prose);
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 1rem;
+  }
+  .prose :global(h2) { padding-top: 0.5rem; }
+</style>

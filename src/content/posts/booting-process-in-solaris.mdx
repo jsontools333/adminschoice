@@ -1,0 +1,105 @@
+---
+title: "Booting Process in Solaris"
+description: "Booting process in Solaris can be divided in to different phases for ease of study ."
+pubDate: 2009-12-20
+updatedDate: 2026-06-20
+pageType: guide
+topic: legacy
+tier: "TIER 4 (Solaris/legacy Unix)"
+tags: ["basics", "boot"]
+testedOn: ["Linux", "Unix"]
+---
+
+Understanding the booting process is important in the sense that you can get a clear idea when a system faces a booting problem if you are familiar with the booting sequence and steps involved. You can thereby isolate a booting phase and quickly resolve the issues.
+
+Booting process in Solaris can be divided in to different phases for ease of study . First phase starts at the time of switching on the machine and is boot prom level , it displays a identification banner mentioning machine host id serial no , architecture type memory and Ethernet address This is followed by the self test of various systems in the machine.
+
+This process ultimately looks for the default boot device and reads the boot program from the boot block which is located on the 1-15 blocks of boot device. The boot block contains the ufs file system reader which is required by the next boot processes.
+
+The ufs file system reader opens the boot device and loads the secondary boot program from /usr/platform/`uname –i`/ufsboot ( uname –i expands to system architecture type)
+
+The boot program above loads a platform specific kernel along with a generic solaris kernel
+
+The kernel initialize itself and load modules which are required to mount the root partition for continuing the booting process.
+
+The booting process undergoes the following phases afterwards :
+
+1) init phase
+2) inittab file
+3) rc scripts & Run Level
+
+1. INIT phase
+
+Init phase is started by the execution of /sbin/init program and starts other processes after reading the /etc/inittab file as per the directives in the /etc/inittab file .
+
+Two most important functions of init are
+a) It runs the processes to bring the system to the default run level state ( Run level 3 in Solaris , defined by initdefault parameter in /etc/inittab )
+b) It controls the transition between different run levels by executing appropriate rc scripts to start and the stop the processes for that run level.
+
+2. /etc/inittab file
+
+This file states the default run level and some actions to be performed while the system reaches up to that level. The fields and their explanation are as follows :
+
+S3:3:wait:/sbin/rc3 > /dev/console 2>&1 &lt; /dev/console
+
+S3 denotes a identification if the line
+
+3 is run level
+wait is action to be performed
+
+/sbin/rc3 is the command to be run.
+
+So the fields in the inittab are
+
+Identification : run level : action : process
+
+The complete line thus means run the command /sbin/rc3 at run level 3 and wait until the rc3 process is complete.
+
+The action field can have any of the following keywords :
+
+Initdefault : default run level of the system
+
+Respawn : start and restart the process if it stops.
+Powerfail : stop on powerfail
+Sysinit : start and wait till console in accessible .
+Wait : wait till the process ends before going on to the next line.
+
+3. RC scripts & Run Levels
+
+Rc scripts performs the following functions :
+
+a) They check and mount the file systems
+b) Start and stop the various processes like network , nfs etc.
+c) Perform some of the house keeping jobs.
+
+System goes in to one of the following run level after booting depending on default run level and the commands issued for changing the run level to some other one.
+
+0 Boot prom level ok> or > prompt in Sun.
+1 Administrative run level . Single user mode
+2 Multiuser mode with no resource sharing .
+3 Multiuser level with nfs resource sharing
+4 Not used
+5 Shutdown & power off (Sun 4m and 4u architecture )
+6 Reboot to default run level
+S s Single user mode user logins are disabled.
+
+Broadly speaking the running system can be in any of the folloing state
+
+Single user
+
+– Minimum processes running , user logins disabled and root password is required to gain access to the shell .
+
+Multiuser
+
+- All system processes are running and user logins are permitted
+
+Run level of a desired state is achieved by a number of scripts executed by the rc program the rc scripts are located in /etc/rc0.d , /etc/rc1.d , /etc/rc2.d , /etc/rc3.d & /etc/rcS.d directories . All the files of a particular run level are executed in the alphanumeric order .Those files beginning with letter S starts the processes and those beginning with K stops the processes.
+
+These files are hard linked to the files in /etc/init.d in order to provide a central location for all these files and eliminating the need to change the run level in case these scripts needs to be run separately . The files in /etc/init.d directory are without any S , K and numeric prefix instead a stop / start argument has to be supplied whenever these scripts are to be executed .
+
+By default system has a number of rc scripts needed for run level transition but sometimes it becomes necessary to start some custom scripts at the booting time and turn them off at the shutdown . Custom scripts can be put in any of the required rc directory but following major considerations has to be kept in mind :
+
+* The sequence number of the file should not conflict with other files.
+* The sevices needed should be available by previously executed scripts.
+* File should be hard linked to the /etc/init.d directory .
+* The system looks for only those files beginning with letter K & S , any thing else is ignored , therefore, to make a file inactive simply changing uppercase K or S to lower case will cause system to ignore it .

@@ -1,0 +1,47 @@
+# Admin's Choice — redirects for pruned content
+# Drop into the Astro project root (or /public) as `_redirects`.
+#
+# 301 = permanent redirect, preserves link equity to a relevant live page
+# 410 = Gone: intentionally removed, tells Google to drop it from the index
+#
+# NOTE on 410s: Cloudflare Pages serves the status with no destination.
+# The trailing 410 is the status code; no target path is needed.
+
+# --- 301 redirects: off-topic posts that have a relevant destination ---
+/fedora-22-end-of-life-today/  /linux-basics/  301
+/sample-question-solaris-certification/  /solaris-certification/  301
+/solaris-11-solaris-10-certification/  /solaris-certification/  301
+/crontab-examples-10-crontab-examples-you-can-use-now/  /crontab-quick-reference/  301
+
+# --- 410 Gone: filler / guest-post-era content, no relevant target ---
+/amazon-go-no-checkout-store-opens-in-seattle/  /amazon-go-no-checkout-store-opens-in-seattle/  410
+/net-or-java-which-is-better/  /net-or-java-which-is-better/  410
+/5-reasons-to-use-hadoop-for-any-organizations/  /5-reasons-to-use-hadoop-for-any-organizations/  410
+/6-linux-alternatives-to-help-you-develop-apps-without-care/  /6-linux-alternatives-to-help-you-develop-apps-without-care/  410
+/7-best-apps-to-check-internet-speed/  /7-best-apps-to-check-internet-speed/  410
+/ai-search-analytics-a-match-made-in-heaven/  /ai-search-analytics-a-match-made-in-heaven/  410
+/agile-and-manual-testing-in-2018-and-beyond/  /agile-and-manual-testing-in-2018-and-beyond/  410
+/android-app-development-for-e-wallet-solutions/  /android-app-development-for-e-wallet-solutions/  410
+/beginners-guide-to-podcasting-successfully/  /beginners-guide-to-podcasting-successfully/  410
+/best-health-apps-for-iphone-in-2019-you-shouldnt-miss-out/  /best-health-apps-for-iphone-in-2019-you-shouldnt-miss-out/  410
+/best-practices-for-test-automation-framework/  /best-practices-for-test-automation-framework/  410
+/global-enterprise-mobility-trends/  /global-enterprise-mobility-trends/  410
+/ideas-for-choosing-the-perfect-writers-laptop/  /ideas-for-choosing-the-perfect-writers-laptop/  410
+/risc-v-sifive-open-source-meets-hardware/  /risc-v-sifive-open-source-meets-hardware/  410
+/running-old-internet-explorer-based-applications-in-ie10/  /running-old-internet-explorer-based-applications-in-ie10/  410
+/strategy-for-multiple-choice-exams/  /strategy-for-multiple-choice-exams/  410
+/submit-guest-posts/  /submit-guest-posts/  410
+/the-current-state-of-the-tech-industry/  /the-current-state-of-the-tech-industry/  410
+/the-most-popular-universities-for-computer-programming-degrees/  /the-most-popular-universities-for-computer-programming-degrees/  410
+/top-10-best-open-source-testing-tools-for-web-and-mobile-apps/  /top-10-best-open-source-testing-tools-for-web-and-mobile-apps/  410
+/top-10-mobile-app-testing-tools-for-both-android-and-ios/  /top-10-mobile-app-testing-tools-for-both-android-and-ios/  410
+/top-10-project-management-tools-for-agile-development/  /top-10-project-management-tools-for-agile-development/  410
+/5-programming-languages-defining-the-future-of-coding/  /5-programming-languages-defining-the-future-of-coding/  410
+/top-7-technology-trends-organizations-need-to-explore-in-2019/  /top-7-technology-trends-organizations-need-to-explore-in-2019/  410
+/top-7-website-performance-indicators-you-should-monitor/  /top-7-website-performance-indicators-you-should-monitor/  410
+/udemy/  /udemy/  410
+/valuable-tips-for-software-developers-applying-to-jobs/  /valuable-tips-for-software-developers-applying-to-jobs/  410
+/what-are-the-main-obstacles-to-digital-transformation-in-the-enterprises/  /what-are-the-main-obstacles-to-digital-transformation-in-the-enterprises/  410
+/what-is-crm-development-cost/  /what-is-crm-development-cost/  410
+/whats-new-in-ios-9-3-3-os-x-el-capitan-v10-11-6/  /whats-new-in-ios-9-3-3-os-x-el-capitan-v10-11-6/  410
+/why-you-need-to-involve-scrum-in-your-startup/  /why-you-need-to-involve-scrum-in-your-startup/  410

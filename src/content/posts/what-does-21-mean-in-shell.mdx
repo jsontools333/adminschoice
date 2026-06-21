@@ -1,0 +1,81 @@
+---
+title: "What does  2>&1  mean in shell ?"
+description: "What does  2>&1  mean in shell ?"
+pubDate: 2021-09-01
+updatedDate: 2026-06-20
+pageType: guide
+topic: shell
+tier: "TIER 2 (core reference)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+> Linux and Unix shell redirections are very useful in command line and shell scripting to redirect and collect errors and outputs. Standard output and standard errors are used a lot but still there is lot of confusion about the meaning, actual execution and correct way to utilize it. learn about 2>&1 redirection with examples to use in your scripts and commands.
+
+The standard input output & standard error are denoted by file descriptor numbers as :
+
+**0 is stdin**
+**1 is stdout**
+**2 is stderr**
+
+by default all the output and errors are directed to the console or screen2>&1 redirects error file descriptor 2 to standard output file descriptor 1.
+
+the & sign is a special symbol used in shell redirection to denote that target is not a file but a file descriptor. This is always used in traget redirection and not in source redirection
+
+2 - standard errors
+
+> - redirect to
+
+& - following file descriptor
+
+1 - standard output
+
+Using with redirection to file :
+
+./test.sh > out.log 2>&1
+
+Here
+
+> redirects standard output of the script to a file out.log
+
+2>&1 - Redirect standard errors to standard out file descriptor, which in this case is already pointing to a file - out.log
+
+shell processes redirections from left to right so it first set standard output to file and then setup second redirection of error to to the file
+
+Using with redirection to discard all output :
+
+./test.sh >/dev/null 2>&1
+
+/dev/null is a special character device file and anything redirected to it is discarded and not stored or used anywhere. Typically /dev/null is used to redirect program outputs which are not needed.
+
+Here
+
+> redirects standard output of the script to a /dev/null
+
+2>&1 - Redirect standard errors to standard out file descriptor, which in this case is already pointing to a /dev/null
+
+all the output and errors are discarded in this case/
+
+### why this will print errors on the standard out and not redirect everything to /dev/null ?
+
+./test.sh 2>&1 >/dev/null
+
+Lets see how this works :
+
+2 - standard errors
+
+> - redirect to
+
+& - following file descriptor
+
+1 - standard output then
+
+> redirects to file
+
+The final setup will be :
+
+2 - standard errors redirects to standard output
+
+1 - standard output redirects to file.
+
+as the redirections are processed from left to right,, when standard error redirector happened the only standard output existed as file redirection happened afterwards.

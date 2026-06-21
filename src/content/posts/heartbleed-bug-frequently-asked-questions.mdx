@@ -1,0 +1,68 @@
+---
+title: "HeartBleed bug : Frequently Asked questions"
+description: "This bug allows hackers to reads sensitive data from the memory of victim host in 64 k chunks."
+pubDate: 2014-04-11
+updatedDate: 2026-06-20
+pageType: guide
+topic: security
+tier: "TIER 2 (core reference)"
+tags: ["security"]
+testedOn: ["Linux", "Unix"]
+---
+
+What Exactly is HeartBleed bug ?
+
+This bug allows hackers to reads sensitive data from the memory of victim host in 64 k chunks. The memory can have user names , passwords , decrypted information or certificates & keys or other confidential information.
+
+What are the impacted systems ?
+
+Systems that use OpenSSL ver 1.0.1 to 1.0.1f for TLS encryption are vulnerable to the heartbleed bug.
+
+How it works ?
+
+The exploit is based on a vulnerability in the heart beat feature of OpenSSL. Heartbeat. Server to keep the SSL session alive periodically sends a heartbeat to the client in the form of small data packet. The client returns exact same amount of data as per protocol to indicate that it is alive.
+
+Vulnerability lies in the fact that client can lie about the data size and server return the same amount of data without verifying input request.
+
+This is how it happens
+
+Client heart beat request TLS1_HB_REQUEST Actual Payload = 1 byte, Declared data length= 64k bytes
+As per the protocol server returns the same amount of data received from client however Server does not check actual data size but rely on the data length number from client and returns 64k data read from its memory.
+
+Server responds like this
+Server heart beat response TLS1_HB_RESPONSE Actual payload = 64k , data length= 64k bytes
+Multiple requests can keep on reading memory and returning data back to the Z
+
+How to find the breach ?
+
+This bug does not leave any trace in log files so it is not possible to detect this type of breach.
+
+Is My Mobile Phone impacted ?
+
+Phones running Android Operating system version 4.1.1 Jelly Bean are vulnerable to this bug. you can find version running in your phone by going to settings->about. There is an app called
+
+Heartbleed Detector
+
+which can check if your phone is impacted
+
+What is the fix ?
+
+Two ways to fix
+
+1. Recompile OpenSSL with disabled heart beat option using following flags
+
+-DOPENSSL_NO_HEARTBEATS
+
+2. Use Latest version
+
+Download & upgrade to following latest version with fix
+
+OpenSSL 1.0.1g released on 7th of April 2014
+
+Related Links
+
+OpenSSL Security Advisory
+
+Download Latest version of OpenSSl
+
+Heartbleed Detector App for Andriod based phones

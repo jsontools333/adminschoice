@@ -1,0 +1,308 @@
+---
+title: "Managing Sun OpenBoot Parameters and commands"
+description: "Learn to access, display and set sun openboot parameters on a Sun servers and workstation for input output port , boot , security , diagnostics & more."
+pubDate: 2009-12-16
+updatedDate: 2026-06-20
+pageType: reference
+topic: legacy
+tier: "TIER 4 (Solaris/legacy Unix)"
+tags: ["basics", "boot", "install"]
+testedOn: ["Linux", "Unix"]
+---
+
+Learn to access, display and set sun openboot parameters on a Sun servers and workstation for input output port , boot , security , diagnostics & more.
+The firmware in Sun's boot PROM is called OpenBoot. The main features of openboot are - initial program loading , & debugging features to assist kernel debugging. OpenBoot supports plug-in device drivers which are written in language Forth. This plug in feature allows Sun or any third-party vendors to develop new boot devices but without making any changes to boot PROM.
+
+## Accessing the openboot
+
+Openboot console can be accessed by any of the following means. Be careful not to do this on a live system as you might end up in rebooting the server .
+
+1. System Reboot
+
+- if auto-boot is not set to true rebooted system returns to OK> prompt which is openboot prompt
+
+2. Pressing the keys L1 and A or STOP A
+
+, at the same time will bring you to the OpenBoot system. You will see the display Type b (boot), c (continued), or n (new command mode) > Typing b boots the operating system . Typing c resumes the execution of a halted program.
+
+Typing n gets you to the Forth monitor, and the prompt will change to ok.
+
+### Following paragraphs gives a list of Openboot parameters & commands
+
+## General Parameters
+
+### printenv
+
+Display all variables and current values.
+
+### setenv
+
+Set variable to the given value.
+
+### set-default
+
+Reset the value of variable to the factory default.
+
+### set-defaults
+
+Reset variable values to the factory defaults.
+
+## input/output Parameters
+
+### input-device=keyboard
+
+Input device used at power-on ( keyboard, ttya, or ttyb).
+
+### keyboard-click?=false
+
+enable or disable , default to disable keyboard click sound
+keymap:
+For custom keyboards
+
+### output-device=screen
+
+Output device used at power-on (screen, ttya, or ttyb).
+
+### ansi-terminal?=true
+
+controls the behavior of the terminal emulator. The value false causes the terminal emulator to stop interpreting ANSI escape sequences resulting in echoing them to the output device.
+
+### screen-#columns=80
+
+screen-#rows=34
+Columns and Rows of display screen.
+
+## Boot Parameters
+
+### auto-boot?=true
+
+System directly boots without stopping at OK> after power on.
+
+### boot-command=boot
+
+command passed on to auto boot if true.
+
+### boot-file:
+
+File for booting Solaris , default is empty string .This variable contains the default boot arguments that are used when OpenBoot is not in diagnostic mode.
+
+### boot-device=disk net
+
+Device to boot from , multiple devices can be specified using spaces .Other devices will be selected if first device fails.
+
+## Network Parameters
+
+### tpe-link-test?=true
+
+Tests the UTP Ethernet port link and flashes error messages if there is no network link.
+
+### local-mac-address?=false
+
+Use the system's MAC address instead of network card's MAC address .
+
+## Diagnostics Parameters
+
+### diag-switch?=false
+
+If true system runs in diagnostic mode.
+
+### diag-file:
+
+default diagnostic mode boot arguments file from which to boot if diag-switch? is true.
+
+### diag-device=net
+
+booting device in diagnostic mode.
+
+### diag-level=max
+
+Level for diagnostics information , can be min , max and minus.
+There may be additional platform specific values. If set to off, POST is not called. The default value is platform-dependent.
+
+## Diagnostics
+
+### banner
+
+this command shows the following systems hardware information : Model, architecture, processor, keyboard, openboot version, Serial no. Ethernet address & host id.
+
+### test floppy
+
+test floppy disk drive
+
+### test net
+
+test network loop backs
+
+### test scsi
+
+test scsi interface
+
+### test-all
+
+test for all devices with self test method
+
+### watch-clock
+
+Show ticks of real-time clock
+
+### watch-net
+
+Monitor network broadcast packets
+
+### watch-net-all
+
+Monitor broadcast packets on all net interfaces
+
+### probe-scsi
+
+Show attached SCSI devices
+
+### probe-scsi-all
+
+Show attached SCSI devices for all host adapters- internal & external.
+
+## NVram
+
+### use-nvramrc?=false
+
+If true , execute commands in NVRAMRC during sys- tem start-up. Defaults to false . nvramrc 
+Displays contents of NVRAM
+
+## Security
+
+### security-mode=none
+
+Firmware security level (options: none, command , or full). If set to command or full, system will prompt for PROM security password. 
+Security password setting when security mode is command or full.
+
+### security-#badlogins=0
+
+No. of bad security login .
+
+## password
+
+### Set security-password
+
+sets the security password for openboot
+
+## SCSI
+
+### scsi-initiator-id=7
+
+SCSI bus address of host adapter, range 0-7. Used in shared scsi storage envornment. 
+Bus
+
+### pcia-probe-list=1,2,3,4 
+pcib-probe-list=1,2,3 
+sbus-probe-list=2,0,1,3
+
+Order to probe pci and sbus buses for devices.
+
+## Ports Parameters
+
+### ttyb-rts-dtr-off=false
+
+If true, operating system does not assert rts (request-to-send) and dtr (data-transfer-ready) on ttyb.
+
+### ttyb-ignore-cd=true
+
+If true, operating system ignores carrier-detect on ttyb.
+
+### ttya-rts-dtr-off=false
+
+If true, operating system does not assert rts (request-to-send) and dtr (data-transfer-ready) on serial management port.
+
+### ttya-ignore-cd=true
+
+If true, operating system ignores carrier-detect on ttyb.
+
+### ttyb-mode=9600,8,n,1,-
+
+ttyb (baud rate, number of bits, parity, number of stops, handshake).
+
+### ttya-mode =9600,8,n,1,-
+
+Serial management port (baud rate, bits, parity, stop, handshake). The serial management port only works at the default values.
+
+## oem
+
+### oem-logo=false 
+oem-logo?=false
+
+If true, uses custom OEM logo (else, uses Sun
+logo , (enabled by oem-logo?
+true) )
+
+### oem-banner?=false 
+oem-banner=false
+
+Custom OEM banner (enabled by oem-banner?
+true)
+mfg-mode=off
+
+## Device Alias Parameters
+
+Shows the properties of alias devices
+
+> ok>show-devs
+ok cd /pci@1f,4000/scsi@3
+ok .properties
+ok ls
+f00809d8 tape
+f007ecdc disk
+ok .speed
+CPU Speed : 200.00MHz
+UPA Speed : 100.00MHz
+PCI Bus A : 66Mhz
+PCI Bus B : 33Mhz
+
+## Useful openboot commands at OK prompt.
+
+### nvedit
+
+Start nvramrc line editor using a temporary edit buffer
+use-nvramrc? If this variable is true , Contents of nvramrc is executed automatically when set using setenv command
+
+### nvrun
+
+Execute the contents of nvedit edit buffer
+
+### nvstore
+
+Save the contents of the nvedit buffer into NVRAM
+
+### nvrecover
+
+Recover nvramrc after a set-defaults
+
+### nvalias
+
+Edit nvramrc to include devalias called 'name'
+
+### nvunalias
+
+Edit nvramrc to remove devalias called 'name'
+
+## Key Sequences
+
+if the PROM security is on key Sequences commands are disabled. If your system has full security enabled, you cannot apply any of the suggested commands unless you have the password to get to the ok prompt.
+
+Stop
+
+- Bypass POST. This command does not depend on security-mode. (Note: some systems bypass POST as a default; in such cases, use Stop-D to start POST.)
+
+Stop-A
+
+Abort.
+
+Stop-D
+
+- Enter diagnostic mode (set diag-switch? to true).
+
+Stop-F
+
+- Enter Forth on TTYA instead of probing. Use exit to continue with the initialization sequence. Useful if hardware is broken.
+
+Stop-N
+
+Reset NVRAM contents to default values.

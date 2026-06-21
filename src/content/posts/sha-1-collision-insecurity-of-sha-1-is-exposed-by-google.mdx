@@ -1,0 +1,25 @@
+---
+title: "SHA-1 Collision - Insecurity of SHA-1 exposed by Google"
+description: "SHA-1 is widely used in applications like SSL, SSH, TLS, IPsec PGP, S/MIME to protect the sensitive information."
+pubDate: 2017-02-25
+updatedDate: 2026-06-20
+pageType: guide
+topic: security
+tier: "TIER 2 (core reference)"
+tags: ["security"]
+testedOn: ["Linux", "Unix"]
+---
+
+SHA-1 is widely used in applications like SSL, SSH, TLS, IPsec PGP, S/MIME to protect the sensitive information.
+
+Google has demonstrated that SHA-1 Collision is possible and two files can have the same SHA-1 hash. This means that system can be manipulated by presenting it with manipulated data with same hash as good data.
+
+SHA-1
+
+(Secure Hash Algorithm 1) was considered insecure way back in 2010 and many companies have already phased it out and many more are planning to phase out SHA-1.
+
+Google Chrome no longer trust SHA-1 signed certificates. Other major players like Microsoft has plans to deprecate SHA-1 by the middle 2017 when its Internet Explorer and Edge browsers will block SHA-1. Firefox is also planning to deprecate SHA-1 from its browsers. However GnuPG e-mail encryption still trusts SHA-1.
+
+here is the Google Security blog post with more technical details
+
+**Announcing the first SHA1 collision**

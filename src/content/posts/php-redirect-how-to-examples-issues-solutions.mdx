@@ -1,0 +1,163 @@
+---
+title: "php redirect - How to, Examples, Issues & Solutions"
+description: "A php header redirect can be setup as in following example with default parameters."
+pubDate: 2020-02-23
+updatedDate: 2026-06-20
+pageType: reference
+topic: sysadmin
+tier: "TIER 2 (core reference)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+php redirect is a convenient way to redirect https requests to another page. Learn about correct syntax, response code , common errors using session data and time delayed redirection.
+
+php redirect to another page on same or different website is handled by php headers. php header() sends a raw HTTP header which is used to redirect php pages to other locations along with several other function
+
+php header syntax :
+
+header ( string $header [, bool $replace = TRUE [, int $http_response_code ]] ) : void
+
+**header** is the header string which is 'Location:' for php redirect and it sends headers back to browser.
+
+**replace** parameter is TRUE by default, but can be FALSE if you want to send multiple headers and don't want to replace send header with first.
+
+**response code** - default response code is 302,
+
+browsers and search engines treat these response code differently, search engines take a 301 as permanent move to new page and update page rank, this can help in maintaining same search ranking for the page. Browsers use 30x code to determine how long or what to cache for these pages. It makes sense to specify the status code explicitly for php redirects depending on the requirements.
+
+## Setting up php redirect header
+
+A php header redirect can be setup as in following example with default parameters.
+
+&lt;?php
+header("Location: http://example.com");
+exit;
+?>
+
+or by specifying custom parameters
+
+&lt;?php
+header("Location: http://example.com",TRUE,301);
+exit;
+?>
+
+The url can be relative to the root domain if it is being redirected to same site
+
+&lt;?php
+header("Location: /page2.php");
+exit
+?>
+
+the exit function after the redirect is to ensure the further execution of php script stops and exists.
+
+## Relative urls in php redirect
+
+The redirect urls can be constructed using php environment variables as in following example:
+
+$url = 'http://' . $_SERVER['HTTP_HOST']; // Get server
+$url .= rtrim(dirname($_SERVER['PHP_SELF']), '/\\'); // Get current directory
+$url .= '/relative/path/to/page/'; // relative path
+header('Location: ' . $url, TRUE, 302);
+
+## php redirect using session data
+
+session data can be used to redirect based on valid user credentials. However care needs to be taken that search bots and other bots may not looks at the session data and may end up fetching your pages.
+
+&lt;?php
+session_start();
+
+if (!isset( $_SESSION["authorized-user"]))
+&#123;
+header("location:../");
+exit();
+&#125;
+
+// Rest of the page
+?>
+
+## Header already sent error in php redirect
+
+This is very common error and sometime difficult to debug. The root cause of this error is that php redirect header must be send before anything else. This means any space or characters sent to browser before the headers will result in this error.
+
+Like following example, there should not be any output of even a space before the headers are sent.
+
+&lt;?php
+header("Location: /page2.php");
+exit
+?>
+
+Even a Byte Order Mark can cause this issue when the text encoding is utf8-BOM, this can be fixed by saving again with encoding as utf8 without BOM in text editors.
+
+## Internal server error in php redirect
+
+The directive Location is sensitive to the placement of colon, The colon : should always be placed next to Location as Location: , any space between Location and : can result in malfunction and internal server error.
+
+This is
+
+NOT
+
+correct, notice the placement of colon,
+
+&lt;?php
+header("Location : http://example.com");
+exit;
+?>
+
+Correct way is :
+
+&lt;?php
+header("Location: http://example.com");
+exit
+?>
+
+## Replace php redirect header
+
+the headers can be replaced with another entry as long as nothing is sent to browsers
+
+&lt;?php
+header("location: page1.php");
+header("location: page2.php"); //replaces page1.php
+exit;
+?>
+
+In the following example, headers are not replaced as browser follows the first redirect and then prints the message. No header already sent message here as browser has already redirected before coming to second redirect.
+
+&lt;?php
+header("location: page1.php");
+echo "moving to page 2"
+header("location: page2.php"); //replaces page1.php
+?>
+
+## php redirect with time delay
+
+As you can't send anything before php headers, to delay a redirect and display a message, you will have to user refresh function instead of Location
+
+The following examples redirects to page after 5 seconds and displays a message during the 5 sec. delay.
+
+&lt;?php
+header( "refresh:5;url=/page6.php" );
+echo 'Redirecting in 5 secs. Click here to go directly &lt;a href="/page6.php">here&lt;/a>.';
+?>
+
+## Redirecting using other methods
+
+following examples avoid headers already sent issues.
+
+1. php redirect using ob_start() and ob_end_flush() php functions
+
+ob_start(), output buffer keeps everything in buffer without sending or displaying until it is flushed
+
+&lt;?php
+ob_start(); //this has to be the first line of your page
+header('Location: page2.php');
+ob_end_flush(); //this has to be the last line of your page
+?>
+
+2. Redirect using javascript
+
+This simple example does the redirection using javascript.
+
+echo '&lt;script type="text/javascript">
+window.location = "http:/example.com/"
+&lt;/script>';

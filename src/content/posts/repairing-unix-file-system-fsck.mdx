@@ -1,0 +1,803 @@
+---
+title: "fsck Command - Check & Repair Linux & Unix File Systems"
+description: "If file system is found to have problem at the booting time non interactive fsck is run and all errors which are considered safe to correct are corrected."
+pubDate: 2009-12-20
+updatedDate: 2026-06-20
+pageType: reference
+topic: sysadmin
+tier: "TIER 4 (Solaris/legacy Unix)"
+tags: ["basics", "featured", "file system", "performance"]
+testedOn: ["Linux", "Unix"]
+---
+
+fsck, similar to chkdsk in windows, checks and repairs the file system in Unix & Linux operating systems. Learn about fsck modes, phases & fsck errors messages
+
+fsck, File System Consistency checK, is a system utility in Unix, Linux and other Unix like systems for checking and repairing file system inconsistencies.
+
+File system can become inconsistent due to several reasons and the most common is abnormal shutdown due to hardware failure, power failure or switching off the system without proper shutdown. Due to these reasons the superblock in a file system is not updated and has mismatched information relating to system data blocks, free blocks and inodes.
+
+### fsck in Linux
+
+fsck in this document is refered with reference to ufs file system but it can be used in Linux systems as
+
+> fsck -t ext2 /dev/sda3
+or
+fsck.ext2 /dev/sda3
+fsck.ext4 /dev/sda3
+fsck.ext3 /dev/sda3
+
+it returns with any of the followig code
+
+> 0 - No errors
+1 - File system errors corrected
+2 - System should be rebooted
+4 - File system errors left uncorrected
+8 - Operational error
+16 - Usage or syntax error
+32 - Fsck canceled by user request
+128 - Shared library error
+
+fsck checks the file systems defined in /etc/fstab in Linux and /etc/vfstab in Unix systems
+
+### fsck - Modes of operation
+
+fsck operates in two modes interactive and non interactive :
+
+> Interactive fsck examines the file system and stops at each error it finds in the file system and gives the problem description and ask for user response whether to correct the problem or continue without making any change to the file system. Non interactive fsck tries to repair all the problems it finds in a file system without stopping for user response useful in case of a large number of inconsistencies in a file system but has the disadvantage of removing some useful files which are detected to be corrupt .
+
+If file system is found to have problem at the booting time non interactive fsck is run and all errors which are considered safe to correct are corrected. But if still file system has problems the system boots in single user mode asking for user to manually run the fsck to correct the problems in file system
+
+### Running fsck
+
+fsck can make big changes to the file system by truncating file, re-allocating inodes and making many other adjustments , it may render many files as useless so use a due caution and respond to fsck prompt carefully.
+
+fsck should always be run in a single user mode which ensures proper repair of file system . If it is run in a busy system where the file system is changing constantly fsck may see the changes as inconsistencies and may corrupt the file system .
+
+If the system can not be brought in a single user mode fsck should be run on the partitions ,other than root & usr, after unmounting them. Root & usr partitions can not be unmounted. If the system fails to come up due to root/usr files system corruption the system can be booted with CD and root/usr partitions can be repaired using fsck.
+
+### command syntax
+
+fsck [ -F fstype] [-V] [-yY] [-o options] special
+
+> **-F** fstype type of file system to be repaired ( ufs , vxfs etc) **-V** verify the command line syntax but do not run the command **-y or -Y** Run the command in non interactive mode - repair all errors encountered without waiting for user response. **-o** options Three options can be specified with -o flag **b=n** where n is the number of next super block if primary super block is corrupted in a file system . **p** option used to make safe repair options during the booting process. **f** force the file system check regardless of its clean flag. **special** - Block or character device name of the file system to be checked/repaired - for example /dev/rdsk/c0t3d0s4 .Character device should be used for consistencies check & repair
+
+### fsck phases
+
+fsck checks the file system in a series of 5 phases and checks a specific functionality of file system in each phase.
+
+```bash
+** phase 1 - Check Blocks and Sizes
+** phase 2 - Check Pathnames
+** phase 3 - Check Connectivity
+** phase 4 - Check Reference Counts
+** phase 5 - Check Cylinder Groups { ufs file system only }
+```
+
+### Abbreviations in fsck messages
+
+While fsck is running it displays warning or error messages in describing the warning, error or description. Some of the commonly used abbreviation are given below.
+
+> BLK - Block number
+DUP - Duplicate block number
+DIR - Directory name
+CG - Cylinder group
+MTIME - Time file was last modified
+UNREF - Unreferenced
+
+### fsck error messages & Corrective action
+
+#### Corrupted superblock - fsck fails to run
+
+If the superblock is corrupted the file system still can be repaired using alternate superblock which are formed while making new file system.
+
+the first alternate superblock number is 32 and others superblock numbers can be found using the following command :
+
+> newfs -N /dev/rdsk/c0t0d0s6
+
+for example to run fsck using first alternate superblock following command is used
+
+> fsck -F ufs -o b=32 /dev/rdsk/c0t0d0s6
+
+#### Link counter adjustment
+
+fsck finds mismatch between directory inode link counts and actual directory links and prompts for adjustment in case of interactive operation. Link count adjustments are considered to be a safe operation in a file system and should be repaired by giving 'y' response to the adjust ? prompt during fsck.
+
+#### Free Block count salvage
+
+During fsck the number of free blocks listed in a superblock and actual unallocated free blocks count does not match. fsck informs this mismatch and asks to salvage free block count to synchronize the superblock count. This error can be corrected without any potential problem to the file system or files.
+
+#### Unreferenced file reconnection
+
+While checking connectivity fsck finds some inodes which are allocated but not referenced - not attached to any directory . Answering y to reconnect message by fsck links these files to the lost+found directory with their inode number as their name .
+
+To get more info about the files in lost+found 'file' command can be used to see the type of files and subsequently they can be opened in their applications or text editors to find out about their contents. If the file is found to be correct it can be used after copying to some other directory and renaming it.
+
+## fsck messages,their meaning and solutions
+
+Click to see the detailed errors, messages & their meaning during various phases of fsck
+
+#### Initialization Phase
+** phase 1 – Check Blocks and Sizes
+** phase 2 – Check Pathnames
+** phase 3 – Check Connectivity
+** phase 4 – Check Reference Counts
+** phase 5 – Check Cylinder Groups
+cleanup phase
+
+## Initialization Phase
+
+In the initialization phase fsck sets up certain tables and open certain files. The following messages relate to error conditions resulting from command-line options, memory requests, the opening of files, the status of files, filesystem size checks, and the creation of the scratch file during different phases of fsck process.
+
+fsck error messages, warning messages and responses for Initialization Phase.
+
+### i.1) Can't open checklist file: F
+
+> The file system checklist or default file F (usually /etc/vfstab) cannot be opened for reading. When this occurs, fsck terminates. Check the access modes of F
+
+### i.2) Can't stat root
+
+> fsck's request for statistics about the root directory failed. This is very rare. When it does happen, fsck terminates.
+
+### i.3) Can't stat F
+
+> Can't make sense out of name F
+fsck's request for statistics about the file system F failed. When fsck is running interactively, it ignores this
+file system and continues checking the next file system given. Check the access modes of F
+
+### i.4) Can't open F
+
+> fsck's attempt to open the file system F failed. When running interactively, it ignores this
+file system and continues checking the next file system given. Check the access modes of F.
+
+### i.5) F: (NO WRITE)
+
+> Either the -n flag was specified or fsck's attempt to open the file system F for writing failed. When fsck is running interactively, all the diagnostics are printed out, but fsck does not attempt to fix anything.
+
+### i.6) file is not a block or character device; OK
+
+> The user has given fsck the name of a regular file by mistake. Check the type of the file specified. **Possible responses** to the OK prompt are:
+
+YES - Ignore this error condition.
+
+NO - Ignore this file system and continue checking the next file system given.
+
+### i.7) UNDEFINED OPTIMIZATION IN super block (SET TO DEFAULT
+
+> The super block optimization parameter is neither OPT_TIME nor OPT_SPACE. **Possible responses** to the SET TO DEFAULT prompt are:
+
+YES - Set the super block to request optimization to minimize running time of the system. (If optimization to minimize disk space use is desired, it can be set using tunefs(1M).
+
+NO - Ignore this file system and continue checking the next file system given.
+
+### i.8) IMPOSSIBLE MINFREE=D IN super block (SET TO DEFAULT)
+
+> The super block minimum space percentage is greater than 99 percent or less than 0 percent. **Possible responses** to the SET TO DEFAULT prompt are:
+
+YES - Set the MINFREE parameter to ten percent. (If some other percentage is desired, it can be set using tunefs(1M).)
+
+NO - Ignore this error condition.
+
+### i.9) MAGIC NUMBER WRONG
+
+> NCG OUT OF RANGE
+CPG OUT OF RANGE
+NCYL DOES NOT JIVE WITH NCG*
+CPG SIZE PREPOSTEROUSLY LARGE
+TRASHED VALUES IN SUPER BLOCK
+
+This is followed by the message:
+F: BAD SUPER BLOCK: B
+USE -b OPTION TO FSCK TO SPECIFY LOCATION OF AN ALTERNATE SUPER-BLOCK TO SUPPLY NEEDED INFORMATION;
+
+An alternative super block must be selected from among the available copies. Choose an alternative
+super block by calculating its offset. Specifying block 32 is a good first choice.
+
+### i.10) INTERNAL INCONSISTENCY: M
+
+> fsck has had an internal panic, whose message is M.
+
+### i.11) CAN NOT SEEK: BLK B (CONTINUE)
+
+> fsck's request to move to a specified block number B in the file system failed. If it does happen. **Possible responses** to the CONTINUE prompt are:
+
+YES - Attempt to continue running the file system check. (Note that the problem often persists.) This error condition prevents a complete check of the
+file system. A second run of fsck should be made to recheck the filesystem. If the block was part of the virtual memory buffer cache, fsck terminates with this message : Fatal I/O error
+
+NO - Terminate the program
+
+### i.12) CAN NOT READ: BLK B (CONTINUE)
+
+> fsck's request to read a specified block number B in the file system failed.
+if it does happen **Possible responses** to the CONTINUE prompt are:
+
+YES - Attempt to continue running the file system check. fsck retries the read and prints out the message:
+THE FOLLOWING SECTORS COULD NOT BE READ: N - where N indicates the sectors that could not be read.
+
+If fsck ever tries to write back one of the blocks on which the read failed, it prints the message:
+WRITING ZERO'ED BLOCK N TO DISK - where N indicates the sector that was written with zero's.
+
+If the disk is experiencing hardware problems, the problem will persist.
+This error condition prevents a complete check of the file system and a second run of fsck should be made to recheck the filesystem. If the block was part of the virtual memory buffer cache, fsck terminates with the message - Fatal I/O error
+
+NO - Terminate the program.
+
+### i.13) CAN NOT WRITE: BLK B (CONTINUE)
+
+> fsck's request to write a specified block number B in the file system failed. The disk is write-protected; check the write-protect lock on the drive. **Possible responses** to the CONTINUE prompt are:
+
+YES - Attempt to continue to run the file system check. The write operation will be retried. Sectors that could not be written are indicated by the message: THE FOLLOWING SECTORS COULD NOT BE WRITTEN: N - where N indicates the sectors that could not be written. If the disk is experiencing hardware problems, the problem will persist. This error condition prevents a complete check of the file system. A second run of fsck should be made to recheck this filesystem. If the block was part of the virtual memory buffer cache, fsck terminates with the message: Fatal I/O error
+
+NO - Terminate the program.
+
+### i.14) bad inode number DDD to ginode
+
+> An internal error was caused by an attempt to read non-existent inode DDD.
+This error causes fsck to exit.
+
+#### Initialization Phase
+NEXT>>** phase 1 – Check Blocks and Sizes
+** phase 2 – Check Pathnames
+** phase 3 – Check Connectivity
+** phase 4 – Check Reference Counts
+** phase 5 – Check Cylinder Groups
+cleanup phase
+
+## Phase 1: check blocks and sizes
+
+fsck error messages, warning messages and responses for Phase 1 - check blocks and sizes phase.
+
+The message gives a yes/no option to fix or not to fix the problem . Pressing no cause fsck to ignore and continue past the error
+
+### 1) UNKNOWN FILE TYPE I=(CLEAR)
+
+> The the inode number s not recognized as special block , character , regular, symbolic link, FIFO file or directory inode.
+
+YES , response to clear prompt reallocates inode by zeroing out its contents and causes UNALLOCATED error message in Phase 2 for directory entries pointing to this inode
+
+NO - cause fsck to ignore and continue past the error
+
+### 2) PARTIALLY TRUNCATED the inode number =(SALVAGE)
+
+> If a system crashes while truncating a file then fsck finds inode size as shorter than the number of blocks allocated to it. fsck is asking to complete the truncation to the specified size .
+
+YES , response to the SALVAGE prompt complete the truncation for the inode number .
+
+NO - causes fsck to ignore and continue past the error .
+
+### 3) LINK COUNT TABLE OVERFLOW (CONTINUE)
+
+> fsck maintains an internal table containing allocated inodes with a link count of zero. This internal table has become full with entries and can't accommodate more entries .
+
+YES , responses to the CONTINUE prompt causes fsck to continue with the fsck. File system is not checked completely and a second run should be made to recheck file system again . If another allocated inode with a zero link count is found, the error message is repeated. again .
+
+No - response terminate the fsck process.
+
+### 4) B BAD I=
+
+> The inode number contains block number B with a number lower than the number of the first data block in the
+file system or greater than the number of the last block in the filesystem. This error condition might generate the EXCESSIVE BAD BLKS error message in Phase 1 if the inode number has too many block numbers outside the
+file system range. This error condition generates the BAD/DUP error messages in Phases 2 and 4.
+
+### 5) EXCESSIVE BAD BLKS I=(CONTINUE)
+
+> There are more than 10 blocks with a number lower than the number of the first data block in the
+file system or greater than the number of the last block in the file system associated with the inode number . **Possible responses** to the CONTINUE prompt are:
+
+Ignore - the rest of the blocks in this inode and continue checking with the next the inode number n the filesystem. This error condition skips the error in the file system so a second run of fsck should be made to recheck this filesystem.
+
+No - Terminate the fsck program leaving file system with errors.
+
+### 6) BAD STATE DDD TO BLKERR
+
+> An internal error has caused the fsck's state map to have the impossible value DDD.
+fsck exits immediately. Run fsck multiple times if this happens.
+
+### 7) B DUP I=
+
+> the inode number contains block number B that is already claimed by another inode. This error condition might generate the EXCESSIVE DUP BLKS error message in Phase 1 if the inode number has too many block numbers claimed by other inodes. This error condition invokes Phase 1B and generates the BAD/DUP error message in Phases 2 and 4.
+
+### 8) BAD MODE: MAKE IT A FILE?
+
+> This message is generated when the status of a given the inode number s set to all ones, indicating
+file system damage. This message does not indicate disk damage, unless it appears repeatedly after fsck -y has been run. A response of y causes fsck to reinitialize the inode to a reasonable value.
+
+### 9) EXCESSIVE DUP BLKS I=(CONTINUE)
+
+> There are too many (usually more than 10) blocks claimed by other inodes. **Possible responses** to the CONTINUE prompt are:
+
+Ignore - the rest of the blocks in this inode and continue checking with the next the inode number n the filesystem. This error condition prevents a complete check of the filesystem. A second run of fsck should be made to recheck the
+filesystem.
+
+NO - Terminate the fsck program. File system errors are not fixed and fsck has to be run again.
+
+### 10) DUP TABLE OVERFLOW (CONTINUE)
+
+> An internal table in fsck containing duplicate block numbers has no more room. **Possible responses** to the CONTINUE prompt are:
+
+Continue - with the program. This error condition prevents a complete check of the
+file system. A second run of fsck should be made to recheck the file system. If another duplicate block is found, this error message repeats.
+
+No, Terminate the fsck program. File system errors are not fixed and fsck has to be run again.
+
+### 11) PARTIALLY ALLOCATED the inode number =(CLEAR)
+
+> the inode number is neither allocated nor unallocated. **Possible responses** to the CLEAR prompt are:
+
+Deallocate , the inode number by zeroing out its contents.
+
+Ignore - ignore this error condition. File system errors are not fixed and fsck has to be run again.
+
+### 12) INCORRECT BLOCK COUNT I=(X should be Y) (CORRECT)
+
+> The block count for the inode number is X blocks, but should be Y blocks. When preening, the count is corrected. **Possible responses** to the CORRECT prompt are:
+
+Replace the block count of the inode number by Y.
+
+Ignore this error condition, File system errors are not fixed and fsck has to be run again.
+
+### 13) B DUP I=I
+
+> When a duplicate block is found in the filesystem, the file system is rescanned to find the inode that previously claimed that block. When the duplicate block is found, the following informational message appears:
+the inode number contains block number B that is already claimed by another inode. This error condition generates the BAD/DUP error message in Phase 2. You can determine which inodes have overlapping blocks by examining this error condition and the DUP error condition in Phase 1.
+
+#### Initialization Phase
+** phase 1 – Check Blocks and Sizes
+NEXT>>
+** phase 2 – Check Pathnames
+** phase 3 – Check Connectivity
+** phase 4 – Check Reference Counts
+** phase 5 – Check Cylinder Groups
+cleanup phase
+
+## Phase 2: check pathnames
+
+fsck error messages, warning messages and responses for Phase 2 -check pathnames.
+
+This phase checks the file paths & removes directory entries pointing to bad inodes found in Phases 1 and 1B above .
+
+The following type of errors are reported.:
+
+1. incorrect root inode mode and status
+2. directory inode pointers out of range
+3. directory entries pointing to bad inodes
+4. directory integrity checks
+
+All errors in this phase are fatal if the filesystem is being repaired, except for directories not being a multiple of the block size and extraneous hard links.
+
+### 1) ROOT INODE UNALLOCATED (ALLOCATE)
+
+> The root inode has no allocated mode bits **Possible responses** to the ALLOCATE prompt are:
+
+YES : Allocate inode 2 as the root inode. The files and directories usually found in the root will be recovered in Phase 3 and put into the lost+found directory. If the attempt to allocate the root fails, fsck exits with the message: CANNOT ALLOCATE ROOT INODE
+
+No , Terminate the program.
+
+### 2 ) ROOT INODE NOT DIRECTORY (REALLOCATE)
+
+> The root inode (usually inode number 2) of the file system is not a directory inode. **Possible responses** to the REALLOCATE prompt are:
+
+Yes : Clear the existing contents of the root inode and reallocate it. The files and directories usually found in the root will be recovered in Phase 3 and put into the lost+found directory. If the attempt to allocate the root fails, fsck exits with the message:
+NO CANNOT ALLOCATE ROOT INODE
+
+fsck prompts with FIX. **Possible responses** to the FIX prompt are:
+
+YES : Change the type of the root inode to directory.
+If the root inode's data blocks are not directory blocks, many error messages are generated.
+
+No : Terminate the program.
+
+### 3 ) DUPS/BAD IN ROOT INODE (REALLOCATE)
+
+> Phase 1 or Phase 1B has found duplicate blocks or bad blocks in the root inode (usually inode number 2) of the file system. **Possible responses** to the REALLOCATE prompt are:
+
+YES Clear the existing contents of the root inode and reallocate it. The files and directories usually found in the root will be recovered in Phase 3 and put into the lost+found directory. If the attempt to allocate the root fails, fsck exits with the message:
+CANNOT ALLOCATE ROOT INODE
+NO fsck prompts with CONTINUE. **Possible responses** to the CONTINUE prompt are:
+YES Ignore the DUPS/BAD error condition in the root inode and try to continue running the
+file system check. If the root the inode number s not correct, this can generate many other error messages.
+
+NO Terminate the program.
+
+### 4) NAME TOO LONG File
+
+> A very long pathname has been found indicating the loops in the file system
+
+### 5) I OUT OF RANGE I=NAME=F (REMOVE)
+
+> A directory entry F has an inode number I that is greater than the end of the inode list. **Possible responses** to the REMOVE prompt are:
+YES Remove the directory entry F.
+
+NO Ignore this error condition.
+
+### 6 ) UNALLOCATED I=OWNER=O MODE=M SIZE=S MTIME=T TYPE=F (REMOVE)
+
+> A directory or file entry F points to an unallocated the inode number . The owner O, mode M, size S, modify time T, and name F are printed. **Possible responses** to the REMOVE prompt are:
+
+YES Remove the directory entry F.
+
+NO Ignore this error condition.
+
+### 7 ) DUP/BAD I=OWNER=O MODE=M SIZE=S MTIME=T TYPE=F (REMOVE)
+
+> Phase 1 or Phase 1B has found duplicate blocks or bad blocks associated with directory or file entry F, the inode number . The owner O, mode M, size S, modify time T, and directory name F are printed. **Possible responses** to the REMOVE prompt are:
+
+YES Remove the directory entry F.
+
+NO Ignore this error condition.
+
+### 8) ZERO LENGTH DIRECTORY I=OWNER=O MODE=M SIZE=S MTIME=T DIR=F (REMOVE)
+
+> A directory entry F has a size S that is zero. The owner O, mode M, size S, modify time T, and directory name F are printed. **Possible responses** to the REMOVE prompt are:
+
+YES Remove the directory entry F; this generates the BAD/DUP error message in Phase 4.
+
+NO Ignore this error condition.
+
+### 9) DIRECTORY TOO SHORT I=OWNER=O MODE=M SIZE=S MTIME=T DIR=F (FIX)
+
+> A directory F has been found whose size S is less than the minimum size directory. The owner O, mode M, size S, modify time T, and directory name F are printed. **Possible responses** to the FIX prompt are:
+
+YES Increase the size of the directory to the minimum directory size.
+
+NO Ignore this directory.
+
+### 10) DIRECTORY F LENGTH S NOT MULTIPLE OF B (ADJUST)
+
+> A directory F has been found with size S that is not a multiple of the directory block size B. **Possible responses** to the ADJUST prompt are:
+
+YES Round up the length to the appropriate block size. When the file system is being
+repaired, only a warning is printed and the directory is adjusted.
+
+NO Ignore the error condition.
+
+### ) DIRECTORY CORRUPTED I=OWNER=O MODE=M SIZE=S MTIME=T DIR=F (SALVAGE)
+
+> A directory with an inconsistent internal state has been found. **Possible responses** to the SALVAGE prompt are:
+
+YES Throw away all entries up to the next directory boundary (usually a 512-byte boundary). This drastic action can throw away up to 42 entries, and should be taken only after other recovery efforts have failed.
+
+NO Skip to the next directory boundary and resume reading, but do not modify the directory.
+
+### 12) BAD INODE NUMBER FOR `.' I=OWNER=O MODE=M SIZE=S MTIME=T DIR=F (FIX)
+
+> A directory I has been found whose inode number for ``.'' does not equal I. **Possible responses** to the FIX prompt are:
+
+YES Change the inode number for ``.'' to be equal to I.
+
+NO Leave the inode number for ``.'' unchanged.
+
+### 13) MISSING `.' I=OWNER=O MODE=M SIZE=S MTIME=T DIR=F (FIX)
+
+> A directory I has been found whose first entry is unallocated. **Possible responses** to the FIX prompt are:
+
+YES Build an entry for ``.'' with inode number equal to I.
+
+NO Leave the directory unchanged.
+
+### 14) MISSING `.' I=OWNER=O MODE=M SIZE=S MTIME=T DIR=F CANNOT FIX, FIRST ENTRY IN DIRECTORY CONTAINS F
+
+> A directory I has been found whose first entry is F. fsck cannot resolve this problem. The
+file system should be mounted and entry F moved elsewhere. The file system should then be unmounted and fsck should be run again.
+
+### 15) MISSING `.' I=OWNER=O MODE=M SIZE=S MTIME=T DIR=F CANNOT FIX, INSUFFICIENT SPACE TO ADD `.'
+
+> A directory I has been found whose first entry is not ``.''. This is very rare. fsck cannot resolve the problem.
+
+### 16) EXTRA `.' ENTRY I=OWNER=O MODE=M SIZE=S MTIME=T DIR=F(FIX)
+
+> A directory I has been found that has more than one entry for ``.''. **Possible responses** to the FIX prompt are:
+
+YES Remove the extra entry for ``.''.
+
+NO Leave the directory unchanged.
+
+### 17) BAD INODE NUMBER FOR `..' I=OWNER=O MODE=M SIZE=S MTIME=T DIR=F (FIX)
+
+> A directory I has been found whose inode number for ``..'' does not equal the parent of I. **Possible responses** to the FIX prompt are:
+
+YES Change the inode number for ``..'' to be equal to the parent of I. (Note that ``..'' in the root inode points to itself.)
+
+NO Leave the inode number for ``..'' unchanged.
+
+### 18) MISSING `..' I=OWNER=O MODE=M SIZE=S MTIME=T DIR=F (FIX)
+
+> A directory I has been found whose second entry is unallocated. **Possible responses** to the FIX prompt are:
+
+YES Build an entry for ``..'' with inode number equal to the parent of I. (Note that ``..'' in the root inode points to itself.)
+
+NO Leave the directory unchanged.
+
+### 19) MISSING `..' I=OWNER=O MODE=M SIZE=S MTIME=T DIR=F CANNOT FIX, SECOND ENTRY IN DIRECTORY CONTAINS F
+
+> A directory I has been found whose second entry is F. fsck cannot resolve this problem. The
+file system should be mounted and entry F moved elsewhere. The file system should then be unmounted and fsck should be run again.
+
+### 20) MISSING `..' I=OWNER=O MODE=M SIZE=S MTIME=T DIR=F CANNOT FIX, INSUFFICIENT SPACE TO ADD `..'
+
+> A directory I has been found whose second entry is not ``..'' (the parent directory). fsck cannot resolve this problem. The
+file system should be mounted and the second entry in the directory moved elsewhere. The
+file system should then be unmounted and fsck should be run again.
+
+### 21 ) EXTRA `..' ENTRY I=OWNER=O MODE=M SIZE=S MTIME=T DIR=F(FIX)
+
+> A directory I has been found that has more than one entry for ``..'' (the parent directory). **Possible responses** to the FIX prompt are:
+
+YES Remove the extra entry for ``..'' (the parent directory).
+
+NO Leave the directory unchanged.
+
+### 22) N IS AN EXTRANEOUS HARD LINK TO A DIRECTORY D (REMOVE)
+
+> fsck has found a hard link N to a directory D. When preening, the extraneous links are ignored. **Possible responses** to the REMOVE prompt are:
+
+YES Delete the extraneous entry N.
+
+NO Ignore the error condition.
+
+### 23) BAD INODE S TO DESCEND
+
+> An internal error has caused an impossible state S to be passed to the routine that descends the
+file system directory structure. fsck exits.
+
+### 24) BAD ENTER STATE S FROM DESCEND
+
+> An internal error has caused an impossible state S to be returned from the routine that descends the
+file system directory structure. fsck exits. If you encounter this error.
+
+### 25) BAD STATE S FOR ROOT INODE
+
+> An internal error has caused an impossible state S to be assigned to the root inode. fsck exits.
+
+#### Initialization Phase
+** phase 1 – Check Blocks and Sizes
+** phase 2 – Check Pathnames
+NEXT>>
+** phase 3 – Check Connectivity
+** phase 4 – Check Reference Counts
+** phase 5 – Check Cylinder Groups
+cleanup phase
+
+## Phase 3: Check Connectivity
+
+This phase checks the directories examined in Phase 2. It reports error conditions resulting from:
+
+- unreferenced directories
+- missing or full lost+found directories
+
+fsck error messages, warning messages and responses for Phase 3 - Check Connectivity.
+
+### 1) UNREF DIR I=OWNER=O MODE=M SIZE=S MTIME=T (RECONNECT)
+
+> The directory the inode number was not connected to a directory entry when the file system was traversed. The owner O, mode M, size S, and modify time T of directory the inode number are printed. When preening, the directory is reconnected if its size is non-zero; otherwise it is cleared. **Possible responses** to the RECONNECT prompt are:
+
+YES Reconnect directory the inode number to the file system in the directory for lost files (usually the lost+found directory). This might generate the lost+found error messages in Phase 3 if there are problems connecting directory the inode number to the lost+found directory. It can also generate the CONNECTED error message in Phase 3 if the link was successful.
+
+NO Ignore this error condition. This generates the UNREF error message in Phase 4.
+
+### 2) NO lost+found DIRECTORY (CREATE)
+
+> There is no lost+found directory in the root directory of the filesystem; When preening, fsck tries to create a lost+found directory. **Possible responses** to the CREATE prompt are:
+
+YES - Create a lost+found directory in the root of the filesystem. This might produce the message:
+NO SPACE LEFT IN / (EXPAND)
+
+Inability to create a lost+found directory aborts the attempt to link up the lost inode, and generates this message:
+SORRY. CANNOT CREATE lost+found DIRECTORY
+This in turn generates the UNREF error message in Phase 4.
+
+NO - Abort the attempt to link up the lost inode. This generates the UNREF error message in Phase 4.
+
+### 3) lost+found IS NOT A DIRECTORY (REALLOCATE)
+
+> The entry for lost+found is not a directory. **Possible responses** to the REALLOCATE prompt are:
+
+YES - Allocate a directory inode, and change lost+found to reference it. The previous inode referenced by the lost+found directory is not cleared. Thus, it is either reclaimed as an UNREF'ed inode or has its link count ADJUST'ed later in this phase. Inability to create a lost+found directory generates the message:
+SORRY. CANNOT CREATE lost+found DIRECTORY
+and aborts the attempt to link up the lost inode. This in turn generates the UNREF error message in Phase 4.
+
+NO - Abort the attempt to link up the lost inode. This generates the UNREF error message in Phase 4.
+
+### 4) NO SPACE LEFT IN /lost+found (EXPAND)
+
+> There is no space to add another entry to the lost+found directory in the root directory of the filesystem. When preening, the lost+found directory is expanded. **Possible responses** to the EXPAND prompt are:
+
+YES Expand the lost+found directory to make room for the new entry. If the attempted expansion fails fsck prints the message:
+SORRY. NO SPACE IN lost+found DIRECTORY
+and aborts the attempt to link up the lost inode. This in turn generates the UNREF error message in Phase 4. Clear out unnecessary entries in the lost+found directory. This error is fatal if the
+file system is being repaired.
+
+NO Abort the attempt to link up the lost inode. This generates the UNREF error message in Phase 4.
+
+### 5) DIR I=I1 CONNECTED. PARENT WAS I=I2
+
+> This is an advisory message indicating that a directory the inode number 1 was successfully connected to the lost+found directory. The parent the inode number 2 of the directory the inode number 1 is replaced by the inode number of the lost+found directory.
+
+### 6) DIRECTORY F LENGTH S NOT MULTIPLE OF B (ADJUST)
+
+> A directory F has been found with size S that is not a multiple of the directory block size B. (Note that this may reoccur in Phase 3 if the error condition is not corrected in Phase 2). **Possible responses** to the ADJUST prompt are:
+YES Round up the length to the appropriate block size. When preening, the file system only a warning is printed and the directory is adjusted.
+
+NO Ignore the error condition.
+
+### 7) BAD INODE S TO DESCEND
+
+> An internal error has caused an impossible state S to be passed to the routine that descends the
+file system directory structure. fsck exits.
+
+#### Initialization Phase
+** phase 1 – Check Blocks and Sizes
+** phase 2 – Check Pathnames
+** phase 3 – Check Connectivity
+NEXT>>** phase 4 – Check Reference Counts
+** phase 5 – Check Cylinder Groups
+cleanup phase
+
+## Phase 4: check reference counts
+
+This phase checks the link count information obtained in Phases 2 and 3. It
+reports error conditions resulting from:
+
+1. unreferenced files
+2. missing or full lost+found directory
+3. incorrect link counts for files, directories, symbolic links, or special
+files
+4. unreferenced files, symbolic links, and directories
+5. bad or duplicate blocks in files, symbolic links, and directories
+
+fsck error messages, warning messages and responses for Phase 4 - check reference counts.
+
+### 1) UNREF FILE I=OWNER=O MODE=M SIZE=S MTIME=T (RECONNECT)
+
+> the inode number was not connected to a directory entry when the file system was traversed. The owner O, mode M, size S, and modify time T of the inode number are printed. When preening the file is cleared if either its size or its link count is zero; otherwise, it is reconnected. **Possible responses** to the RECONNECT prompt are:
+
+YES Reconnect the inode number to the file system in the directory for lost files (usually the lost+found directory). This may generate the lost+found error message in Phase 4 if there are problems connecting the inode number to the lost+found directory.
+
+NO Ignore this error condition. This always invokes the CLEAR error condition in Phase 4.
+
+### 2) (CLEAR)
+
+> The inode mentioned in the error message immediately preceding cannot be reconnected. This message cannot appear if the
+file system is being repaired, because lack of space to reconnect files is a fatal error. **Possible responses** to the CLEAR prompt are:
+YES Deallocate the inode by zeroing out its contents.
+
+NO Ignore this error condition.
+
+### 3) NO lost+found DIRECTORY (CREATE)
+
+> There is no lost+found directory in the root directory of the filesystem; when preening, fsck tries to create a lost+found directory. **Possible responses** to the CREATE prompt are:
+YES Create a lost+found directory in the root of the filesystem. This might generate the message:
+NO SPACE LEFT IN / (EXPAND) **Possible responses** . Inability to create a lost+found directory generates the message:
+SORRY. CANNOT CREATE lost+found DIRECTORY
+and aborts the attempt to link up the lost inode. This in turn generates the UNREF error message in Phase 4.
+
+NO Abort the attempt to link up the lost inode. This generates the UNREF error message in Phase 4.
+
+### 4) lost+found IS NOT A DIRECTORY (REALLOCATE)
+
+> The entry for lost+found is not a directory. **Possible responses** to the REALLOCATE prompt are:
+
+YES Allocate a directory inode and change the lost+found directory to reference it. The previous inode reference by the lost+found directory is not cleared. Thus it is either reclaimed as an UNREFed inode or has its link count ADJUSTed later in this phase.
+Inability to create a lost+found directory aborts the attempt to link up the lost inode and generates this message:
+SORRY. CANNOT CREATE lost+found DIRECTORY
+This generates the UNREF error message in Phase 4.
+
+NO Abort the attempt to link up the lost inode. This generates the UNREF error message in Phase 4.
+
+### 5) NO SPACE LEFT IN /lost+found (EXPAND)
+
+> There is no space to add another entry to the lost+found directory in the root directory of the filesystem. When preening, the lost+found directory is expanded. **Possible responses** to the EXPAND prompt are:
+
+YES Expand the lost+found directory to make room for the new entry. If the attempted expansion fails fsck aborts the attempt to link up the lost inode and prints this message:
+SORRY. NO SPACE IN lost+found DIRECTORY
+This generates the UNREF error message in Phase 4. Clear out
+unnecessary entries in the lost+found directory. This error is fatal if the file system is being fixed.
+
+NO Abort the attempt to link up the lost inode. This generates the UNREF error message in Phase 4.
+
+### 6) LINK COUNT TYPE I=OWNER=O MODE=M SIZE=S MTIME=T COUNT=X SHOULD BE Y (ADJUST)
+
+> The link count for the inode number is X but should be Y. The owner O, mode M, size S, and modify time T are printed. When preening, the link count is adjusted unless the number of references is increasing, a condition that should never occur unless precipitated by a hardware failure. When the number of references is increasing during preening, fsck exits with the message:
+LINK COUNT INCREASING **Possible responses** to the ADJUST prompt are:
+
+YES Replace the link count of file the inode number by Y.
+
+NO Ignore this error condition.
+
+### 7) UNREF TYPE I=OWNER=O MODE=M SIZE=S MTIME=T (CLEAR)
+
+> the inode number was not connected to a directory entry when the file system was traversed. The owner O, mode M, size S, and modify time T of the inode number are printed. Because this is a file that was not connected because its size or link count was zero, it is cleared during preening. **Possible responses** to the CLEAR prompt are
+
+YES Deallocate the inode number by zeroing out its contents.
+
+NO Ignore this error condition.
+
+### 8) BAD/DUP TYPE I=OWNER=O MODE=M SIZE=S MTIME=T (CLEAR)
+
+> Phase 1 or Phase 1B has found duplicate blocks or bad blocks associated with the inode number . The owner O, mode M, size S, and modify time T of the inode number are printed. This message cannot appear when the
+file system is being repaired, because it would have caused a fatal error earlier. **Possible responses** to the CLEAR prompt are:
+
+YES De-allocate the inode number by zeroing out its contents.
+
+NO Ignore this error condition.
+
+#### Initialization Phase
+** phase 1 – Check Blocks and Sizes
+** phase 2 – Check Pathnames
+** phase 3 – Check Connectivity
+** phase 4 – Check Reference Counts
+NEXT>>** phase 5 – Check Cylinder Groups
+cleanup phase
+
+## Phase 5: Check Cylinder Groups
+
+(ufs file system only)
+This phase checks the free-block and used-inode maps. It reports error conditions resulting from:
+
+1. Allocated inodes missing from used-inode maps Free blocks missing from free-block maps Free inodes in the used-inode maps Incorrect total free-block count Incorrect total used inode count
+
+fsck error messages, warning messages and responses for Phase 5 - Check Cylinder Groups.
+
+### 1) BLK(S) MISSING IN BIT MAPS (SALVAGE)
+
+> A cylinder group block map is missing some free blocks. During preening, the maps are reconstructed. **Possible responses** to the SALVAGE prompt are:
+
+YES Reconstruct the free block map.
+
+NO - Don't salvage
+
+### 2) CG C: BAD MAGIC NUMBER
+
+> The magic number of cylinder group C is wrong. This usually indicates that the cylinder group maps have been destroyed. When running interactively, the cylinder group is marked as needing reconstruction. This error is fatal if the file system is being
+repaired.
+
+### 3) SUMMARY INFORMATION BAD (SALVAGE)
+
+> The summary information was found to be incorrect. When preening, the summary information is recomputed. **Possible responses** to the SALVAGE prompt are:
+
+YES Reconstruct the summary information.
+
+NO Ignore this error condition.
+
+### 4) FREE BLK COUNT(S) WRONG IN super block (SALVAGE)
+
+> The super block free block information was found to be incorrect. When preening, the
+super block free block information is recomputed. **Possible responses** to the SALVAGE prompt are:
+
+YES Reconstruct the super block free block information.
+NO Ignore this error condition.
+
+#### Initialization Phase
+** phase 1 – Check Blocks and Sizes
+** phase 2 – Check Pathnames
+** phase 3 – Check Connectivity
+** phase 4 – Check Reference Counts
+** phase 5 – Check Cylinder Groups
+NEXT>>cleanup phase
+
+## cleanup phase
+
+V files, W used, X free (blocksY frags, Z )
+
+fsck error messages, warning messages and responses cleanup phase.
+
+After a file system has been checked, a few cleanup functions are performed. The cleanup phase displays advisory messages about the status of the file system :
+
+### 1 ) number-of files, number-of-files used, number-of-files free (number-of frags, number-of blocks, percent fragmentation)
+
+> V files, W used, X free (Y frags, Z blocks) This is an advisory message indicating that the
+file system checked contains V files using W fragment-sized blocks, and that there are X fragment sized blocks free in the
+file system. The numbers in parentheses break the free count down into Y free fragments and Z free full sized blocks.
+
+### 2) /dev/rdsk/cntndnsn FILE SYSTEM STATE SET TO OKAY
+
+> This is an advisory message indicating that the file system errors were corrected by fsck and now file system is in good condition .
+
+### 3) ***** FILE SYSTEM WAS MODIFIED *****
+
+> This is an advisory message indicating that the file system was modified by fsck. If this file system is mounted or is the current root file system, you should reboot the system.
+
+If the file system is mounted you might need to unmount it and run fsck again; otherwise the work done by fsck might be undone by the in-core copies of tables.
+
+### 4) filename FILE SYSTEM STATE NOT SET TO OKAY
+
+> The fsck command was not able to fix all the errors in current execution . Run fsck again to see it can set the file system to an Ok state.

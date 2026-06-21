@@ -1,0 +1,200 @@
+---
+title: "NISplus Installation & Administration"
+description: "This article discusses the nisplus objects, installation of servers ,clients and administration commands."
+pubDate: 2009-12-29
+updatedDate: 2026-06-20
+pageType: guide
+topic: legacy
+tier: "TIER 4 (Solaris/legacy Unix)"
+tags: ["nis"]
+testedOn: ["Linux", "Unix"]
+---
+
+NISplus is network which allows you to store client information at a
+central place where all the clients have access. This enables system
+administrators to manage a group of servers from a central place.
+This article discusses the nisplus objects, installation of servers ,clients and administration commands.
+
+> 1.0 Introduction to NIS+
+1.1 Objects in NIS+
+1.2 Standard tables in NIS+
+1.3 Groups in NIS+
+2.0 Preparing for Install
+2.1 Installing Server
+3.0 Installing Client
+4.0 Administration commands
+
+___________________________________
+
+1.0 Introduction to NIS+
+
+- NIS + is network information services which allows you to store client information at a central place where all the clients have access. The information can be user passwords , home directories, network services etc.
+- The information is stored in NIS+ tables . Some of the standard tables (16 in number) comes with predefined structure when NIS+ is installed . The other tables can be created as per requirement using NIS+ commands.
+- NIS+ uses hierarchical structure and can have multiple domains servers .
+- NIS+ uses the client server model . The primary server is called master server and the backup server is called the replica server. Both server runs NIS+ and have copies of tables . The changes in master server are propagated to replica servers in increments.
+- For security it uses both authentication and authorization for securing the access to system and resources. Authentication verifies validity of a user ; Authorization verifies if the user is allowed to have access to the resources. Access to any NIS+ table can be controlled through the table permissions.
+- Clients have a configuration file /etc/nsswitch.com ; entries in this file determines where the clients should look for the information , in local files or NIS+ maps at the server.
+
+1.1 Objects in NIS +
+
+There are three objects in NIS+
+1. Parent domain - represented by domain
+name e.g. planet.com.: (Parent domain )'
+2. org_dir - which contains all the NIS+ tables .
+3. groups_dir - contains the groups information, by default only admin
+group is there.
+
+1.2 Standard Tables in NIS+
+
+They contain same type of information as standard files of the same
+name .The passwd table however contains the encrypted password information
+also. Standard tables in NIS+ are :
+passwd, group auto_master auto_home Bootparams cred ethers hosts mail_aliases sendmailvars netmasks netgroup networks protocols rpc services timezone client_info
+
+1.3 Groups in NIS+
+
+By default only admin group is created at the time of installation of NIS+.
+
+2.0 Preparing for Install
+
+First step is to prepare the data files for NIS+ maps .This can be done by
+coping the files which needs to be put in the nis+ tables for centralized
+administration . The files are located in /etc and mostly have the same name
+as NIS+ tables
+
+If you want only passwords, groups, hosts, home directories to be
+administered then you need to copy the these files in some other directory - say
+nisfiles. You can make additional changes here .
+
+> #cp /etc/passwd /export/home/nisfiles
+#cp /etc/group /export/home/nisfiles
+#cp /etc/hosts /export/home/nisfiles
+
+auto_home can be created by editing a copy of passwd file and keeping
+only the login name and home directory .
+
+A typical auto_home will consists of following entries
+
+> #vi auto_home
++auto_home
+peter 10.20.30.40:/home/&
+john 10.20.30.40:/home/&
+
+First column is user names followed by name of the machine
+providing home directories & home directory path.
+
+2.1 Installing Server
+
+a) Define a default domain if not defined already in /etc/defaultdomain.
+#domainname
+planet.com
+#domainname > /etc/defaultdomain
+
+b) As root ; change directory to the /usr/lib/nis or add PATH to this directory.
+Run server initialization program.
+#nisserver -r
+
+To setup server in NIS compatibility mode
+#nisserver -r -Y
+
+The above commands will setup the NIS+ server software.
+Reboot the server
+c) Login as root ; change directory to the one containing the files auto_home, passwd and group.
+
+Run the command to populate the empty nis+ tables.
+
+#cd /export/home/nisfiles
+#nispopulate –v –F
+This will try to populate all the standard tables from the files in local directory . you can also specify a particular file name in for populating a single table e.g.
+
+#nispopulate –v –F auto_home
+auto_home is the local file containg the entries in proper format.
+
+3.0 Installing Client
+
+a.) Login as root in client
+Define a default domain name – planet here.
+
+b.) Run the client initialsation programme.
+#nisclient –i -h jupiter -d planet.com
+
+reboot the client machine.
+
+c.) Login again and open /etc/nsswitch.conf
+check to see that only entries coreesponding to the populated tables are
+pointing to nisplus first and then files. Rest of them should be files and nisplus.
+
+4.0 Administration Commands
+
+Following are some of the useful command for administering nis+
+Listing table & objects in NIS+
+#nisls ;Gives the total objects in NIS+
+#nisls org_dir ;Lists the tables listed in the directory.
+
+Listing a contents of tables
+
+#niscat passwd.org_dir
+
+Listing table structure
+
+#niscat -o passwd.org_dir ;lists structure of
+password table.
+
+Adding A user
+
+#nistbladm -a name=john uid=123 gid=111 home=/home/john
+shell=/bin/sh passwd.org_dir
+
+Changing the user information
+
+in passwd table (Super user only
+
+Fill in the corresponding values in &lt;>
+#nistbladm –a name=&lt;> passwd=&lt;> uid=&lt;> gid=&lt;>
+home=&lt;> shelll=&lt;> passwd.org_d
+
+example
+#nistbladm -a name=john uid=123 gid=234 home=/home/john
+shell=/bin/sh passwd.org_di
+
+to change only shell
+#nistbladm -m shell=/usr/local/bin/bash [name=john],passwd.org_dir
+
+Changing user passwd
+
+As root
+# nispasswd ;user has to update his key
+through chkey -p
+
+As user
+$ nispasswd ;update encrypted key
+$chkey -p ;(user NIS+ passwd and login passwd are the
+same.)
+
+Adding user credentials
+#nisaddcred -p 123 -P john local
+# nisaddcred -p unix.123@planet.com -P john.planet.com. des
+
+123 is userid and john is the user name.
+
+Adding / removing a user dir entry in auto_home table :
+#nistbladm -a key=john value=10.20.30.40:/home/john
+auto_home.org_dir
+#nistbladm -r key=john auto_home.org_dir ;If key is not
+unique then more fields needs to be defined .
+
+Removing a user
+#nistbladm -r name=john passwd.org_dir
+
+Modifying the tables for multiple entries.
+
+#nisaddent -d passwd > /tmp/passwd ;Dump the
+table to a file
+
+#vi /tmp/passwd ;Edit the dumped file
+# nisaddent -r -f /tmp/passwd passwd ;Put back
+the dumped file.
+
+nisaddent command is available only for some of the
+standard tables, for others either nispopulate or nistbladm has to
+be used .

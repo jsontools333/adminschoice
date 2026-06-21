@@ -1,0 +1,802 @@
+---
+title: "Solaris Error Messages T-Z"
+description: "Solaris / Unix error messages are very short and often we need some more information about the origin of an error and a possible steps to fix the issues."
+pubDate: 2009-12-20
+updatedDate: 2026-06-20
+pageType: reference
+topic: legacy
+tier: "TIER 4 (Solaris legacy)"
+tags: ["errors"]
+testedOn: ["Linux", "Unix"]
+---
+
+Solaris / Unix error messages are very short and often we need some more information about the origin of an error and a possible steps to fix the issues.
+Here is a list of Solaris / Unix error messages for your reference, most of the error messages are generic Unix error messages but many are specific Solaris Error Messages. Please comment if you can provide some more details about these errors.
+For other parts please scroll down to related posts section.
+This is a multi part document , this is last part covering error messages from T to Z
+
+Please scroll down to related posts section for other parts of this document.
+
+[]() U
+
+202.
+
+```bash
+tar: /dev/rmt/0: No such file or directory
+```
+
+203.
+
+```bash
+tar: directory checksum error
+```
+
+204.
+
+```bash
+tar: tape write error
+```
+
+205.
+
+Text is lost because the maximum edit log
+
+size has been exceeded.
+
+206.
+
+THE FOLLOWING FILE SYSTEM(S) HAD AN UNEXPECTED INCONSISTENCY:
+
+207.
+
+The SCSI bus is hung. Perhaps an external device is turned off.
+
+208.
+
+THE SYSTEM IS BEING SHUT DOWN NOW !!!
+
+209.
+
+The system will be shut down in N minutes
+
+210.
+
+This mail file has been changed by another mail reader.
+
+211.
+
+Timeout waiting for ARP/RARP packet
+
+212.
+
+timeout waiting for input during variable
+
+213.
+
+Too many links
+
+214.
+
+Too many open files
+
+[]() U
+
+215.
+
+umount: warning: /variable not in mnttab
+
+216.
+
+Unable to install/attach driver 'variable'
+
+217.
+
+undefined control
+
+218.
+
+Unmatched `
+
+219.
+
+UNREF FILE I=i OWNER=o MODE=m SIZE=s MTIME=t CLEAR?
+
+220.
+
+Use "logout" to logout.
+
+221.
+
+/usr/openwin/bin/xinit: connection to X server lost
+
+[]() V
+
+222.
+
+Value too large for defined data type
+
+223.
+
+variable... Host unknown
+
+224.
+
+variable... User unknown
+
+225.
+
+variable... Local configuration error
+
+[]() W
+
+226.
+
+WARNING: Clock gained N days-- CHECK AND RESET THE DATE!
+
+227.
+
+WARNING: No network locking on variable: contact
+
+adminto install server change
+
+228.
+
+WARNING: processorlevel 4 interrupt not serviced
+
+229.
+
+WARNING: /tmp: File system full, swap space limit exceeded
+
+230.
+
+WARNING: TOD clock not initialized--CHECK AND RESET THE DATE!
+
+231.
+
+WARNING:Unable to repair the / filesystem. Run fsck
+
+232.
+
+Watchdog Reset
+
+233.
+
+Watchdog Reset, Rebooting.
+
+234.
+
+Who are you?
+
+235.
+
+Window Underflow
+
+[]() X
+
+236.
+
+X connection to variable:0.0 broken (explicit kill or server shutdown).
+
+237.
+
+xinit: not found
+
+238.
+
+XIO: fatal IO error 32 (Broken pipe) on X server "variable:0.0"
+
+239.
+
+Xlib: Client is not authorized to connect to Server
+
+240.
+
+Xlib: connection to "variable:0.0" refused by server
+
+241.
+
+xterm: fatal IO error 32 (Broken Pipe)or Kill Client on X server " variable:0.0"
+
+242.
+
+XView warning: Cannot load font set 'variable'(Font Package)
+
+[]() Y
+
+243.
+
+ypbind[N]: NIS server for domain "variable" OK
+
+244.
+
+ypbind[N]: NIS server not responding for domain "variable"; still trying
+
+245.
+
+ypwhich: can't communicate with ypbind
+
+[]() Z
+
+246.
+
+zsN: silo overflow
+
+&lt;a []() tar: /dev/rmt/0: No such file or directory
+
+> The default tape device /dev/rmt/0, or possibly the device
+specified by the TAPE environment variable, is not currently
+connected to the system, is not configured, or its hardware
+symbolic link is broken.
+List the files in the /dev/rmt directory to see which tape
+devices are currently configured. If none are configured,
+
+ensure
+that a tape device is correctly attached to the system, and
+reboot with the -r option to reconfigure devices.
+If tape devices other than /dev/rmt/0 are configured, you
+could
+specify one of them after the -f option of tar(1).
+
+[]() tar: directory checksum error
+
+> This error message from tar(1) indicates that the checksum of the
+directory and the files it has read from tape does not match the
+checksum advertised in the header block. Usually this indicates
+the wrong blocking factor, although it could indicate corrupt
+data on tape.
+To resolve this problem, make certain that the blocking factor
+you specify on the command line (after -b) matches the blocking
+factor originally specified. If in doubt, leave out the block
+size and let tar determine it automatically. If that doesn't
+help, tape data could be corrupted.
+
+[]() tar: tape write error
+
+> A physical write error has occurred on the tar(1) output file,
+which is usually a tape, although it could be a diskette or disk
+file. Look on the system console, where the device driver should
+provide the actual error condition. This might be a write-
+protected tape, a physical I/O error, an end-of-tape condition,
+or a File too large limitation.
+In the case of write-protectedtapes, enable the write switch.
+For physical I/O errors, the best course of action is to replace
+the tape with a new one. For end-of-tape conditions, try using a
+higher density if the device supports one, or use cpio(1) or pax
+(1) for their multi-volume support., When encountering File too
+large limitations, use the parent shell'slimit(1) or ulimit
+facility to increase the maximum file size.
+For more information on tar tapes, see the section on copying UFS
+files in the System Administration Guide,Volume I.
+
+[]() Text is lost because the maximum edit log size has been exceeded.
+
+> This message appears at the beginning of a cmdtool(1) session
+after 100,000 characters have gone by in the scrolling window.
+Clicking on the top rectangle of the scrollbar might display this
+message. No data were lost, but the user cannot scroll back
+before this wraparound point.
+To increase the maximum size of the Command Tool log file, use
+cmdtool with the-M option, specifying more than 100,000 bytes.
+
+[]() THE FOLLOWING FILE SYSTEM(S) HAD AN UNEXPECTED INCONSISTENCY:
+
+> At boot time the /etc/rcS script runs the fsck(1M) command to
+check the integrity of filesystems marked "fsck" in /etc/vfstab.
+If fsck cannot repair a filesystem automatically, it interrupts
+the boot procedure and produces this message. When fsck gets into
+this state, it cannot repair filesystems without losing one or
+more files, so it wants to defer this responsibility to you, the
+administrator. Data corruption has probably already occurred.
+First run fsck -n on the filesystem, to see how many and what
+type of problems exist. Then run fsck again to repair the
+filesystem. If you have a backup of the filesystem, you can
+generally answer "y" to all the fsck questions. It's a good idea
+to keep a record of all problematic files and inode numbers for
+later reference. To run fsck yourself, specify options as
+recommended by the boot script. For example:
+# fsck /dev/rdsk/c0t4d0s0
+Usually, files lost during fsck repair were created just before a
+crash or power outage, and cannot be recovered. If important
+files are lost, you can recover them from backup tapes.
+If you don't havea backup, ask an expert to run fsck for you.
+For more information, see the sectionon checking filesystem
+integrity in the System Administration Guide, Volume I.
+
+[]() The SCSI bus is hung. Perhaps an external device is turned off.
+
+> This message appears near the beginning of rebooting, immediately
+after a "Boot device: ..." message, and then the system hangs.
+The problem is conflicting SCSI targets for a non-boot device.
+Having an external device turned off is unlikely to cause this
+problem.
+See the message "Boot device:
+/iommu/sbus/variable/variable/sd@3,0" for a solution.
+For more information, see the section on halting and booting in
+the System Administration Guide, Volume I.
+
+[]() THE SYSTEM IS BEING SHUT DOWN NOW !!!
+
+> This message means the system is going down immediately and it's
+too late to save any changes.
+This message is often preceded by messages telling you that the
+system is going down in 15 minutes, 10 minutes, and so on. When
+you see these initial broadcast shutdown messages, save all your
+work, send any e-mail you're working on, and close your files.
+Fortunately vi sessions are automatically saved for later
+recovery, but many otherapplications have no crash protection
+mechanism. Data loss is likely.
+For more information on shutting down the system, see the System
+Administration Guide, Volume I. If you are using the AnswerBook,
+"halting the system" is a good search string.
+
+[]() The system will be shut down in N minutes
+
+> Thismessage from the system shutdown(1M) script informs you that
+the superuser is taking down the system.
+Save all changes now or your work will be lost. Write out any
+files you were changing, send any e-mail messages you were
+composing, and close your files.
+For more information on shutting down the system, see the System
+Administration Guide, Volume I. If you are using the AnswerBook,
+"halting the system" is a good search string.
+
+[]() This mail file has been changed by another mail reader.
+
+> This message appears in a pop-up dialog box whenever you start
+mailtool(1) while another mail reader has the inbox locked. A
+question follows: "Do you wish to ask that mail reader to save
+the changes?" You are given three choices.
+If you choose "Save Changes" mailtool will request the other mail
+reader to relinquish its lock and write out any changes it has
+made to your inbox. If you choose "Ignore" mailtool will read
+your inbox without locking it. If you choose "Cancel" mailtool
+will exit.
+
+[]() Timeout waiting for ARP/RARP packet
+
+> This problem can occur while booting from the net, and indicates
+a network connection problem.
+Make sure the Ethernet cable is connected to the network. Check
+that this system has an entry in the NIS ethers map or locally on
+the boot server. Then check the IP address of the server and the
+client to make sure they are on the same subnet. Local /etc/hosts
+files must agree with each other and withthe NIS hosts map.
+If those are not causing the problem, go to the system's PROM
+monitor ok prompt and run test net to test the network
+connection. (On older PROM monitors, use test-net instead.) If
+the network test fails, check the Ethernet port, card, fuse, and
+cable, replacing them if necessary. Also check the twisted pair
+port to make sure it is patched to the correct subnet.
+For more information on packets, see SPARC: Installing Solaris
+Software. If you are using the AnswerBook, "ARP/RARP" isa good
+search string.
+
+[]() Too many links
+
+> An attempt was made to create more than the maximum number of
+hard links (LINK_MAX, by default 32767) to a file. Because each
+subdirectory is a link to its parent directory, the same error
+results from trying to create too many subdirectories.
+Check to see why there are so many links to the same file. To get
+more than the maximum number of hard links, use symbolic links
+instead.
+The symbolic name for this error is EMLINK, errno=31.
+
+[]() Too many open files
+
+> A process has too many files open at once. The system imposes a
+per-process soft limit on open files, OPEN_MAX (usually 64),
+which can be increased, and a per-process hard limit (usually
+1024), which cannot be increased.
+You can control the soft limit from the shell. In the C shell,
+use the limit command to increase the number of descriptors. In
+the Bourne or Korn shells, use the ulimit command with the -n
+option to increase the number of file descriptors.
+If the window system refuses to start new applications because of
+this error, increase the open file limit in your login shell
+before starting the window system.
+The symbolic name for this error is EMFILE, errno=24.
+
+[]() umount: warning: /variable not in mnttab
+
+> This message results when the superuser attempts to unmount a
+filesystem that is not mounted. Note that subdirectories of
+filesystems,such as /var, cannot be unmounted.
+Run the mount(1M) or df(1M) command to see what filesystems are
+mounted. If you really want to unmount one of them, specify the
+existing mount point.
+
+[]() Unable to install/attach driver 'variable'
+
+> These messages appear in /var/adm/messages at boot time, when the
+system tries to load drivers for devices the machine does not
+have.
+Despite the alarmist tone, this message is intended as purely
+informational. You probably don't want all these device drivers,
+because they make your system kernel larger, requiring
+memory.
+
+[]() undefined control
+
+> This message, prefaced by the file name and line number involved,
+is from the C preprocessor /usr/ccs/lib/cpp, and indicates a line
+starting with a sharp (#) but not followed by a valid keyword
+such as define or include.
+A piece of software might be running the C preprocessor on an
+initialization file that you thought was interpreted by a shell.
+In most shells, the sharp (#) indicates a comment. The C
+preprocessor considers comments to be anythingbetween /* and */
+delimiters.
+
+[]() Unmatched `
+
+> This message from the C shell csh(1) indicates that a user typed
+a command containing a backquote symbol (`) without a closeing
+backquote. Similar messages result from an unmatched single quote
+(') or an unmatched double quote ("). Other shells generally give
+a continuation prompt when a command line contains an unmatched
+quote symbol.
+Correct the command line and try again. To continue typing on
+another line, give the C shell a backslash right before the
+newline.
+
+[]() UNREF FILE I=i OWNER=o MODE=m SIZE=s MTIME=t
+= CLEAR?
+
+> During phase 4, fsck(1M) discovered that the specified file was
+orphaned because the inode had no record of its pathname. In
+other words, the file was not connected into any directory.
+Answer yes to reconnect the file into the lost+found directory.
+Then contact the file's owner to ask whether they want it back,
+and where they want you to place it.
+For more information, see the chapter on checking filesystem
+integrity in the System Administration Guide, Volume I.
+
+[]() Use "logout" to logout.
+
+> This C shell message might come as a surprise to Bourne or Korn
+shell users accustomed to logging out with a Control-d.
+When ignoreeof is set, the C shell requires users to logout by
+typing logout or exit. Write any modified files to disk before
+exiting.
+
+[]() /usr/openwin/bin/xinit: connection to X server lost
+
+> This means that the xinit(1) program, which sets up X11 resources
+and starts a window manager, failed to locate the X server
+process. Perhaps the user interrupted window system startup, or
+exited abnormally from OpenWindows (for example, by killing
+processes or by rebooting). It is possible that the X server
+crashed. Data loss is possible in some cases. Depending on
+process timing, this message might be normal when OpenWindows
+exits during a system reboot.
+The only solution is to exit and restart OpenWindows. You do not
+need to reboot the system unless it hangs and fails to give you a
+console prompt. To exit OpenWindows, select Workspace->Exit. To
+restart OpenWindows, type openwin at the system prompt.
+
+[]() Value too large for defined data type
+
+> The user ID or group ID of an IPC object or file system object
+was too large to be stored in an appropriate member of the
+caller-provided structure.
+Run the application on a newer system, or ask the program's
+author to fix this condition.
+This error occurs only on systems that support a larger range of
+user or group ID values than a declared member structure can
+support. This condition usually occurs because the IPC or file
+system object resides on a remote machine with a larger value of
+type uid_t, off_t, or gid_t than that of the local system.
+The symbolic name for this error is EOVERFLOW, errno=79.
+
+[]() WARNING: Clock gained N days-- CHECK AND RESET THE DATE!
+
+> Each workstation contains an internal clock powered by a
+rechargeable battery. After the system is halted and turned off,
+the internal clock continues to keep time. When the system is
+powered on and reboots, the system notices that the internal
+clock has gained time since the workstation was halted.
+In most cases, especially if the power has been off for less than
+a month, the internal clock keeps the correct time, and you do
+not have to reset the date. Use the date(1) command to check the
+date andtime on your system. If the date or time is wrong,
+become superuser and use the date(1) command to reset them.
+
+[]() WARNING: No network locking on variable:
+
+[]() contact adminto install server change
+
+> The Solaris 2.x mount(1M) command issues this message whenever it
+mounts a filesystem that doesn't have NFS locking, such as a
+standard SunOS 4.1.x exported filesytem. Data loss is possible in
+applications that depend on locking.
+On the remote SunOS 4.1.x system, install the appropriate
+rpc.lockd jumbo patch to implement NFS locking. For SunOS 4.1.4,
+install patch #102264; for SunOS 4.1.3, install patch #100075;
+for earlier 4.1 releases, install patch #101817.
+
+[]() WARNING: processorlevel 4 interrupt not serviced
+
+> This message is basically a diagnostic from the SCSI driver.
+Especially on machineswith the sun4c architecture, it can appear
+on the console every 10 minutes or so.
+To reduce the frequency of this message, add this line near the
+bottom of the /etc/system file and reboot:
+set esp:esp_use_poll_loop=0
+You might also see this message repeatedly after manually
+removing a CD when it was busy. Don't do this! To get the system
+back to normal, reboot the system with the -r (reconfigure)
+option.
+
+[]() WARNING: /tmp: File system full, swap space limit exceeded
+
+> The system swap area (virtual memory) has filled up. You needto
+reduce swap space consumption by killing some processes or
+possibly by rebooting the system.
+See the message "Not enough space" for information about
+increasingswap space.
+
+[]() WARNING: TOD clock not initialized-- CHECK AND RESET THE DATE!
+
+> -
+This message indicates that the Time Of Day (TOD) clock reads
+zero, so its time is the beginning of the UNIX epoch: midnight 31
+December 1969. On a brand-new system, the manufacturer might have
+neglected to initialize the system clock. On older systems it is
+more likely that the rechargeable battery has run out and
+requires replacement.
+First replace the batteryaccording to the manufacturer's
+instructions. Then become superuser and use the date(1) command
+to set the time and date. On SPARC systems the clock is powered
+by the same battery as the NVRAM, so a dead battery also causes
+loss of the machine's Ethernet address and host ID, which are
+more serious problems for networked systems.
+
+[]() WARNING:Unable to repair the / filesystem. Run fsck
+
+> This message comes at boot time from the /etc/rcS script whenever
+it gets a bad return code from fsck(1) after checking a
+filesystem. The message recommends an fsck command line, and
+instructs you to exit the shell when done to continue booting.
+Then the script places the system in single-user mode so fsck can
+be run effectively.
+See "/dev/rdsk/variable: UNEXPECTED INCONSISTENCY" for
+information about repairing UFS filesystems.
+See "THE FOLLOWING FILE SYSTEM(S) HAD AN UNEXPECTED
+INCONSISTENCY" for information about repairing non-UFS
+filesystems.
+
+[]() Watchdog Reset
+
+> This fatal error usually indicates some kind of hardware problem.
+Data corruption on the system is possible.
+Look for some other message that might help diagnose the problem.
+By itself, a watchdog reset doesn't provide enough information;
+because traps are disabled, all information has been lost. If all
+that appears on the console is an ok prompt, issue the PROM
+command below to view the final messages that occurred just
+before system failure:
+ok f8002010 wector p
+Yes, that word iswector, not vector.
+The result is a display of messages similar to those produced by
+the dmesg(1M) command. These messages can be useful in finding
+the cause of system failure.
+This message doesn't come from the kernel, but from the OpenBoot
+PROM monitor, a piece of Forth software that gives you the ok
+prompt before you boot UNIX. If the CPU detects a trap when traps
+are disabled (an unrecoverable error), it signals a watchdog. The
+OpenBoot PROM monitor detects the watchdog, issues this message,
+and brings down the system.
+
+[]() Watchdog Reset, Rebooting.
+
+> See the message "Watchdog Reset" for details. This rebooting
+message occurs under the same conditions, but when the EEPROM's
+watchdog-reboot? variable is set to true, causing the machine to
+automatically reboot itself. Data corruption on the system is
+possible.
+
+[]() Who are you?
+
+> Many networking programs can print this message, including
+from(1B), lpr(1B), lprm(1B), mailx(1), rdist(1), sendmail(1M),
+talk(1), and rsh(1). The command prints this message when it
+cannot locate a password file entry for the current user. This
+might occur if a user logged in just before the superuser deleted
+that user's password entry, or if the network naming service
+fails for a user who has no entry in the local password file.
+If a user's password file entry was accidentally deleted, restore
+it from backups or from another password file. If a user's login
+name or user ID was changed, ask that user to logout and login
+again. If the network naming service failed, check the NIS
+server(s) and repair or reboot as necessary.
+There is a known problem (bug 1138025) with starting hundreds of
+rsh processes on another machine. This message appears because
+rsh hangs while binding to a reserved port, and responds too
+slowly to interact with the network naming service.
+
+[]() Window Underflow
+
+> This message often occurs at boot time, sometimes along with a
+"Watchdog Reset" error. It comes from the OpenBoot PROM monitor,
+which was passed a processor trap from the hardware. This error
+indicates that some programtried to access a SPARC register
+window that wasn't accessible from the processor.
+On some system architectures, specifically sun4c, the problem
+could be that different capacity memory chips are mixed together.
+Someone might have placed 1MB SIMMs in the same bank with 4MB
+SIMMs. If this is so, rearrange the memory chips. Make sure to
+put higher-capacity SIMMs in the first bank(s), and lower-
+capacity SIMMs inthe remaining bank(s); never mix different
+capacity SIMMs in the same bank.
+The problem could also be that cache memory on the motherboard
+has gone bad and needs replacement. If main memory is installed
+correctly, try swapping the motherboard.
+The best way to isolate the problem is to look at the %pc
+register to see where it got its arguments from, and why the
+arguments were bad. If you can reproduce the condition causing
+this message, your system vendor might be able to help diagnose
+the problem.
+
+[]() X connection to variable:0.0 broken (explicit kill or
+
+[]() server shutdown).
+
+> This means that the client has lost its connection to the X
+server. The "0.0" represents the display device, which is usually
+the console. This message can appear when a user is running an X
+application on a remote system with the DISPLAY set back to the
+original system and the remote system's X server disappears,
+perhaps because someone exited X windows orrebooted the machine.
+It sometimes appears locally when a user exits the window system.
+Dataloss is possible if applications were killed before saving
+files.
+Try to run the application again in a few minutes after the
+system has rebooted and the window system is running.
+
+[]() xinit: not found
+
+> OpenWindows was probably not installed properly, and the
+openwin(1) program could not find xinit(1) to start up the X
+windows system. If the user is running another version of X
+windows, such as the MIT X11 distribution, the startx program
+serves the same function as xinit.
+Check the PATH environment variable to make sure it contains the
+appropriate X windows install directory. Verify that xinit is in
+this directory as an executable program.
+
+[]() XIO: fatal IO error 32 (Broken pipe) on X server "variable:0.0"
+
+> This means that I/O with the X server has been broken. The "0.0"
+represents the display device, which is usually the console. This
+message can appear when a user is running Display PostScript
+applications and the X server disappears or the client is shut
+down. Data loss is possible if applications disappeared before
+saving files.
+Try to run the application again in a few minutes after the
+system has rebooted and the window system is running.
+
+[]() Xlib: Client is not authorized to connect to Server
+
+> See the message "Xlib: connection to ... refused by server" for
+details.
+
+[]() Xlib: connection to "variable:0.0" refused by server
+
+> This message is immediately followed by the "Xlib: Client is not
+authorized to connect to Server" message. These messages indicate
+that an X windows application tried to run on the X server
+specified inside double quotes, which did not allow the request.
+The "0.0" represents the display device, which is usually the
+console. If no server name appears, the superuser probably tried
+to run an X application on the current machine in an X session
+that was owned by somebody else.
+To allow this client to connect to the X server, run xhost
++clientname on the X server system. Only the owner of the current
+X session (who is not necessarily the superuser) isallowed to
+run the xhost command. If somebody else is running X windows on
+the server, ask them to log out and then start your own X session
+on that server; remote X connections are usually allowed for the
+same user ID.
+
+[]() xterm: fatal IO error 32 (Broken Pipe) or KillClient on X server
+variable:0.0"
+
+> This means that xterm(1) has lost its connection to the X server.
+The "0.0" represents the display device, which is usually the
+console. This message can appear when a user is running xterm and
+the X server disappears or the client gets shut down. Data loss
+is possible if applications were killed before saving files.
+Try to run the terminal emulator again in a few minutes after the
+system has rebooted and the window system is running.
+
+[]() XView warning: Cannot load font set 'variable' (Font Package)
+
+> This message from the XView library warns that a requested font
+is not installed on the X server. Often multiple warnings appear
+about the same font. The set of available fonts can vary from
+release to release.
+To see which fonts are available on the X server, run the
+xlsfonts(1) program. Then specify another font name that you see
+in the output of xlsfonts. Sometimes it is possible to locate a
+similar font from a different vendor.
+There are two packages of X windowsfonts: the common but not
+required fonts (SUNWxwcft), and the optional fonts (SUNWxwoft).
+Run pkginfo(1) to see if both these packages are installed, and
+add them to the system as you wish.
+
+[]() ypbind[N]: NIS server for domain "variable" OK
+
+> This message appears after an "NIS server not responding" message
+to indicate that ypbind(1M is able to communicate with an NIS
+server again.
+Proceed with your work. This message is purely informational.
+
+[]() ypbind[N]: NIS server not responding for domain
+
+[]() "variable"; still trying
+
+> This means that the NIS client daemon ypbind(1M) cannot
+communicate with an NIS server for the specified domain. This
+message appears when a workstation running the NIS naming service
+has become disconnected from the network, or when NIS servers are
+down or extremely slow to respond.
+If other NIS clients are behaving normally, check the Ethernet
+cabling on the workstation that is getting this message. On SPARC
+machines, disconnected network cabling also produces a series of
+"no carrier" messages. On x86 machines, the above message might
+be your only indication that network cabling is disconnected.
+If many NIS clients on the network are giving this message, go to
+the NIS server in question and reboot or repair as necessary. To
+locate the NIS server for a domain, run the ypwhich(1) command.
+When the server machine comes back in operation, NIS clients give
+an "NIS server for domain OK" message.
+For more information about ypbind, see the section on
+administering secure NFS in the NFS Administration Guide.
+
+[]() ypwhich: can't communicate with ypbind
+
+> This message from the ypwhich(1) command indicates that the NIS
+binder process ypbind(1M) is not running on the local machine.
+If the system is not configured to use NIS, this message is
+normal and expected. Configure the system to use NIS if
+necessary.
+If the system is configured to use NIS, but the ypbind process is
+not running, invoke the following command to start it up:
+# /usr/lib/netsvc/yp/ypbind -broadcast
+
+[]() zsN: silo overflow
+
+> This message means that the Zilog 8530 character input silo (or
+serial portFIFO) overflowed before it could be serviced. The
+zs(4S) driver, which talks to a Zilog Z8530 chip, is reporting
+that the FIFO (holding about two characters) has been overrun.
+The number after zs shows which serial port experienced an
+overflow:
+zs0 - tty serial port 0 (/dev/ttya) zs1 - tty serial port 1
+(/dev/ttyb) zs2 - keyboard port (/dev/kbd) zs3 - mouse port
+(/dev/mouse)
+Silo overflows indicate that data in the respective serial port
+FIFO has been lost. However, consequences of silo overflows
+might be negligible if the overflows occur infrequently, if data
+loss is not catastrophic, or if data can be recovered or
+reproduced. For example, although a silo overflow on the mouse
+driver (zs3) indicates that the system could not process mouse
+events quickly enough, the user can perform mouse motions again.
+Similarly, lost data from a silo overflow on a serial port with a
+modem connection transferring data using uucp(1C) will be
+recovered when uucp discovers the loss of data and requests
+retransmission of the corrupted packet.
+Frequent silo overflow messages can indicate a zs hardware FIFO
+problem, a serial driver software problem, or abnormal data or
+system activity. For example, the system ignores interrupts
+during system panics, so mouse and keyboard activity result in
+silo overflows.
+If the serial ports experiencing silo overflows are not being
+used, a silo overflow could indicate the onset of a hardware
+problem.
+Another type of silo overflow is one that occurs during reboot
+when an HDLC line is connected to any of the terminal ports. For
+example, an X.25 network could be sending frames before the
+kernel has been told to expect them. Such overflow messages can
+be ignored.

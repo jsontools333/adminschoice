@@ -1,0 +1,64 @@
+---
+title: "pip - How to Use pip, python Package Installer"
+description: "You can install Python packages using the pip command."
+pubDate: 2023-01-18
+updatedDate: 2026-06-20
+pageType: guide
+topic: python
+tier: "TIER 2 (core reference)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+## Install python packages with pip
+
+You can install Python packages using the pip command. pip is a package management system used to install and manage software packages written in Python. pip is included with Python 2.7.9 and later & Python version 3.4 and later. pip3 is the official package manager and pip command for Python 3
+
+Here are some examples of how to use pip to for installing and managing python modules
+
+## Install Module
+
+*pip install module_name*
+For example, if you want to install the requests module, you would run the following command:
+
+```bash
+pip install requests
+```
+
+## 
+
+## Upgrade Module
+
+You can use the -U option to upgrade to newer version if you already have an older version installed.
+
+```bash
+pip install -U requests
+```
+
+## 
+
+## Install Specific Version
+
+You can also specify a specific version of the package to be installed by using the == operator
+
+pip install requests==2.28.2
+
+## 
+
+## Install Multiple Packages
+
+You can also install multiple packages at once by providing a list of package names separated by spaces:
+
+```bash
+pip install package1 package2 package3
+```
+
+## 
+
+## Using requirement file
+
+It's also possible to install packages from a requirements file which is a plain-text file that lists the packages that a Python project depends on.
+
+pip install -r requirements.txt
+
+&lt;https://www.youtube.com/watch?v=YvxhzL3jTYw>

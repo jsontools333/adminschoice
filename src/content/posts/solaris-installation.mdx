@@ -1,0 +1,186 @@
+---
+title: "Solaris Installation"
+description: "Solaris installation poses a challenges to the new Solaris sysadmins who have never done the installation of Solaris before ."
+pubDate: 2009-12-20
+updatedDate: 2026-06-20
+pageType: guide
+topic: legacy
+tier: "TIER 4 (Solaris/legacy Unix)"
+tags: ["basics", "install"]
+testedOn: ["Linux", "Unix"]
+---
+
+Solaris installation poses a challenges to the new Solaris sysadmins who have never done the installation of Solaris before . Though the installation itself is simple and straight forward but doing it the first time comes with its own anxiety associated with unexplored and unknown things .
+
+The idea of this article is to introduce you with the procedure and sequence of event Solaris installation to build enough confidence to finish the installation on your own.
+
+Table of contents
+1. Before you begin
+2. Getting Started
+3. Starting the installation
+4. OS distributions & disk configuration
+5. After Installation
+6. Next Steps
+
+1. Before you begin
+
+For Solaris installation on standalone Sun machine you need the following besides sun cpu :
+
+A) Sun Monitor and Sun Keyboard
+OR
+For carrying the installation through the serial port A of Sun (ttya)
+Dumb Terminal or PC with serial port communication software like HyperTerminal
+AND
+A null modem cable ( Pin 2 & 3 crossed 5 common ground in 9 Pin to 9 pin ; Pin 7 is common ground in 25 Pin connector ) connecting sun's serial port A with PC serial port.
+
+B) You will also require a IP address, netmask and a host name for your system.
+
+2. Getting Started
+
+Installation starts at OK> prompt & you can get to ok> using any of the following method :
+
+A. by pressing Stop A key sequence on a Sun Keyboard.
+B. typing #init 0 if your system boots up directly .
+C. Pressing ctrl-break or shift-break on a pc keyboard if using pc as
+console through serial port.
+D. If auto-boot feature is enabled system directly boots up
+and gives you a # prompt .You can disable auto-boot so next time it
+stays at ok prompt for starting installation.
+#/usr/platform/sun4u/bin/eeprom auto-boot?=false
+reboot the system.
+
+3. Starting the installation
+
+Insert the installation media - OS CD in CD drive and type boot cdrom at ok> prompt .
+Ok>boot cdrom
+
+The first phase begins with system identification and gathers information about the system from the the user .System starts booting up and after initialization it asks for language and locale also terminal type in case of PC/terminal
+
+Select your locale and DEC VT100 terminal type for terminal selection
+Further installation through the terminal require response to the
+selections through ESC and function keys and space bar which are
+mentioned on the installation screen.
+
+On the next screens, you are to identify the system as networked or non-networked, and set the default time zone and date/time. After this following host information is required :
+
+A) A host name for the system
+B) Whether the system is networked if yes you will have to
+provide the IP address & netmask of this machine.
+
+Next you will be asked to select the name services
+Name services
+
+```bash
+[    ]                      NIS+
+[    ]                      NIS
+[    ]                      DNS
+[X ]                        None
+```
+
+Select the service if you have complete details like domain names etc or select none to configure after installation.
+
+You have to select a distribution type from among the choices choices
+
+4. OS distribution & Disk configuration
+
+After identification is complete the installation process proceeds on to the OS and disk configuration and need your input for these settings. Selection depends on role of your machine
+
+Typical space requirement for Solaris 7 is given here.
+
+```bash
+[   ] Entire Distribution plus OEM support 64-bit 1242.00 MB (F4 to Customize
+[X] Entire Distribution 64-bit .....…...….1215.00 MB
+[   ] Developer System Support 64-bit.... 1154.00 MB
+[   ] End User System Support 64-bit .….. 765.00 MB
+[   ] Core System Support .............. .334.00 MB
+```
+
+* Entire distribution with OEM has all software with some third party software
+* Entire distribution has all software without third party software .
+* Developer system has run time libraries for C software etc.
+* End user has X windows and CDE environment .
+* Core system is without X windows softwares etc.
+
+If you are not sure select entire distribution.
+
+You will be presented with choice to select the boot disk among the disks present in the system ,unless you have reasons select the c0t0d0 at boot disk.
+
+[ X ] c0t0d0 (17269 MB) boot disk 17269 MB
+
+[ ] c0t1d0 (17269 MB) 17269 MB
+
+overlap partition represents entire disk and is slice s2 of the disk.
+If any of the disk contain a preexisting partition you will be given a choice to preserve the partition .
+Next the current layout is given ( if existing ) and you are asked to select between Automatic and Custom layout of disk partitions.
+
+* Automatic layout make a single partition of entire boot disk .
+* Customize option gives and option to create the partitions and select the sizes .
+
+Things to keep in mind while doing interactive or custom installation
+- Additional space is required in /var & /home if server is to handle mail and printing as mail and print files are formed in /var & if the user home directories are to be located on /home partition
+
+A sample partition table may look like following .
+
+```bash
+File system/Mount point Disk/Slice Size
+---------------------------------------
+
+/           c0t0d0s0       300 MB
+
+swap        c0t0d0s1       2000 MB
+
+overlap     c0t0d0s2       17269 MB
+
+/usr        c0t0d0s3       2000 MB
+
+/opt        c0t0d0s4       1000 MB
+
+/var        c0t0d0s5       1000 MB
+```
+
+- The swap partition size depends on the size of RAM in the system if you are not sure of its size keep it double the RAM or more than RAM in the system.
+
+- If you are not sure of individual partition sizes of / , /usr /opt & /var make one partition as / and keep its size sufficiently higher than the distribution size you have selected in earlier steps . Always keep in mind the future software that you might have to install like compilers applications etc and log files that will be generated and accumulate in /var directory or partition.
+
+After you have specified the partition sizes it gives summary and error if any
+
+```bash
+Installation Option: Initial
+
+Boot Device:            c0t0d0s0
+Client Services:        None
+Software: Solaris 2.7, Entire Distribution
+
+File System and Disk Layout:
+/          c0t0d0s0     300 MB
+swap       c0t0d0s1     2000 MB
+/usr       c0t0d0s3     2000 MB
+/opt       c0t0d0s4     1000 MB
+/var       c0t0d0s5     1000 MB
+
+one more question is asked about rebooting
+
+[X] Auto Reboot
+[  ] Manual Reboot
+```
+
+Afterwards it starts configuring disk making partitions and installing software indicating the progress in a table .
+
+MBytes Installed: 700.66
+
+MBytes Remaining: 0.00
+
+```bash
+Installing:
+|    |     |     |     |     |
+
+0   20    40    60    80    100
+```
+
+After the installation is complete it customizes system files , devices ,logs , installs patches which are there in OS CD for that release. You can install recommended latest patches later
+
+System then reboots or ask you to reboot depending upon the choice selected earlier .
+
+5. After Installation
+
+After rebooting it asks for new root passed and comes to console prompt where you can login as root install patches ,additional software , make user etc. etc.

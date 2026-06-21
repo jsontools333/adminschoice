@@ -1,0 +1,170 @@
+---
+title: "Bash Positional Parameters, Arguments"
+description: "Bash Shell has several special positional parameters which can be referenced but can not be assigned."
+pubDate: 2021-01-21
+updatedDate: 2026-06-20
+pageType: guide
+topic: shell
+tier: "TIER 2 (core reference)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+> **Bash** is an **sh** -compatible command language interpreter that executes commands read from the standard input or from a file. bash scripts uses positional parameters to process command line arguments in a bash shell script, to get process status, exit status and options flag.as an arguments to process the inputs. Learn to identify, and use these parameters to add more logic and functionality in your bash scripts.
+
+Bash Shell has several special positional parameters which can be referenced but can not be assigned. These bash parameters are used to process command line arguments in a bash shell script, to get process status, exit status and options flag.
+
+These bash positional parameters can be assigned to a variable and values can be used for further processing.
+
+## $0 , $1 $2 $3 ... bash Parameters
+
+These are special parameters and has specific meaning according to the number. These parameters are useful if you want to validate executing file name and do the processing based on the arguments.
+
+$0 : bash Shell argument 0
+
+, It expands into bash script file name or bash shell.
+
+$1 $2 $3 ...
+
+:
+
+bash shell argument number
+
+: Used to get the specific argument from the script.
+
+for example let's create & execute the test script with some parameters and note the bash arguments supplied as parameters :
+
+> *$test.sh aa bb cc dd* *#!/bin/sh* *echo "File name is " $0* *echo "First arg. is " $1* *echo "Second arg. is " $2* *echo "Third arg. is " $3* *echo "Fourth arg. is " $4*
+
+On execution it gives the following results
+
+> *$ ./test.sh aa bb cc dd* *File name is ./test.sh* *First arg. is aa* *Second arg. is bb* *Third arg. is cc* *Fourth arg. is dd*
+
+## $* - bash Parameter
+
+## Lists all the command line parameters in a single string format.
+
+> **for example let's create & execute the test script with some parameters :** test.sh
+#!/bin/sh
+echo "All (*) args are " $* **On execution it gives the following results** ./test.sh aa bb cc dd
+All (*) args are aa bb cc dd
+
+## $@ bash parameter
+
+### Lists all command line parameters in a array format.
+
+for example let's create & execute the test script with some parameters :
+
+> *test.sh* *#!/bin/sh* *echo "Array of args are " $@*
+
+On execution it gives the following results
+
+> *./test.sh aa bb cc dd* *Array of args are aa bb cc dd*
+
+The difference between $* and $@ is that $* gives out a single string output whereas $@ gives a list format output .
+
+## $# bash parameter
+
+### Numeric count of the command line argument.
+
+This is useful when the script expects certain number of arguments and you need to validate before proceeding.
+
+for example let's create & execute the test script with some parameters :
+
+> test.sh
+#!/bin/sh
+echo "Number of args. ( # ) are " $#
+
+On execution it gives the following results
+
+> ./test.sh aa bb cc dd
+Number of args. ( # ) are 4
+
+## $? bash Parameter
+
+### Returns the exit status of last executed process.
+
+$? parameter returns 0 for success and non zero for error conditions.
+
+for example let's create & execute the test script with successful and failed operation:
+
+> **Our first file just have a ls command and echo of exist status:** test.sh
+#!/bin/sh
+ls
+echo "Exit status is : " $? **on execution , it gives 0 as exist status:** ./test.sh
+letters osmodule rpms testfile txt1
+Exit status is : **0** **Our Second file just have a misspelled ls command and echo of exist status:** test.sh
+#!/bin/sh
+las ## non existing command
+echo "Exit status is : " $? **on execution , it gives a non 0 exist status, indicating failure to execute:** ./test.sh
+./test.sh: line 2: las: command not found
+Exit status is : 127
+
+## $! bash Parameter
+
+### Gives the process ID of the last job placed into the background
+
+Lets try it out by putting a process in background by doing tail -f on a file , txt1.log and getting its process id.
+
+> *$tail -f txt1 &* *$ jobs* *[1]+ Running tail -f txt1.log & ### still running in background* *$echo $! ### get the process id* *5378* *$ps -ef | grep 5378 #### confirm if this is the same process id* *work 5378 4406 0 23:33 pts/0 00:00:00 tail -f txt1.log*
+
+## $$ bash Parameter
+
+### Expands to the process ID of the shell or invoking shell in case of subshell.
+
+> **Lets create a test file to get the process id** test.sh
+#!/bin/sh
+echo "Shell process id is : " $$
+
+./test.sh
+Shell process id is : 5103 #### it gives the process id of the sub subshell when script executed.
+
+or
+$ echo $$
+4406 #### This is process id of the invoking shell, bash in this case.
+
+$ ps -ef | grep 4406
+work 4406 4402 0 22:38 pts/0 00:00:00 bash #### confirmation of pid
+
+## $_ bash Parameter
+
+### Gives shell script names or command line argument for the last command executed.
+
+lets executes a ls -ltr command
+
+```bash
+ls -ltr
+total 156
+drwxr-xr-x. 2 work work 4096 Jun 20 2015 Templates
+drwxr-xr-x. 2 work work 4096 Jun 20 2015 Public
+drwxr-xr-x. 2 work work 4096 Jun 20 2015 Pictures
+drwxr-xr-x. 2 work work 4096 Jun 20 2015 Music $ echo $_
+-ltr ### it gives command line parameters $ ./test.sh
+$ echo $_
+./test.sh ### Gives file name for shell scripts
+```
+
+## $- bash Parameter
+
+### List special parameters set for bash.
+
+This is the default flag set returned :
+
+$echo $-
+himBH
+
+h : hash all, remember the locations of commands it has found through querying your PATH.
+i : interactive shell
+m : monitor jobs in background & foreground
+B : brace expand use the efficient brace expansion in bash.
+H : history expand - enable to use history command and reuse commands from history.
+
+bash options can be added or removed using set command, Ironically + sign removes the option and - sign adds it
+
+> *$ echo $-* *himBH* $ set +H
+[work@localhost ~]$ echo $-
+himB
+
+[work@localhost ~]$ set -H
+[work@localhost ~]$ echo $-
+himBH

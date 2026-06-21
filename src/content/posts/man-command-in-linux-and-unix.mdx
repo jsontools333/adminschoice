@@ -1,0 +1,108 @@
+---
+title: "man command in Linux and Unix"
+description: "If you are new to Unix and Linux system and looking for help command in unix or info command in linux to get started, man command is the answer."
+pubDate: 2017-02-22
+updatedDate: 2026-06-20
+pageType: guide
+topic: sysadmin
+tier: "TIER 2 (core reference)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+man command, short for manual, provides help for the commands, utilities or function in Linux and Unix systems. Learn about usage , related packages, sections and other interesting facts about man pages.
+
+If you are new to Unix and Linux system and looking for help command in unix or info command in linux to get started, man command is the answer.
+
+### man command in Linux and Unix with example & how to use man pages
+
+man command sysntax is very simple as
+
+$man
+
+and to use man pages simply call command with man page as in exampel below :
+
+> $man ls
+or
+$man useradd
+$man df
+
+### How to find the names of the commands ?
+
+You can refer to the articles unix command line Tutorial and Unix tutorial
+
+Unix Commands Tutorial
+
+Unix Tutorial – Learn Unix OS Basics to get started
+
+### man page sections
+
+man pages are divided in to following section names
+
+NAME, SYNOPSIS, CONFIGURATION, DESCRIPTION, OPTIONS, EXIT STATUS, RETURN VALUE, ERRORS, ENVIRONMENT, FILES, VERSIONS, CONFORMING TO, NOTES, BUGS, EXAMPLE, AUTHORS, and SEE ALSO.
+
+general convention in man pages is
+
+bold text
+
+- type exactly as shown.
+
+italic text
+
+- replace with applicable argument.
+[-abc] - optional arguments within [ ]
+-a|-b - options delimited by | cannot be used together.
+argument ... argument is repeatable.
+[expression] ... entire expression within [ ] is repeatable.
+
+### man packages in Linux & Unix
+
+if man command is not working mostlikely the man packages are not installed. here are some examples to install man packages in linux and Unix , Solaris
+
+To install man package in centos , install two packages
+
+> # yum install man-pages
+... ok
+# yum install man
+... ok
+
+To install man package in fedora
+
+> #yum install man-db
+
+To install man package in Unix Solaris
+
+Install two packages SUNWman and SUNWdoc.
+Check if they are already installed with
+
+> pkginfo SUNWdoc
+pkginfo SUNWman
+
+you can install these from cdrom by mounting and using pkgadd command
+
+> pkgadd -d SUNWman
+pkgadd -d SUNWdoc
+
+### What do the numbers in a man page mean?
+
+man pages collection is organized in sections and each section stores a particular topic man pages as follows :
+
+1 Executable programs or shell commands
+2 System calls (functions provided by the kernel)
+3 Library calls (functions within program libraries)
+4 Special files (usually found in /dev)
+5 File formats and conventions eg /etc/passwd
+6 Games
+7 Miscellaneous (including macro packages and conventions), e.g. man(7), groff(7)
+8 System administration commands (usually only for root)
+9 Kernel routines [Non standard]
+
+At the end of a man page man page section is indicated by its section numbers like ls(1) manpath(5), ascii(7) represant the section of mabn comntaing the command.
+
+The default action is to search in all of the available in a default order of ("1 1p 8 2 3 3p 4 5 6 7 9 0p n l p o 1x 2x 3x 4x 5x 6x 7x 8x". This can be overridden by the SECTION directive in /etc/man_db.conf)
+
+Related Articles :
+
+**Unix Commands Tutorial**
+
+**Unix Tutorial – Learn Unix OS Basics to get started**

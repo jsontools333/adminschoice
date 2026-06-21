@@ -1,0 +1,960 @@
+---
+title: "Solaris Error Messages A-D"
+description: "Solaris / Unix error messages are very short and often we need some more information about the origin of an error and a possible steps to fix the issues."
+pubDate: 2009-12-20
+updatedDate: 2026-06-20
+pageType: reference
+topic: legacy
+tier: "TIER 4 (Solaris legacy)"
+tags: ["basics", "errors"]
+testedOn: ["Linux", "Unix"]
+---
+
+Solaris / Unix error messages are very short and often we need some more information about the origin of an error and a possible steps to fix the issues.
+
+Here is a list of Solaris / Unix error messages for your reference, most of the error messages are generic Unix error messages but many are specific Solaris Error Messages. Please comment if you can provide some more details about these errors.
+
+This is a multi part document , this part covers error messages starting from A to D
+
+A
+
+1.
+
+A command window has exited because its child exited.
+
+2.
+
+admintool: Received communication service error 4
+
+3.
+
+answer book: XViewerror: NULL pointer passed to xv_set
+
+4.
+
+Arg list too long
+
+5.
+
+Argument out of domain
+
+6.
+
+Arguments too long
+
+7.
+
+assertion failed: variable, file variable, line N
+
+8.
+
+automountd[N]: No network locking on variable: contact admin to install server change
+
+9.
+
+automountd[N]: server variable not responding
+
+10.
+
+automount[N]: variable: Not a directory
+
+[]() B
+
+11.
+
+Bad address
+
+12.
+
+BAD/DUP FILE I=i OWNER=o MODE=m SIZE=s MTIME=t
+
+13.
+
+Bad file number
+
+14.
+
+N BAD I=N
+
+15.
+
+bad module/chip at: variable
+
+16.
+
+BAD SUPER BLOCK: variable
+
+17.
+
+BAD TRAP
+
+18.
+
+bad trap = N
+
+19.
+
+/bin/sh: variable: too big
+
+20.
+
+Block device required
+
+21.
+
+#errno21
+
+22.
+
+Broadcast Message from root (pts/N) on server [date]
+
+23.
+
+Broken pipe
+
+24.
+
+Bus Error
+
+[]() C
+
+25.
+
+Cannot allocate color map entry for "variable"
+
+26.
+
+Can't create public message device (Device busy)
+
+27.
+
+Can't invoke /etc/init, error N
+
+28.
+
+can't synchronize with hayes
+
+29.
+
+```bash
+cd: Too many arguments
+```
+
+30.
+
+Channel number out of range
+
+31.
+
+```bash
+chmod: ERROR: invalid mode
+```
+
+32.
+
+Command not found
+
+33.
+
+Connection closed.
+
+34.
+
+Connection closed by foreign host.
+
+35.
+
+[Connection closed. Exiting]
+
+36.
+
+Connection refused
+
+37.
+
+Connection timed out
+
+38.
+
+console login: ^J^M^Q^K^K^P
+
+39.
+
+core dumped
+
+40.
+
+Could not initialize tooltalk (tt_open): TT_ERR_NOMP
+
+41.
+
+Could not start new viewer
+
+42.
+
+cpio: Bad magic number/header.
+
+43.
+
+Cross-device link
+
+44.
+
+data access exception
+
+45.
+
+Data fault
+
+46.
+
+Deadlock situation detected/avoided
+
+47.
+
+Device busy
+
+48.
+
+/dev/rdsk/variable: CAN'T CHECK FILE SYSTEM.
+
+49.
+
+/dev/rdsk/variable: UNEXPECTED INCONSISTENCY; RUN fsck MANUALLY.
+
+50.
+
+Directory not empty
+
+51.
+
+Disc quota exceeded
+
+52.
+
+dumptm: Cannot open `/dev/rmt/variable': Device busy
+
+53.
+
+DUP/BAD I=i OWNER=o MODE=m SIZE=s MTIME=t FILE=f REMOVE?
+
+54.
+
+N DUP I=N
+
+[]() 1.A command window has exited because its child exited.
+
+> The argument to a cmdtool(1) or a shelltool(1) window looks like
+it is supposed to be a command, but the system cannot find the
+command.
+To run this command inside a cmdtool or a shelltool, make sure
+the command is spelled correctly and is in your search path (if
+necessary, use a full path name). If you intended this argument
+as an option setting, use a minus sign (-) at the beginning of
+the option.
+Both the cmdtool and the shelltool are OpenWindows terminal
+emulators.
+
+[]() admintool: Received communication service error 4
+
+> AdminTool could not start a display method because a remote
+procedure call timed out, so it can't send the request. This
+error results when admintool tries to access the NIS or NIS+
+tables when networking is not enabled.
+Verify the system network status with ifconfig -a to make sure
+the system is connected to the network. Make sure the ethernet
+cable is connected and the system is configured to run NIS or
+NIS+.
+
+[]() answerbook: XView error: NULL pointer passed to xv_set
+
+> The AnswerBook navigator window comes up, but the document viewer
+window does not. This message appears on the console, and the
+message "Could not start new viewer" appears in the navigator
+window. This situation indicates that you have an unknown client
+or a problem with the network naming service.
+Run the ypmatch(1) or nismatch(1) command o determine if the
+client hostname is in the hosts map. If it isn't, add it to to
+NIS hosts map on the NIS master server. Then make sure the
+/etc/hosts file on the client contains an IP address and entry
+for that hostname followed by loghost (reboot if you changed the
+/etc/hosts file). Check that the ypmatch or nismatch client hosts
+command returns the same IP host address as in the /etc/hosts
+file. Finally, quit all existing AnswerBooks and restart.
+For more information on the NIS hosts map, see the section on the
+default search criteria in the NIS+ and FNS Administration Guide.
+If you are using the AnswerBook, "NIS hosts map" is a good search
+string.
+
+[]() Arg list too long
+
+> The system could not handle the number of arguments given to a
+command or program when it combined those arguments with the
+environment's exported shell variables. The argument list limit
+is the size of the argument list plus the size of the
+environment's exported shell variables.
+The easiest solution is to reduce the size of the parent process
+environment by unsetting extraneous environment variables. (See
+the man page for the shell you're using to find out how to list
+and change your environment variables.) Then run the program
+again.
+An argument list longer than ARG_MAX bytes was presented to a
+member of the exec() family of system calls.
+The symbolic name for this error is E2BIG, errno=7.
+
+[]() Argument out of domain
+
+> This is a programming error or a data input error.
+Ask the program's author to fix this condition,or supply data in
+a different format.
+This indicates an attempt to evaluate a mathematical programming
+function at a point where its value is not defined. The argument
+of a programming function in the math package (3M) is out of the
+domain of the function. This could happen when taking the square
+root, power, or log of a negative number, when computing a power
+to a non-integer, or when passing an out-of-range argument to a
+hyperbolic programming function.
+To help pinpoint a program's math errors, use the matherr(3M)
+facility.
+The symbolic name for this error is EDOM, errno=33.
+
+[]() Arguments too long
+
+> This C shell error message indicates that there are too many
+arguments after a command. For example, this can happen by
+invoking rm * in a huge directory. The C shell cannot handle
+than 1706 arguments.
+Temporarily start a Bourne shell with sh and run the command
+again. The Bourne shell dynamically allocates command line
+arguments. Return to your original shell by typing exit.
+
+[]() assertion failed: variable, file variable, line N
+
+> A condition in the program that was never expected to happen has
+happened.
+Contact the vendor or author of the program to ask why it failed.
+If you have the source code for the program, you can look at the
+file and line number where the assertion failed. This might give
+you an idea of how to run the program differently.
+This message results from a diagnostic macro called assert() that
+a programmer inserted into the specified line of a source file.
+The expression that evaluated untrue precedes the file name and
+line number.
+
+[]() automountd[N]: No network locking on variable: contact admin to install server change
+
+> See "WARNING: No network locking on variable: contact admin to
+install server" message for details. If the server is not
+changed, data loss is possible in applications that depend on
+locking.
+
+[]() automountd[N]: server variable not responding
+
+> This automounter message indicates that the system tried to mount
+a filesystem from an NFS server that is either down or extremely
+slow to respond. In some cases this message indicates that the
+network link to the NFS server is broken, although that condition
+produces other error messages as well.
+If you are the system administrator responsible for the non-
+responding NFS server, check it out to see whether the machine
+needs repair or rebooting. Encourage your user community to
+report such problems quickly but only once. When the NFS server
+is back in operation, the automounter will be able to access the
+requested file system.
+
+[]() automount[N]: variable: Not a directory
+
+> The file specified after the first colon is not a valid mount
+point because it is not a directory.
+Ensure that the mount point is a directory, and not a regular
+file or a symbolic link.
+
+[]() Bad address
+
+> The system encountered a hardware fault in attempting to access a
+parameter of a programming function.
+Check if the bad address resulted from supplying the wrong device
+or option to a command. If that is not the problem, contact the
+vendor or author of the program for an update.
+This error could occur any time a function that takes a pointer
+argument is passed an invalid address. Because processors differ
+in their ability to detect bad addresses, on some architectures
+passing bad addresses can result in undefined behaviors.
+The symbolic name for this error is EFAULT,errno=14.
+
+[]() BAD/DUP FILE I=i OWNER=o MODE=m SIZE=s MIME CLEAR?
+
+> While checking anode link counts during phase 4, fsck(1M) found a
+file (or directory) that either does not exist or exists
+somewhere else.
+To clear the anode of its reference to this file or directory,
+answer yes. With the -p (preen) option, fsck automatically clears
+bad or duplicate file references, so answering yes to this
+question seldom causes a problem.
+
+[]() Bad file number
+
+> Generally this is a program error, not a usage error.
+Contact the vendor or author of the program for an update.
+Either a file descriptor refers to no open file, or a read (or
+write) request is made to a file that is open only for writing
+(or reading).
+The symbolic name for this error is EBADF, errno=9.
+
+[]() N BAD I=N
+
+> Upon detecting an out-of-range block, fsck(1M) prints the bad
+block number and its containing inode (after I=).
+In fsck phases 2 and 4, you will decide whether ornot to clear
+these bad blocks. Before committing to repair with fsck, you
+could determine which file contains this inode by passing the
+inode number to the ncheck(1M) command: by passing the inode
+number to the ncheck(1M) command:
+# ncheck -iinum file system
+
+[]() bad module/chip at: variable
+
+> This message from the memory management system often appears with
+parity errors, and indicates a bad memory module or chip at the
+position listed. Data loss is possible if the problem occurs
+other than at boot time.
+Replace the memory module or chip at the indicated position.
+Refer to the vendor's hardware manual for help finding this
+location.
+
+[]() BAD SUPER BLOCK: variable
+
+> This message from fsck(1M) indicates that a filesystem's super-
+block is damaged beyond repair and must be replaced. At boot time
+(with the -p option) this message is prefaced by the file system's
+device name. After this message comes the actual damage
+recognized (see Action). Unfortunately fsck does not print the
+number of the damaged super-block.
+The most common cause of this error is overlapping disk
+partitions. Donot immediately rerun fsck as suggested by the
+lines that display after the error message. First make sure that
+you have a recent backup of the file system involved; if not, try
+to back up the file system now using ufsdump(1M). Then run the
+format(1M) command, select the disk involved, and print out the
+partition information.
+# format : N > partition > print
+Note whether the overlap occurs at the beginning or end of the
+file system involved. Then run newfs(1M) with the -N option to
+print out the file system parameters, including the location of
+backup super-blocks.
+# newfs -N /dev/dsk/device
+Select a super-block from a non-overlapping area of the disk, but
+note that in most cases you have only one chance to select the
+proper replacement super-block, which fsck soon propagates to all
+the cylinders. If you select the wrong replacement super-block,
+data corruption will probably occur, and you will have to restore
+from backup tapes. After you select a new super-block, provide
+fsck with the new master super-block number:
+# fsck -o b=NNNN /dev/dsk/device
+Specific reasons for a damaged super-block include: a wrong magic
+number, out of range NCG (number of cylinder groups) or CPG
+(cylinders per group), the wrong number of cylinders, a
+preposterously large super-block size, and trashed values in
+super-block. These reasons are generally not meaningful because a
+corrupt super-block is usually extremely corrupt.
+
+[]() BAD TRAP
+
+> A bad trap can indicate faulty hardware or a mismatch between
+hardware and its configuration information. Data loss is possible
+if the problem occurs other than at boot time.
+If you recently installed new hardware, verify that the software
+was correctly configured. Check the kernel trace back displayed on
+the console to see which device generated the trap. If the
+configuration files are correct, you will probably have to
+replace the device.
+In some cases, the bad trap message indicates a bad or down-rev
+CPU.
+A hardware processor trap occurred, and the kernel trap handler
+was unable to restore system state. This is a fatal error that
+usually precedes a panic, after which the system performs a sync,
+dump, and reboot. The following conditions can cause a bad trap:
+a system text or data access fault, a system data alignment error,
+or certain kinds of user software traps.
+
+[]() bad trap = N
+
+See the message "BAD TRAP" for details.
+
+[]() /bin/sh: variable: too big
+
+> This Bourne shell message indicates a classic "no memory" error.
+While trying to load the program specified after thefirstcolon,
+the shell noticed that the system ran out of virtual memory (swap
+space).
+See the message "Not enough space" for information on
+reconfiguring your system to add more swap space.
+
+[]() Block device required
+
+> A raw (character special) device was specified where a block
+device was required, such as during a call to the mount(1M)
+command.
+To see which block devices are available, use ls -l to look in
+/devices. Then specify a block device instead of a character
+device. Block device modes start with a b, whereas raw character
+device modes start with a c.
+The symbolic name for this error is ENOTBLK, errno=15.
+
+[]() Boot device: /iommu/sbus/variable/variable/sd@3,0
+
+> This message alwaysappears at the beginning of rebooting. If
+there is a problem, the system hangs, and no other messages
+appear. This condition is caused by conflicting SCSI targets for
+the boot device, which is almost always target 3.
+The boot device is usually the machine's internal disk drive,
+target 3. Make sure that external and secondary disk drives are
+targeted to 1, 2, or 0, and do not conflict with each other. Also
+make sure that tape drives are targeted to 4 or 5, and CD drives
+to 6, avoiding any conflict with each other or with the disk
+drives. You can set a device's target number using pushbutton
+switches or a dial on the back near the SCSI cables. If the
+targeting of the internal disk drive is in question, check it by
+powering off the machine, removing all external drives, turning
+the power on, and running the probe-scsi-all or probe-scsi
+command from the PROM monitor.
+
+[]() Broadcast Message from root (pts/N) on server [date]
+
+> This message from the wall(1M) command gets transmitted to all
+users logged into a system. You could see it during a rlogin or
+telnet session, or on terminals connected to a timesharing
+system.
+Carefully read the broadcast message. Often this broadcast is
+followed by a shutdown warning.
+See the message "The system will be shut down in N minutes" for
+details about system shutdown.
+For more information on bringing down the system, see the section
+on halting the system in the System Administration Guide, Volume
+I. If you are using the AnswerBook, "halting the system" is a
+good search string.
+
+[]() Broken pipe
+
+> This condition is often normal, and the message is merely
+informational (as when piping many lines to the head program).
+The condition occurs when a write on a pipe does not find a
+reading process. This usually generates a signal to the executing
+program, but this message displays when the program ignores the
+signal.
+Check the process at the end of the pipe to see why it exited.
+The symbolic name for this error is EPIPE, errno=32.
+
+[]() Bus Error
+
+> A process has received a signal indicating that it attempted to
+perform I/O to a device that is restricted or that does not
+exist. This message is usually accompanied by a core dump, except
+on read-only filesystems.
+Use a debugger to examine the core file and determine what
+program fault or system problem led to the bus error. If
+possible, check the program's output files for data corruption
+that might have occurred before the bus error.
+Bus errors can result from either programming error or device
+corruption on your system. Some common causes of bus errors are:
+invalid file descriptors, unreasonable I/O requests, bad memory
+allocation, misaligned data structures, compiler bugs, and
+corrupt boot blocks.
+
+[]() Cannot allocate color map entry for "variable"
+
+> This message from libXt (X Intrinsics library) indicates that the
+system color map was full even before the color name specified in
+quotes was requested. Some applications can continue after this
+message. Other applications, such as Workspace Properties Color,
+fail to come up when the color map is full.
+Exit the programs that make heavy use of the color map, then
+restart the failed application and try again.
+
+[]() Can't create public message device (Device busy)
+
+> This message comes from the lp print scheduler, indicating that
+it is either extremely busy or hung.
+If print jobs are coming out of the printer in question, wait
+until they are finished and then resubmit this print job. If you
+see this message again, the lp system is probably hung.
+See the message "lp hang" for a procedure to clear the queue.
+If lp is unable to create a device for printer messages, the
+message FIFO could be already in use, or locked by another print
+job.
+
+[]() Can't invoke /etc/init, error N
+
+> This message can appear while a system is booting, indicating
+that the init program is missing or corrupted. Note that
+/etc/init is a symbolic link to /sbin/init.
+Boot the miniroot so you can replace init. Halt the machine by
+typing Stop-A or by pressing the reset button. Reboot single-user
+from CDROM, the net, or diskette. For example, type boot cdrom -s
+at the ok prompt to boot from CDROM. After the system comes up
+and gives you a # prompt, mount the device corresponding to the
+original / partition somewhere, with a command similar to the
+mount command below. Then copy the init program from the miniroot
+to the original / partition, and reboot the system.
+# mount /dev/dsk/c0t3d0s0 /mnt # cp /sbin/init /mnt/sbin/init #
+reboot
+If this doesn't work, other files might be corrupted, and you
+might need to reinstall the entire system.
+The error number is 2 if /sbin/init is missing, or 8 if
+/sbin/init has an incorrect executable format. This is usually
+followed by a "panic:icode" message. The system tries to reboot
+itself, but goes into a loop, because rebooting is impossible
+without init.
+
+[]() can't synchronize with hayes
+
+> This message sometimes appears when using a modem that the system
+regards as a "Hayes" type modem, which includes most modems
+manufactured today. The message can be caused by incorrect switch
+settings, by poor cable connections, or by not turning the modem
+on.
+Check that the modem is on and that the cables between the modem
+and your system are securely connected. Check the internal and
+external modem switch settings. Turn the modem off and then on
+again, if necessary.
+
+[]() cd: Too many arguments
+
+> The C shell's cd(1) command takes only one argument. Either
+than one directory was specified, or a directory name containing
+a space was specified. Directory names with spaces are easy to
+create with File Manager.
+Use only one directory name. To change to a directory whose name
+contains spaces, enclose the directory name in double (") or
+single (') quotes, or use File Manager.
+
+[]() Channel number out of range
+
+> The system has run out of stream devices. This error results when
+a stream head attempts to open a minor device that does not exist
+or that is currently in use.
+Check that the stream device in question exists and was created
+with an appropriate number of minor devices. Make sure that the
+hardware corresponds to this configuration. If the stream device
+configuration is correct, try again later when more system
+resources might be available.
+The symbolic name for this error is ECHRNG, errno=37.
+
+[]() chmod: ERROR: invalid mode
+
+> This message from the chmod(1) command indicates a problem in the
+first non-option argument.
+If you are specifying a numeric file mode, you can provide any
+number of digits (although only the final one to four are
+considered), but all digits must be between 0 and 7. If you are
+specifying a symbolic file mode, use the syntax provided in the
+chmod usage message to avoid the "invalid mode" error message:
+Usage: chmod [ugoa][+-=][rwxlstugo] file ...
+Note that some combinations of symbolic keyletters produce no
+error message but fail to have any effect. The first group,
+[ugoa], is truly optional. The second group, [+-=], is mandatory
+for chmod to have an effect. The third group,[rwxlstugo], is
+also mandatory for effect, and can be used in combination when
+that combination does not conflict.
+
+[]() Command not found
+
+```hcl
+The C shell could not find the program you gave as a command.
+Check the form and spelling of the command line. If that looks
+correct, echo $path to see if the user's search path is correct.
+When communications are garbled, it is possible to unset a search
+path to such an extent that only built-in shell commands are
+available. Here is a command to reset a basic search path:
+% set path = (/usr/bin /usr/ccs/bin /usr/openwin/bin .)
+If the search path looks correct, check the directory contents
+along the search path to see if programs are missing or if
+directories are not mounted.
+```
+
+[]() Connection closed.
+
+> This message can appear when using rlogin(1) to another system if
+the remote host cannot create a process for this user, if the
+user takes too long to type the correct password, if the user
+interrupts the network connection, or if the remote host goes
+down. Data loss is possible if files were modified and not saved
+before the connection closed.
+Just try again. If the other system has gone down, wait for it to
+reboot first.
+
+[]() Connection closed by foreign host.
+
+> When a user telnets to another system, this message can appear if
+the user takes too long to type the correct password, if the
+remote host cannot create a login for this user,or if the remote
+host goes down or terminates the connection. Data loss is
+possible if files were modified and not saved before the
+connection closed.
+Just try again. If the other system has gone down, wait for it to
+reboot first.
+
+[]() [Connection closed. Exiting]
+
+> After using the talk(1) command to communicate with another user,
+the other person enters an interrupt (usually Control-c), and
+this message appears on your screen.
+Sending an interrupt like this is the usual way of exiting the
+talk program. The talk session is over and you can return to your
+work.
+
+[]() Connection refused
+
+> No connection could be made because the target machine actively
+refused it. This happens either when trying to connect to an
+inactive service or when a service process is not present at the
+requested address.
+Activate the service on the target machine, or start it up again
+if it has disappeared. If for security reasons you do not intend
+to provide this service, inform the user community, possibly
+suggesting an alternative.
+The symbolic name for this error is ECONNREFUSED, errno=146.
+
+[]() Connection timed out
+
+> This occurs either when the destination host is down or when
+problems in the network cause lost transmission.
+First check the operation of the host system, for example by
+using ping(1M) and ftp (1), then repair or reboot as necessary.
+If that doesn't solve the problem, check the network cabling and
+connections.
+No connection was established in a specified time. A connect or
+send request failed because the destination host did not properly
+respond after a reasonable interval. (The timeout period is
+dependent on the communication protocol.)
+The symbolic name for this error is ETIMEDOUT, errno=145.
+
+[]() console login: ^J^M^Q^K^K^P
+
+> This usually occurs because OpenWindows exited abnormally,
+leaving the system's keyboard in the wrong mode. The characters
+that appear when someone attempts to login are garbage
+transliterations of what someone types.
+Find another machine and remote login to this system, then run
+this command:
+$ /usr/openwin/bin/kbd_mode -a
+This puts the console back into ASCII mode. Note that kbd_mode is
+not a windows program, it just fixes the console mode.
+The usual reason for this problem occurring is an automated
+script run from cron that clears out the /tmp directory every so
+often. Ensure that any such scripts do not remove the /tmp/.X11-
+pipe or /tmp/.X11-unix directories, or any files therein.
+
+[]() core dumped
+
+```hcl
+A core file contains an image of memory at the point of software
+failure, and is used by programmers to find the reason for the
+failure.
+To see which program produced a core file, run either the file(1)
+command or the adb (1) command. The following examples show the
+output of the file and adb commands on a core file from the
+dtmail program.
+$ file core core: ELF 32-bit MSB core file SPARC Version 1, from
+`dtmail'
+$ adb core core file = core -- program `dtmail' SIGSEGV 11:
+segmentation violation ^D (use Control-d to quit
+the
+program)
+Ask the vendor or author of this program for a debugged version.
+Some signals, such as SIGQUIT, SIGBUS, and SIGSEGV, produce a
+core dump. See the signal(5) man page for a complete list.
+If youhave the source code for the program, you can try
+compiling it with cc -g, and debugging it yourself using dbx or a
+similar debugger. The where directive of dbx provides a stack
+trace.
+On mixed networks, it can be difficult to discern which machine
+architecture produced a particular core dump, since adb on one
+type of system generally cannot read a core file from another
+type of system, and will produce an "unrecognized file" message.
+Run adb on various machine architectures until you find the right
+one.
+The term "core" is archaic-- ferrite core memory was supplanted
+by silicon RAM in the 1970s, although spaceships still employ
+core memory for its imperviousness to radiation.
+```
+
+[]() Could not initialize tooltalk (tt_open): TT_ERR_NOMP
+
+> Various desktop tools display or print this message when the
+ttsession(1) process is not available. The TookTalk service
+generally tries to restart ttsession if it is not running. So
+this error indicates that the ToolTalk service is either not
+installed or is not installed correctly.
+Verify that the ttsession command exists in /usr/openwin/bin or
+/usr/dt/bin. If this command is not present, ToolTalk is not
+installed correctly. The packages constituting ToolTalk are the
+runtime SUNWtltk, developer support SUNWtltkd, and themanual
+pages SUNWtltkm. CDE ToolTalk packages have the same names with
+".2" appended.
+The full TT_ERR_NOMP message string reads as follows: "No
+ttsession is running, probably because tt_open() has not been
+called yet. If this is returned from tt_open() it means ttsession
+could not be started, which generally means ToolTalk is not
+installed on the system."
+
+[]() Could not start new viewer
+
+> This message appears in the AnswerBook navigator window, along
+with an XView error messageon the console.
+See the message "answerbook: XView error: NULL pointer passed to
+xv_set" for details.
+
+[]() cpio: Bad magic number/header.
+
+> A cpio(1) archive has either become corrupted or was written out
+with an incompatible version of cpio.
+Use the -k option to cpio to skip I/O errors and corrupted file
+headers. This might permit you to extract other files from the
+cpio archive. To extract files with corrupted headers, try
+editing the archive with a binary editor such as emacs. Each cpio
+file header contains a filename as a string.
+
+[]() Cross-device link
+
+> An attempt was made to make a hard link to a file on another
+device, such as on another file system.
+Establish a symbolic link using ln -s instead. Symbolic links are
+permitted across file system boundaries.
+The symbolic name for this error is EXDEV, errno=18.
+
+[]() data access exception
+
+> This message can result from running an old version of the
+operating system that does not support new hardware, or by
+running an operating system that is not configured for new
+hardware. It can also result from incorrectly installed DSIMMs or
+from a disk problem.
+Upgrade your operating system to a version that supports the new
+hardware or machine architecture. For example, upgrading a
+SPARCstation 2 (with sun4c kernel architecture) to a SPARCstation
+20 (with sun4m kernel architecture) requires an operating system
+upgrade or reconfiguration.
+
+[]() Data fault
+
+> This is a kind of bad trap that usually causes a system panic.
+When this message appears after a bad trap message, a system text
+or data access fault probably occurred.¤ In the absence of a bad
+trap message, this message might indicate a user text or data
+access fault. Data loss is possible if the problem occurs other
+than at boot time.
+Make sure the machine can reboot, then check the log file
+/var/adm/messages for hints about what went wrong.
+¤ See the message "BAD TRAP" for more information.
+
+[]() Deadlock situation detected/avoided
+
+> A programming deadlock situation was detected and avoided.
+If the system had not detected and avoided a deadlock, a piece of
+software would have hung. Run the program again. The deadlock
+might not reoccur.
+This error usually relates to file and record locking, but can
+also apply to mutexes, semaphores, condition variables, and
+read/write locks.
+The symbolic name for this error is EDEADLK, errno=45.
+
+[]() Device busy
+
+> An attempt was made to mount a device that was already mounted or
+to unmount a device containing an active file (such as an open
+file, a current directory, a mount point, or a running program).
+This message also occurs when trying to enable accounting that is
+already enabled.
+To unmount a device containing active processes, close all the
+files under that mount point, quit any programs started from
+there, and change directories out of that hierarchy. Then try to
+unmount again.
+Mutexes, semaphores, condition variables, and read/write locks
+set this error condition to indicate that a lock is held.
+The symbolic name for this error is EBUSY, errno=16.
+
+[]() /dev/rdsk/variable: CAN'T CHECK FILE SYSTEM.
+
+> The system cannot automatically clean (preen) this file system
+because it appears to be set up incorrectly or is having hard
+disk problems. This message asks that you run fsck(1M) manually,
+since data corruption might already have occurred.
+Run fsck to clean the file system in question. See the message
+"/dev/rdsk/N: UNEXPECTED INCONSISTENCY; RUN fsck MANUALLY" for
+proper procedures.
+
+[]() /dev/rdsk/variable: UNEXPECTED INCONSISTENCY; RUN fsck MANUALLY.
+
+> At boot time the /etc/rcS script runs the fsck(1M) command to
+check the integrity of file systems marked "fsck" in /etc/vfstab.
+If fsck cannot repair a file system automatically, it interrupts
+the boot procedure and produces this message. When fsck gets into
+this state, it cannot repair a file system without losing one or
+more files, so it wants to defer this responsibility to you, the
+administrator. Data corruption has probably already occurred.
+First run sack -n on the file system, to see how many and what
+type of problems exist. Then run fsck again to repair the
+file system. If you have a recent backup of the file system, you
+can generally answer "y" to all the fsck questions. It's a good
+idea to keep a record of all problematic files and inode numbers
+for later reference. To run fsck yourself, specify options as
+recommended by the boot script. For example:
+# fsck /dev/rdsk/c0t4d0s0
+Usually the files lost during fsck repair are these that were
+created just before a crash or power outage, and they cannot be
+recovered. If you lose important files, you can recover them from
+backup tapes.
+If you don't have a backup, ask an expert to run fsck for you.
+
+[]() Directory not empty
+
+> The directory operation that was attempted, such as directory
+removal with rmdir, can be performed only on an empty directory.
+To remove the directory, first remove all the files that it
+contains. A quick way to remove a non-empty directory hierarchy
+is with the rm -r command.
+The symbolic name for this error is ENOTEMPTY, errno=93.
+
+[]() Disc quota exceeded
+
+> The user'sdisk limit has been exceeded on a user filesystem,
+usually because a file was just created or enlarged beyond the
+limit. This almost always refers to a magnetic disk, and not to
+an optical disc. Any data created after this condition occurs
+will be lost.
+The user can delete files to bring disk usage under the limit, or
+the server administrator can use the edquota(1M) command to
+increase the user's disk limit.
+The symbolic name for this error is EDQUOT, errno=49.
+
+[]() dumptm: Cannot open `/dev/rmt/variable': Device busy
+
+> During file system backup, the dump program cannot open the tape
+drive because some other process is holding it open.
+Find the process that has the tape drive open, and either kill(1)
+the process or wait for it to finish.
+# ps -ef | grep /dev/rmt # kill -9 processID
+
+[]() DUP/BAD I=i OWNER=o MODE=m SIZE=s MTIME=t FILE=f REMOVE?
+
+```hcl
+During phase 1, fsck(1M) found duplicate blocks or bad blocks
+associated with the file or directory specified after FILE= whose
+inode number appears after I= (with other information).
+To remove this file or directory, answer yes. If you end up
+removing more than a few files in this manner, data loss will
+result, so it might be preferable to restore the filesystem from
+backup tapes.
+```
+
+[]() N DUP I=N
+
+> Upon detecting a block that is already claimed by another inode,
+fsck(1M) prints the duplicate block number and its containing
+inode (after I=).
+In fsck phases 2 and 4, you will decide whether or not to clear
+these bad blocks. Before committing to repair with fsck, you
+could determine which file contains this inode by passing the
+inode number to the ncheck(1M) command:
+# ncheck -iinum filesystem

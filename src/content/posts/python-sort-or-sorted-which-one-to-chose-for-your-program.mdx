@@ -1,0 +1,102 @@
+---
+title: "python sort() or sorted()- which one to chose for your program ?"
+description: "Sorting functions are essential tools for data manipulation and set of rules in computer programming languages like python."
+pubDate: 2023-10-01
+updatedDate: 2026-06-20
+pageType: guide
+topic: python
+tier: "TIER 2 (core reference)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+Sorting functions are essential tools for data manipulation and set of rules in computer programming languages like python.
+
+Sorting is a essential operation used to arrange information for searching, presentation, and analysis.
+
+A type sort function generally takes a set of parameters which includes numbers, strings, or custom objects, and then arranges them in ascending or descending order depending on the parameters.
+
+Here are the main variations between sort and taken care of functions in Python
+
+Python has two functions to sort the items, they look similar but have significant differences and choosing the right one can lead to correct results and performance improvements.
+
+Here are the main differences between sort and sorted functions in Python
+
+## Input types
+
+Sort() works only on lists, while sorted() can sort any iterable, such as tuples, sets, and dictionaries.
+
+## Calling methods
+
+Sort() can be called directly on a list, while sorted() requires the iterable to be passed as an argument.
+
+```hcl
+nums= [ 6,3,5,4,2,1 ]nums.sort()n = sorted(nums)
+```
+
+## List handling
+
+Python sort is an in-place method that modifies the original list, while sorted() returns a new sorted list. In the example above list nums is modified by sort() and a new list n is created by sorted()
+
+## Return Value
+
+Sort() does not return any value but returns None, whereas sorted() returns the sorted list.
+The sorted() function returns a list regardless of the type of iterable passed to it.
+
+```hcl
+nums= [ 6,3,5,4,2,1 ]
+result=nums.sort()
+ 
+print(result)
+None
+ 
+print(nums). ## Original list is changed
+[1, 2, 3, 4, 5, 6]
+```
+
+```hcl
+nums= [ 6,3,5,4,2,1 ]
+ 
+n = sorted(nums)
+ 
+print(n)
+[1, 2, 3, 4, 5, 6]
+ 
+print(nums).  ## Original list is unchanged
+[ 6,3,5,4,2,1 ]
+```
+
+## Sort Order
+
+Sort() and sorted() both have a reverse parameter, boolean True or False, that allows you to sort in descending order.
+
+> nums.sort(reverse=True) print(nums) [6, 5, 4, 3, 2, 1] nr=sorted(nums, reverse=True) print(nr) [6, 5, 4, 3, 2, 1]
+
+## Speed of Operation
+
+Sort() is generally faster than sorted() because it modifies the original list directly.
+
+## Usage
+
+Sorted() is more useful when you want to keep the original list unchanged for example when the program refers to the list at multiple places and looks for the order of items.
+Sort() is recommended when you don't need the original order of the elements for example when the list status is finalized as a sorted list and all subsequent calls refer to the sorted list.
+
+## Sort internal
+
+Sort() uses the less than (&lt;) operator to compare elements, if any one comparison fails the sort operation fails.
+sorted() uses the comparison operators.
+
+## Efficiency
+
+Sort() is more efficient for large lists since it avoids the extra memory overhead of creating a new list. Sorted uses extra memory and processing to create new list.
+
+## Stable nature
+
+Both sort() and sorted() are stable, meaning that elements with equal values maintain their relative order. This is to ensure that in a multiple column sort, multiple items with the same first column but different second columns maintain relative order.
+
+## Use cases
+
+If you only need to sort a list and don't care about the original order, sort() is the better choice.
+If you want a sorted list without modifying the original, sorted() is the way to go.
+
+Remember to choose between sort() and sorted() based on the specific requirements of your code.

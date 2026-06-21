@@ -1,0 +1,88 @@
+---
+title: "AWS Services Not Covered by Free Tier"
+description: "Amazon AWS offer a free tier of service where you can build and explore AWS."
+pubDate: 2026-06-16
+updatedDate: 2026-06-20
+pageType: guide
+topic: devops
+tier: "TIER 3 (DevOps/Cloud)"
+tags: ["cloud", "devops"]
+testedOn: ["Linux", "Unix"]
+---
+
+Amazon AWS offer a free tier of service where you can build and explore AWS. However when working with AWS many time we get billing surprise at the end of the month, which may be smaller of bigger. The main cause is our under standing of free tier versus as Amazon intended to be.
+
+Here are the details of the services not included in the free tier and their usage will cause a billing event. besides the service which are not in the free tier , some free tier services also has free usage limits and can cost if the usage limits are crosses.
+
+Based on the AWS documentation and common billing scenarios, here are the key services and features **NOT included** in the AWS Free Tier:
+
+### AWS Services Not Covered by Free Tier
+
+### Premium/Enterprise Services
+
+- **Savings Plans** and **Reserved Instances**
+- **AWS Marketplace** paid offerings
+- **AWS Professional Services** contracts
+- **Enterprise Agreements**
+- **AWS Skill Builder Team** subscriptions
+
+### Networking Components
+
+- **NAT Gateways** (major cost driver - not free)
+- **VPC Endpoints** (beyond basic VPC usage)
+- **Elastic Load Balancers** (ALB/NLB)
+- **AWS Direct Connect**
+- **AWS Transit Gateway**
+
+### Storage Beyond Limits
+
+- **EBS volumes** beyond the free tier allocation
+- **EBS snapshots** (charged separately)
+- **S3 storage** beyond 5GB limit
+- **S3 requests** beyond free tier limits
+
+### Compute Beyond Limits
+
+- **Instance types** other than t2.micro/t3.micro
+- **EC2 usage** beyond 750 hours/month
+- **Multiple regions** (limits are cumulative)
+- **Spot Instances** (separate pricing model)
+
+### Database Services
+
+- **RDS instances** beyond t2.micro/t3.micro
+- **DynamoDB** beyond free tier limits
+- **ElastiCache**
+- **Amazon Redshift**
+
+### Advanced Features
+
+- **Elastic IP addresses** when not attached to running instances
+- **Auto Scaling** (the service is free, but resources it creates aren't)
+- **CloudFormation** (free, but resources it creates may incur charges)
+
+## Common Billing Scenarios Even on Free Tier which may result in billing
+
+### Exceeding Usage Limits
+
+- Running instances for more than 750 hours/month
+- Using more than 5GB of S3 storage
+- Exceeding data transfer limits
+- Going over Lambda request limits (1M requests/month)
+
+### Resource Management Issues
+
+- **Stopped vs. Terminated** : Stopped EC2 instances still incur EBS storage charges
+- **Unattached resources** : EBS volumes, Elastic IPs not attached to instances
+- **Auto-restart** : Auto Scaling groups or recovery settings restarting instances
+
+### Account Plan Limitations
+
+- **Free Account Plan** : Limited to ~30 services, excludes premium features
+- **Paid Account Plan** : Access to all services, charges apply beyond credits
+
+## Important Notes
+
+- ⚠️ **Key Reminder** : Free Tier doesn't mean "everything is free" - it provides specific limits on eligible services.
+- 📊 **Monitor Usage** : Set up [Free Tier usage alerts](https://console.aws.amazon.com/billing/home#/preferences) and [zero-spend budgets](https://console.aws.amazon.com/billing/home#/budgets) to avoid unexpected charges.
+- 🔍 **Check Eligibility** : Visit the [AWS Free Tier page](https://aws.amazon.com/free/) to see exactly which services and limits apply to your account type.

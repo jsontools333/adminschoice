@@ -1,0 +1,321 @@
+---
+title: "kubernetes Commands You must know"
+description: "This command is used to apply the configuration changes to the resources in the Kubernetes cluster and clean up and validate changes."
+pubDate: 2023-02-23
+updatedDate: 2026-06-20
+pageType: reference
+topic: devops
+tier: "TIER 2 (core reference)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+kubectl is the Kubernetes command-line tool which allows us to run commands against Kubernetes clusters. kubectl is installable and available on a variety of Linux , macOS and Windows platforms.
+
+kubectl command line can be used to deploy applications, inspect and manage cluster resources, and view logs. complete list of kubectl operations, see official - [`kubectl` reference documentation](https://kubernetes.io/docs/reference/kubectl/) .
+
+[Kubernetes](https://kubernetes.io/docs/concepts/overview/) , also known as K8s, is an open-source container orchestration engine for automating deployment, scaling, and management of containerized applications. The open source project is hosted by the Cloud Native Computing Foundation ( [CNCF](https://www.cncf.io/about) ).
+
+## Here are some of the most commonly used kubectl commands :
+
+```bash
+kubectl apply
+```
+
+This command is used to apply the configuration changes to the resources in the Kubernetes cluster and clean up and validate changes.
+
+**Examples :**
+
+```bash
+kubectl apply
+```
+
+apply the configuration changes to the resources in the Kubernetes cluster.
+
+```bash
+kubectl apply --validate
+```
+
+validate the configuration file before applying it.
+
+```bash
+kubectl apply -f <filename>
+```
+
+apply the configuration changes from the specified YAML file.
+
+```bash
+kubectl apply -k <directory>
+```
+
+apply the configuration changes from the specified directory.
+
+```bash
+kubectl apply --prune
+```
+
+remove resources that are no longer specified in the default configuration file
+
+```bash
+kubectl apply -f <filename> --prune
+```
+
+apply the configuration changes from the specified YAML file and remove any resources that are no longer specified in the file.
+
+```bash
+kubectl apply -f <filename> --validate
+```
+
+validate the configuration changes from the specified YAML file before applying them.
+
+```bash
+kubectl apply -f <filename> --dry-run
+```
+
+perform a dry run of the configuration changes before applying them.
+
+```bash
+kubectl apply -f <filename> --dry-run=client
+```
+
+perform a client-side dry run of the configuration changes from the specified YAML file.
+
+## kubectl create
+
+Command is used to create a new resource in the Kubernetes cluster.
+
+**Examples** :
+
+```bash
+kubectl create deployment <deployment-name> --image=<image-name>
+```
+
+create a new deployment with the specified name and image.
+
+```bash
+kubectl create secret
+```
+
+create a new secret in the Kubernetes cluster.
+
+```bash
+kubectl create secret generic <secret-name> --from-literal=<key>=<value>
+```
+
+create a new generic secret with the specified name and key-value pair.
+
+## kubectl delete
+
+Command is used to delete a specific resource.
+
+**Examples** :
+
+```bash
+kubectl delete deployment <deployment-name>
+```
+
+delete the specified deployment.
+
+```bash
+kubectl delete pod <pod-name>
+```
+
+delete the specified pod.
+
+## kubectl describe
+
+Command is used to provide detailed information about a specific resource.
+
+**Examples:**
+
+```bash
+kubectl describe pod <pod-name>
+```
+
+show the detailed information about the specified pod.
+
+```bash
+kubectl describe service <service-name>
+```
+
+show the detailed information about the specified service.
+
+## kubectl edit
+
+Command is used to edit the configuration of a resource.
+
+**Examples:**
+
+```bash
+kubectl edit deployment <deployment-name>
+```
+
+open the configuration file of the specified deployment in the default editor for your system.
+
+## kubectl exec
+
+Command is used to execute a command inside a specific container in a pod.
+
+**Examples:**
+
+```bash
+kubectl exec -it
+```
+
+Command is used to execute a command inside a specific container in a pod interactively. Examples:
+
+```bash
+kubectl exec -it <pod-name> <container-name> -- /bin/bash
+```
+
+open a terminal inside the specified container in the specified pod and allow you to interact with it.
+
+## kubectl get
+
+Command is used to retrieve information about the resources running in the Kubernetes cluster.
+
+**Examples** :
+
+```bash
+kubectl get events
+```
+
+show all the events in the default namespace.
+**Examples:**
+
+```bash
+kubectl get events --all-namespaces
+```
+
+show all the events in all namespaces.
+
+```bash
+kubectl get pods
+```
+
+show all the pods running in the default namespace.
+
+```bash
+kubectl get services
+```
+
+show all the services running in the default namespace.
+
+## kubectl label
+
+Command is used to add or remove labels from resources.
+**Examples** :
+
+```bash
+kubectl label pods <pod-name> <label-key>
+```
+
+remove the specified label from the specified pod.
+
+```bash
+kubectl label pods <pod-name> <label-key>=<label-value>
+```
+
+add the specified label to the specified pod.
+
+## kubectl logs
+
+Command is used to retrieve the logs of a specific container in a pod.
+
+**Examples:**
+
+```bash
+kubectl logs --follow
+```
+
+Command is used to stream the logs of a specific container in a pod in real-time. Examples:
+
+```bash
+kubectl logs -f <pod-name> <container-name>
+```
+
+stream the logs of the specified container in the specified pod in real-time.
+
+```bash
+kubectl logs <pod-name> <container-name>
+```
+
+show the logs of the specified container in the specified pod.
+
+## kubectl port-forward:
+
+Command is used to forward the traffic from a specific port of a pod to a local port on your machine.
+
+**Examples** :
+
+```bash
+kubectl port-forward <pod-name> <local-port>:<pod-port>
+```
+
+forward the traffic from the specified port of the specified pod to the specified local port on your machine.
+
+## kubectl rollout
+
+Command is used to manage rollouts of updates to a deployment.
+
+**Examples:**
+
+```bash
+kubectl rollout history
+```
+
+Command is used to view the history of rollouts for a deployment.
+
+```bash
+kubectl rollout history deployment/<deployment-name> --revision=<revision-number>
+```
+
+show the details of the specified revision of the specified deployment.
+
+```bash
+kubectl rollout history deployment/<deployment-name>
+```
+
+show the history of rollouts for the specified deployment.
+
+```bash
+kubectl rollout status deployment/<deployment-name>
+```
+
+show the status of the rollout for the specified deployment.
+
+```bash
+kubectl rollout undo deployment/<deployment-name>
+```
+
+undo the last rollout for the specified deployment.
+
+## kubectl scale
+
+Command is used to scale the number of replicas of a deployment.
+
+**Examples:**
+
+```bash
+kubectl scale deployment <deployment-name> --replicas=<number-of-replicas>
+```
+
+scale the specified deployment to the specified number of replicas.
+
+## kubectl top:
+
+Command is used to view resource utilization metrics.
+
+**Examples:**
+
+```bash
+kubectl top node
+```
+
+show the CPU and memory usage of all the nodes in the cluster.
+
+```bash
+kubectl top pod <pod-name>
+```
+
+show the CPU and memory usage of the specified pod.

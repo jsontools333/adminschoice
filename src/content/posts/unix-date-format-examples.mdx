@@ -1,0 +1,184 @@
+---
+title: "Linux & Unix Date Format Examples"
+description: "Learn about Linux and Unix date & time formating with the help of simple explanation and added example."
+pubDate: 2012-03-10
+updatedDate: 2026-06-20
+pageType: reference
+topic: sysadmin
+tier: "TIER 2 (core reference)"
+tags: ["basics", "featured", "tips"]
+testedOn: ["Linux", "Unix"]
+---
+
+Learn about Linux and Unix date & time formating with the help of simple explanation and added example. Date command in Unix & Linux is used to format date as well as time. First portion of this article covers Date function and the second portion has the time function covered.
+
+### Linux & Unix Basic date format
+
+$date "+&lt;Parameter>&lt;seprator>&lt;Parameter>&lt;seprator>&lt;Parameter>
+
+Where Parameters is any one or more Parameter from the list below and separator is a any field separator like hyphen( - ) , slash , colon : and it is optional.
+
+### Linux & Unix Date Format Examples
+
+lets get the parameter for year , month and date and produce a hyphen separated date format
+
+> $date "+%Y-%m-%d"
+2010-02-10
+%Y is keyword for four digit year
+%m is keyword for two digit month
+%d is keyword for two digit date
+Hyphen is separator here .
+
+If you change the separator here to slash the format would look like
+
+> $date "+%Y/%m/%d"
+2010/02/10
+
+You can switch date keyword anyway you want , if you need month first and year last ,
+
+> $date "+%m-%d-%Y"
+02-10-2010
+
+### Weekdays
+
+You can have additional weekday information in your date with %A as
+
+> $date "+%m-%d-%Y %A"
+02-10-2010 Wednesday
+
+or
+
+$date "+%A %m-%d-%Y"
+Wednesday 02-10-2010
+
+These are options you can select for weekday
+
+> %a weekday, abbreviated Wed
+%A weekday, full Wednesday
+%d day of the month (dd), zero padded 10
+%e day of the month (dd) 10
+%j day of year, zero padded 000-366
+%u day of week starting with Monday (1), i.e. mtwtfss 3
+%w day of week starting with Sunday (0), i.e. smtwtfs 3
+
+### Month
+
+You can have additional month information in your date with %B as
+
+> $date "+%m-%d-%Y %B"
+02-10-2010 Februrary
+or
+$date "+%B %m-%d-%Y"
+February 02-10-2010
+
+These are options you can select for month
+
+> %m mm month as two digits
+%b Mon, locale's abbreviated Feb
+%B locale's full month, variable length February
+
+### Year
+
+You can have additional year information as two digit or four digit with %y or %Y as
+
+> $date "+%m-%d-%y "
+02-10-10
+
+or
+
+$date "+%m-%d-%Y "
+02-10-2010
+
+These are options you can select for year
+
+> %y yy two digit year 00–99
+%Y ccyy year 2010
+
+Additional date format parameters which can be used :
+
+### Week
+
+> %U week number Sunday as first day of week 01–53
+%W week number Monday as first day of week 01–53
+%V week of the year 01–53
+
+### Century
+
+> cc or %C century prints only last two digits (e.g., 20)
+
+### Date
+
+> %D mm/dd/yy 02/10/10
+%x locale's date representation (mm/dd/yy) 02/10/2010
+%F %Y-%m-%d 2010-02-10
+
+### Date and Time time stamp
+
+> %c locale's date and time Wed Feb 10 10:02:33 PST 2010
+
+## Time function
+
+Time function is simple to use and date command is used to format & display time as well . You can use date and time parameters to format your date time stamp as per your requirment
+
+A simple time stamp with date can be generated as :
+
+> $date "+%c"
+%c locale's date and time Sat Nov 04 12:02:33 EST 1989
+
+Date function have some preformated time stamps to make things easier
+
+Example :
+
+> $date "+%r"
+05:28:55 PM
+
+More preformated options :
+
+> %R hours, minutes (24 hour clock) hh:mm e.g. 17:28
+%T hours, minutes, seconds (24-hour clock) 17:28:55
+%X locale's time representation (%H:%M:%S) 05:28:55 PM
+
+Custom time format
+
+Examples
+
+> Time stamp with 12 hr clock
+
+$date "+%l:%M:%S
+5:22:45
+
+Time stamp with 24 hr clock
+
+$date "+%H:%M:%S"
+20:22:45
+
+Time stamp with AM/PM
+
+$date "+%l:%M:%S %p"
+5:22:45 PM
+
+## More date time parameters :
+
+### Hours
+
+> %l (Lowercase L) hour (12 hour clock) 8
+%I (Uppercase I) hour (12 hour clock) zero padded 08
+%k hour (24 hour clock) 20
+%H hour (24 hour clock) zero padded 20
+%p locale's upper case AM or PM (blank in many locales) PM
+%P locale's lower case am or pm (really!) pm
+
+### Minutes
+
+> %M MM minutes 28
+
+### Seconds
+
+> %s seconds since 00:00:00 1970-01-01 UTC (Unix epoch) 1265833735
+%S SS second 00–60
+%N nanoseconds 000000000–999999999
+
+### Time zone
+
+> %z -zzzz RFC-822 style numeric timezone -0500
+%Z time zone (e.g., EDT) nothing if no time zone is determinable EST

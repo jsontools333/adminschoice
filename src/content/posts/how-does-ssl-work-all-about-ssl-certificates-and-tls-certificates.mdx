@@ -1,0 +1,67 @@
+---
+title: "How does SSL work? All about SSL certificates and TLS certificates"
+description: "SSL certificates has become an essential component of todays internet security."
+pubDate: 2023-10-06
+updatedDate: 2026-06-20
+pageType: guide
+topic: networking
+tier: "TIER 2 (core reference)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+![figure](/images/https-3344700_1280-1.jpg)
+
+SSL certificates has become an essential component of todays internet security. Commerce and non commerce sites as well as interbal sites also uses SSL certificates to ensure transaction security by encrypting the data communication between client and server and also validating the identity of the server.
+
+SSL certificates are now referred to as TLS (Transport Layer Security) certificates. The last active version of SSL , namely SSL version 3 has been depreacated due to security vulnarabilities and new TLS protocol has taken its place. Most stable TLS version in use now is TLS version 1.3.
+
+How SSL\TLS certificates work?
+
+SSL\TLS certificates work in well defined steps and it is important to understand these steps in order to avoid any security vulanaability and take the right proactive steps to avoid a issues.
+
+Here's is the complete process and details of the steps involved in SSL/TLS certificate.
+
+## Certificate Issuance:
+
+A ssl certificate is issueed by Certificate Authority (CA) the upon request. The certificate auithoriy validates the identity of the issuer and provide certificate with their digital signatures.
+
+## Certificate Request:
+
+To get the SSL/TLS certificate, the admin/owner generate a Certificate Signing Request (CSR). CSR contains information about the website's identity, such as its domain name and public key. The CSR is sent to the chosen CA for verification. CA are the third party trusted certicate issuers.
+
+## Verification:
+
+CA asks for indetity information and verify the legitimacy of the certificate requester. The validation checks can be - confirming domain ownership, checking the requester's address and validating their identity. Once the CA is satisfied with the verification process as per their process, they issue an SSL/TLS certificate.
+
+## Certificate Issuance:
+
+CA then creates and digitally signs the SSL/TLS certificate using CA's private key. This signature proves during cvalidations that the certificate is valid and was issued by a trusted authority. The CA then sends the SSL/TLS certificate back to the website owner.
+
+## Certificate Installation:
+
+The website owner installs the SSL/TLS certificate on their web server using standard process to install certificates like adding certificate to the server configuration .
+
+## SSL/TLS Handshake:
+
+An SSL/TLS handshake starts when a user's web browser connects to the secured website with SSL certificate.
+
+The handshake steps are :
+
+- The web server presents the SSL/TLS certificate to the client.
+- The client (mostly web browser) checks if the certificate is valid and not expired, trusted by a CA, and issued for the domain where client is trying to connect.
+- If these validation checks are passed by the certificate, the client then generates a random symmetric encryption key, called the session key.
+
+## Key Exchange:
+
+Now the client encrypts the session key with the public key from the server's SSL/TLS certificate and then sends it back to the server. This message can be decryped by the servers private key.
+
+## Encryption:
+
+Ater both the client and server have the same session key, they can establish a secure, encrypted communication channel using symmetric encryption, using same session key and same encryption suite. Now all the data exchanged between the client and server is encrypted and decrypted using this shared session key.
+
+## Secure Communication:
+
+After this, all the data transmitted between the client and server is encrypted and one listening to the message exchange can not decrypt these message and thereby ensuring message confidentiality and integrity.
+
+To Sum up, SSL/TLS certificates provide a mechanism for verifying the authenticity of websites and providing encryption method thereby enabling secure communication between client and servers. They ensure that that the data sent over and received between a user's device and a web server remains private and protected from unauthorized access.

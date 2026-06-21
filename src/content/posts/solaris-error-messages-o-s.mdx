@@ -1,0 +1,692 @@
+---
+title: "Solaris Error Messages O-S"
+description: "Solaris / Unix error messages are very short and often we need some more information about the origin of an error and a possible steps to fix the issues."
+pubDate: 2009-12-20
+updatedDate: 2026-06-20
+pageType: reference
+topic: legacy
+tier: "TIER 4 (Solaris legacy)"
+tags: ["errors"]
+testedOn: ["Linux", "Unix"]
+---
+
+Solaris / Unix error messages are very short and often we need some more information about the origin of an error and a possible steps to fix the issues.
+
+Here is a list of Solaris / Unix error messages for your reference, most of the error messages are generic Unix error messages but many are specific Solaris Error Messages. Please comment if you can provide some more details about these errors.
+
+This is a multi part document, this part covers error messages starting from O to S,
+
+for other parts please scroll down to related posts section.
+
+[]() p
+
+166.
+
+Operation not applicable
+
+167.
+
+out of memory
+
+[]() p
+
+168.
+
+PARTIALLY ALLOCATED INODE I=N CLEAR?
+
+169.
+
+passwd.org_dir: NIS+ servers unreachable
+
+170.
+
+#errno170
+
+171.
+
+Permission denied
+
+172.
+
+Please specify a recipient.
+
+173.
+
+Protocol not supported
+
+174.
+
+Protocol wrong type for socket
+
+[]() R
+
+175.
+
+Read error from network: Connection reset by peer
+
+176.
+
+Read-only file system
+
+177.
+
+rebooting...
+
+178.
+
+Recipient names must be specified
+
+179.
+
+Reset tty pgrp from N to N
+
+180.
+
+Resource temporarily unavailable
+
+181.
+
+Result too large
+
+182.
+
+rmdir: variable: Directory not empty
+
+183.
+
+ROOT LOGIN /dev/console
+
+184.
+
+ROOT LOGIN /dev/pts/N FROM variable
+
+185.
+
+rx framing error
+
+[]() S
+
+186.
+
+SCSI bus DATA IN phase parity error
+
+187.
+
+SCSI transport failed: reason 'reset'
+
+188.
+
+Segmentation Fault
+
+189.
+
+sendmail[N]: NOQUEUE: SYSERR: net hang reading from variable
+
+190.
+
+setmnt: Cannot open /etc/mnttab for writing
+
+191.
+
+share_nfs: /home: Operation not applicable
+
+192.
+
+Soft error rate (N%) during writing was too high
+
+193.
+
+Soft error rate (retries = N) during writing was too high
+
+194.
+
+Stale NFS file handle
+
+195.
+
+statd: cannot talk to statd at variable
+
+196.
+
+stty: TCGETS: Operation not supported on socket
+
+197.
+
+su: No shell
+
+198.
+
+su: 'su root' failed for variable on /dev/pts/N
+
+199.
+
+su: 'su root' succeeded for variable on /dev/pts/N
+
+200.
+
+syncing file systems...
+
+201.
+
+syslog service starting.
+
+[]() Operation not applicable
+
+> This error indicates that no system support exists for some
+function that the application requested.
+Ask the system vendor for an upgrade, or contact the vendor or
+author of the application for an update.
+
+This message indicates that no system support exists for an
+operation. Many modules set this error when a programming
+function is not yet implemented. If you are writing a program
+that produces this message while calling a system library, try to
+find and use an alternative library function. Future versions of
+the system might support this operation; check system release
+notes for further information.
+
+The symbolic name for this error is ENOSYS, errno=89.
+
+[]() out of memory
+
+> Hundreds of different programs can produce this message when the
+system is running many large applications simultaneously. This
+message usually means that the system has run out of swap space
+(virtual memory).
+
+See the message "Not enough space" for details. Any data
+written
+during this condition will probably be lost.
+
+[]() PARTIALLY ALLOCATED INODE I=N CLEAR?
+
+> During phase 1, fsck(1M) found that the specified inode was
+neither allocated nor unallocated. The reason is probably that
+the system crashed in the middle of a sync(2) or write(2)
+operation.
+
+Should you answer yes to this question, "UNALLOCATED"
+messages
+might result during phase 2, if any directory entries point to
+this inode. If you are being careful, exit fsck(1M) and run
+ncheck(1M) (specifying the inode number after the -i option) to
+determine which file or directory is involved here. You might be
+able restore this file or directory from another system. It is
+also possiblethat fsck will copy this file to the lost+found
+directory in a later phase.
+
+[]() passwd.org_dir: NIS+ servers unreachable
+
+> This is the first of three messages thatan NIS+ client prints
+when it cannot locate an NIS+ server on the network.
+
+[]() Password does not decrypt secret key for
+unix.uid@variable
+
+> This message appears at login time when a user's password is not
+identical to the user's keylogin network password. When a system
+is running NIS+, the login program firstperforms UNIX
+authentication, and then attempts a keylogin(1) for secure RPC
+authentication.
+To gain credentials for secure RPC, users can run keylogin (after
+login) and type in their secret key. To stop this message from
+appearing at login time, users can run the chkey -p command and
+set their network password to bethe same as their NIS+ password.
+If a user doesn't remember the network password, the system
+administrator should delete and re-create the user's credentials
+table entry so the user can establish a new network password with
+chkey.
+
+[]() Permission denied
+
+> An attempt was made to access a file in a way forbidden by the
+protection system.
+Check the ownership and protection mode of the file (with a long
+listing from the ls-l command) to see who is allowed to access
+the file. Then change the file or directory permissions as
+needed.
+
+The symbolic name for this error is EACCES, errno=13.
+
+[]() Please specify a recipient.
+
+> With mailtool, this message comes up in a dialog box whenever a
+user tries to deliver a message with no address in the To: field.
+
+[]() Protocol not supported
+
+> The requested networking protocol hasnot been configured into
+the system, or no implementation for it exists. (A protocol is a
+formal description of the messages to be exchanged and the rules
+to be followed when systems exchange information.)
+Verify that the protocol is in the /etc/inet/protocols file and
+in the NIS protocols map, if applicable. If the protocol is not
+listed, and you want to permit its use, configure the protocol as
+documented or as required.
+The symbolic name for this error is EPROTONOSUPPORT, errno=120.
+
+[]() Protocol wrong type for socket
+
+> This message indicates either application programming error, or
+badly configured protocols.
+Make sure that the /etc/protocols file corresponds number-for-
+number with the NIS protocols map. It it does, ask the vendor or
+author of the application for an update.
+A protocol was specified that does not support the semantics of
+the socket type requested. This amounts to a request for an
+unsupported type of socket. Look at the source code that made
+this socket request and check that it requested one of the types
+specifiedin /usr/include/sys/socket.h.
+The symbolic name for this error is EPROTOTYPE, errno=98.
+
+[]() Read error from network: Connection reset by
+peer
+
+> This message appears when a user is remotely logged into a
+machine that crashes or gets rebooted during the rlogin(1) or
+rsh(1) session. Any data changes that were not saved are probably
+lost. Sometimes this message appears only when the user types
+something, even though the system went down hours before.
+Try torlogin again, perhaps after waiting a few minutes for the
+system to reboot.
+
+[]() Read-only file system
+
+> Files and directories on filesystems that are mounted read-only
+cannot be changed.
+
+If you only modify these files and directoriesoccasionally,
+rlogin(1) to the servers from which the filesystems are mounted
+and change the files or directories there. If you change these
+files and directories frequently, mount(1M) the filesystems
+read/write.
+The symbolic name for this error is EROFS, errno=30.
+
+[]() rebooting...
+
+> This message appears on the console to indicate that the machine
+is booting, either after the superuser issued a reboot command,
+or after a system panic if the EEPROM's watchdog-reboot? variable
+is set to true.
+Allow the machine to boot itself. In case of a system panic, look
+above this message for other indications of what went wrong.
+
+[]() Recipient names must be specified
+
+> Somebody sent mail without a valid recipient in the To: field, so
+sendmail could not deliver the mail message. Using mail(1), the
+recipient's address might have been specified using spaces or
+non-alphanumeric characters. The mailtool(1)and mailx(1)
+commands try to prevent this by issuing "Please specify a
+recipient" or "No recipients specified" messages
+instead. If
+there is at least one valid recipient, each invalid recipient
+address will generate a "User unknown" message.
+Look in the sender's dead.letter file for the automatically saved
+message, andhave the originator send it again, this time
+specifying a recipient.
+
+[]() Reset tty pgrp from N to N
+
+> The C shell sometimes issues this message when it clears away the
+window process group after the user exits the window system. This
+can happen when the window system doesn't clean up after itself.
+Proceed with your work. This message is purely informational.
+
+[]() Resource temporarily unavailable
+
+> This indicates that the fork(2) system call failed because the
+system's process table is full, or that a system call failed
+because of insufficient memory or swap space. It is also possible
+that a user is not allowed to create anymore processes.
+Simply waiting often gives the system time to free resources.
+However if this message occurs often on a system, reconfigure the
+kernel and allow more processes. To increase the size of the
+process table in Solaris 2.x, increase the value of maxusers in
+the /etc/system file. The default maxusers value is the amount of
+main memory in MB, minus 2.
+If one user is not allowed to create any more processes, that
+user has probably exceeded the memorysize limit; see the limit(1)
+man page for details.
+
+The symbolic name for this error is EAGAIN, errno=11.
+
+[]() Result too large
+
+> This is a programming error or a data input error.
+Ask the program's author to fix this condition.
+This indicates an attempt to evaluate a mathematical programming
+function at a point where its value would overflow or underflow.
+The value of a programming function in the math package (3M) is
+not representable within machine precision. This could occur
+after floating point overflow or underflow (either single or
+double precision), or after total loss of numeric significance in
+Bessel functions.
+Note that this message can indicate "Result too small"
+in the
+case of floating pointunderflow.
+To help pinpoint a program's math errors, use the matherr(3M)
+facility.
+The symbolic name for this error is ERANGE, errno=34.
+
+[]() rmdir: variable: Directory not empty
+
+> The rmdir(1) command can remove empty directories, only. The
+directory whose name appears after the first colon in the message
+still contains some files or directories.
+Use rm(1) instead of rmdir. To remove this directory and
+everything underneath it, use the rm -ir command to recursively
+descend the directory, being asked if you want to delete each
+element. To remove the directory and all its contents without
+being asked for approval, use the rm -r command.
+
+[]() ROOT LOGIN /dev/console
+
+> This syslog message indicates that someone has logged in as root
+on the system console.
+
+If you have just logged in as root, don't worry. If this is not
+you, consider the possibility of a security breach. The best
+site-wide policy is for all system administrators to su instead
+oflogging in as root.
+
+[]() ROOT LOGIN /dev/pts/N FROM variable
+
+> This syslog message indicates that someone has remote logged in
+as root on a pseudo-terminal from the system specified after the
+FROM keyword.
+For security reasons, it is a bad idea to allow root logins from
+anywhere besides the console. To restrict superuser logins to the
+console, remove the comment from the CONSOLE line in
+/etc/default/login.
+
+[]() rx framing error
+
+> Usually this error indicates a hardware problem.
+Check the Ethernet cabling and connectors to locate a problem.
+A framing error occurs when the Ethernet I/O driver receives a
+non-integral unit of octets, such as 63 bytes and then 3 bits.
+(Ethernet specifies the use of octets.) Framing errors are caused
+by corruption of the starting or ending frame delimiters. These
+can be corrupted by some violation of the encoding scheme.
+Framing errors are a subset of CRC errors, which are usually
+caused by anomalies on the physical media.An
+"alignment/framing
+error" is a type of CRC error where octet boundaries do not
+line
+up.
+
+[]() SCSI bus DATA IN phase parity error
+
+> The most common cause of this problem is unapproved hardware.
+Some SCSI devices for thePC market do not meet the high I/O
+speed requirements for the UNIX market. Other possible
+causes of
+this problem are improper cabling or termination, and power
+fluctuations. Data corruption is possible but unlikely to occur,
+because this parity error prevents data transfer.
+Check that all SCSI devices on the bus are Sun approved hardware.
+Then verify that all cables are no longer than six meters, total,
+and that all SCSI connections are properly terminated. If power
+fluctuations are occuring, invest in an uninterruptible power
+supply.
+
+[]() SCSI transport failed: reason 'reset'
+
+> This message indicates that the system sent data over the SCSI
+bus, but the data never reached its destination because of a SCSI
+bus reset. The most common cause of this condition is conflicting
+SCSI targets.¤Data corruption is possible but unlikely to
+occur, because this failure prevents data transfer.
+Verify that all cables are no longer than six meters, total, and
+that all SCSI connections are properly terminated. If power
+surges are a problem, acquire a surge suppressor or
+uninterruptible power supply.
+A machine's internal disk drive is usually SCSI target 3. Make
+sure that external and secondary disk drives are targeted to 1,
+2, or 0, and do not conflict with each other. Also make sure
+that tape drives are targeted to 4 or 5, and CD drives to 6,
+avoiding any conflict with each other or with disk drives. If the
+targeting of the internal disk drive is in question, power off
+the machine, remove all external drives, turn the power on, and
+from the PROM monitor run the probe-scsi-all or probe-scsi
+command.
+If SCSI device targeting is acceptable, memory configuration
+could be the problem, especially for machines with the sun4c
+architecture. Ensure that high-capacity memory chips (such as 4MB
+SIMMs) are in lower banks, while lower-capacity memory chips
+(such as 1MB SIMMs) are in the upper banks.
+Note that SPARC systems do not always support third party CDROM
+drives, and might generate a similar "unknown vendor"
+error
+message. Check with the CDROM vendor for specific configuration
+requirements.
+Some third party disk drives have a read-ahead cache that
+interferes with Solaris device drivers. Make sure that any
+existing read-ahead cache facility is turned off.
+
+[]() Segmentation Fault
+
+> Segmentation faults usually result from programming error. This
+message is usually accompanied by a core dump, except on read-
+only filesystems.
+
+To see which program produced a core file, run either the file(1)
+command or the adb (1) command. The following examples show the
+output of the file and adb commands on a core file from the
+dtmail program.
+$ file core core: ELF 32-bit MSB core file SPARC Version 1, from
+`dtmail'
+$ adb core core file = core -- program `dtmail' SIGSEGV 11:
+segmentation violation ^D (use
+Control-d to quit the adb
+rogram)
+Ask the vendor or author of this program for a debugged version.
+A process has received a signal indicating that it attempted to
+access an area of memory that is protected or that does not
+exist. The two most common causes of segmentation faults are
+attempting to dereference a null pointer or indexing past the
+bounds of an array.
+
+[]() sendmail[N]: NOQUEUE: SYSERR: net hang
+reading from variable
+
+> This is a sendmail message that appears on the console and in the
+log file /var/adm/messages. If this message occurs once for a
+particular user, it is possible that a mail message from this
+user ends with a partial line (having no terminating newline
+character). If this message appears frequently or at busy times,
+especially along with other networking errors, it could indicate
+network problems.
+Check the user's mail spool file to see if a message ends without
+a newline character. If so, talk with the user and determine
+how
+to prevent the problem from occurring again. If these messages
+are the result of network problems, you could try moving the mail
+spool directory to another machine with a faster network
+interface.
+During the SMTP receipt of DATA phase, a message-terminating
+period on a line of its own never arrived, so sendmail timed out
+and produced this error.
+
+[]() setmnt: Cannot open /etc/mnttab for writing
+
+> The system is having problems writing to /etc/mnttab. It is
+possible that the filesystem containing /etc is mounted read-
+only, or is not mounted at all.
+
+Check that this file exists and is writable by root. If so,
+ensure that the /etc filesystem has been mounted, and is mounted
+read-write rather than read-only.
+
+[]() share_nfs: /home: Operation not applicable
+
+> This message usually indicates that the system has a local
+filesystem mounted on /home, which is where the automounter
+usually mounts users' home directories.
+When a systemis running the automounter, do not mount local
+filesystems on the /home directory. Mount them on another
+directory, such as /disk2, which on most systems you will have to
+create.You could also change the automounter auto_home entry,
+but that is a more difficult solution.
+
+[]() Soft error rate (N%) during writing was too
+high
+
+> This message from the SCSI tape drive appears when Exabyteor DAT
+tapes generate too many soft (recoverable) errors. It is followed
+bythe advisory "Please, replace tape cartridge" message.
+Soft
+errors are an indication that hard errors could soon occur,
+causing data corruption.
+First clean the tape head witha cleaning tape as recommended by
+the manufacturer. If that doesn't work, replace the tape
+cartridge. You might need to replace the tape drive if the
+problem still occurs with new tape cartridges.
+
+[]() Soft error rate (retries = N) during writing
+was too high
+
+> This message from the SCSI tape drive appears when Archive tapes
+generate too many soft (recoverable) errors. It is followed by
+the advisory "Periodic head cleaning required and/or replace
+tape
+cartridge" message. Soft errors are an indication that hard
+errors couldsoon occur, causing data corruption.
+First clean the tape head with a cleaning tape as recommended by
+the manufacturer. If that doesn't work, replace the tape
+cartridge. Youmight need to replace the tape drive if the
+problem still occurs with new tape cartridges.
+
+[]() Stale NFS file handle
+
+> A file or directory that was opened by an NFS client was either
+removed or replaced on the server.
+
+If you were editing this file, write it to a local filesystem
+instead. Try remounting the filesystem on top of itself or
+shutting down any client processes that refer to stale file
+handles. If neither of these solutions works, reboot the system.
+The original vnode isno longer valid. The only way to get rid of
+this error is to force the NFS server and client to renegotiate
+file handles.
+The symbolic name for this error is ESTALE, errno=151.
+
+[]() statd: cannot talk to statd at variable
+
+> This message comes from the NFS status monitor daemon statd,
+which provides crash recovery services for the NFS lock daemon
+lockd. The message indicates that statd has left old references
+in the /var/statmon/sm and /var/statmon/sm.bak directories. After
+a user has removed or modified a host in the hosts database,
+statd might not properly purge files in these directories, which
+results in its trying to communicate with a nonexistent host.
+Remove the file named variable (where variable is the hostname)
+from both the /var/statmon/sm and /var/statmon/sm.bak
+directories. Then kill the statd daemon and restart it. If that
+doesn't get rid of the message, kill and restart lockd as well.
+If that doesn't work, reboot the machine at your convenience.
+
+[]() stty: TCGETS: Operation not supported on
+socket
+
+> This message results when a user tries to remote copy with rcp(1)
+or remote shell with rsh(1) from one machine to another, but has
+an stty(1) command in the remote
+The solution is to move the stty command to the user's .login (or
+equivalent) file. Alternatively, execute the stty command in
+.cshrc only when the shell is interactive. Here is a test to
+do
+just that:
+if ($?prompt) stty ...
+The rcp andrsh commands make a connection using sockets, which
+do not support stty's TCGETS ioctl.
+
+[]() su: No shell
+
+> This message indicates that someone changed the default login
+shell for root to a program missing from the system. For example,
+the final colon-separated field in /etc/passwd could have been
+changed from /sbin/sh to/usr/bin/bash, which does not exist in
+that location. Possibly an extra space was appended at the end of
+line. The outcome is that you cannot login as root or switch user
+to root, and so cannot directly fix this problem.
+
+The only solution is to reboot the system from another source,
+then edit the password file to correct this problem. Invoke
+sync(1M) several times, then halt the machine by typing Stop-A or
+by pressing the reset button. Reboot single-user from CDROM, the
+net, or diskette, such as by typing boot cdrom -s at the ok
+prompt.
+After the system comes up and gives you a # prompt, mount the
+device corresponding to the original / partition somewhere, such
+as with a mount(1M) command similar to the one below. Then run an
+editor on the newly-mounted system password file (use ed(1) if
+terminal support is lacking):
+
+# mount /dev/dsk/c0t3d0s0 /mnt # ed /mnt/etc/passwd
+
+Use the editor to change the password file's root entry to call
+an existing shell, such as /usr/bin/csh or /usr/bin/ksh.
+
+To keep the "No shell" problem from happening,
+habitually use
+admintool or /usr/ucb/vipw to edit the password file. These tools
+make it difficult to change password entries in ways that make
+the system unusable.
+
+[]() su: 'su root' failed for variable on
+/dev/pts/N
+
+> The user specified after "for" tried to become
+superuser, but
+typed the wrong password.
+If the user is supposed to know the root password, wait to see if
+the correct password is supplied. If the user is not supposed to
+know the root password, ask why he or she is attempting to become
+superuser.
+
+[]() su: 'su root' succeeded for variable on
+/dev/pts/N
+
+> The user specified after "for" just became superuser by
+typing
+the root password.
+If the user is supposed to know the root password, this message
+is purely informational. If the user is not supposed to know the
+root password, change this password immediately and ask how the
+user learned it.
+
+[]() syncing file systems...
+
+> This indicates that the kernel is updating the super-blocks
+before taking the system down, to ensure filesystem integrity.
+This message appears after a halt(1M) or reboot (1M) command. It
+can also appear after a system panic, in which case the system
+might contain corrupted data.
+
+If you just halted or rebooted the machine, don't worry-- this
+message is normal. In case of a system panic, look up the panic
+messages that appear above this one. Your system vendor might be
+able to help diagnose the problem. So that you can describe the
+panic to the vendor, either leave your system in its panicked
+state or be sure that you can reproduce the problem.
+Numbers that sometimes display after the three dots in the
+message show the count of dirty pages that are being written out.
+Numbers in brackets show an estimate of the number of busy
+buffers in the system.
+
+[]() syslog service starting.
+
+> During system reboot, this message might appear and theboot
+seems to hang. After starting syslogd(1M) service, the system
+runs /etc/rc2.d/S75cron, which in turn calls ps(1). Sometimes
+after an abrupt system crash /dev/bd.off becomes a link to
+nowhere, causing the ps command to hang indefinitely.
+Reboot single user (for example with boot -s) and run ls -l
+/dev/bd* to see if this is the problem. If so, remove
+/dev/bd.off, then run bdconfig off or reboot with the -r
+(reconfigure) option.
+
+This is the most commonly reported situation that causes ps to
+hang.

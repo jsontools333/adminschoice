@@ -1,0 +1,60 @@
+---
+title: "KRACK - Key Reinstallation Attacks on WPA2 Protocol"
+description: "KRACK is a security flaw with WPA2 security and it allows to compromise wireless WPA security by forcing nonce reuse ."
+pubDate: 2017-10-23
+updatedDate: 2026-06-20
+pageType: guide
+topic: security
+tier: "TIER 2 (core reference)"
+tags: ["security"]
+testedOn: ["Linux", "Unix"]
+---
+
+## Introduction
+
+KRACK is a security flaw with WPA2 security and it allows to compromise wireless WPA security by forcing nonce reuse .
+
+This is not an issue related to passwords but the protocol used by WPA and impacts pretty much all devices which uses wi-fi connection like phone, computers, wi-fi routers are impacted.
+
+## What is Impacted ?
+
+The attack works against all modern WPA2 protected Wi-Fi networks and devices using wi-fi networks. It is also possible to inject and manipulate data & in some cases attacker might be able to inject ransomware or other malware into websites.
+
+Android, Linux, Apple, Windows, OpenBSD, MediaTek, Linksys, and others, are all affected by some variant of the attacks. Key reinstallation attack is exceptionally devastating against Linux and Android 6.0 or higher because Android and Linux can be tricked into (re)installing an all-zero encryption key.
+Other devices, it is harder to decrypt all packets, although a large number of packets can nevertheless be decrypted.
+
+It is also possible to decrypt data sent towards the victim (e.g. the content of a website) depending on the device being used and network setup. Using HTTPS as an additional layer of protection can (still) be bypassed in a number of situations. For example, HTTPS was previously bypassed in non-browser software, in Apple's iOS and OS X, in Android apps, in Android apps again, in banking apps, and even in VPN apps.
+
+## The Mechanics of KRACK
+
+In a key reinstallation attack, a victim is tricked into reinstalling a key which is already in use. Reinstallation of keys is achieved by manipulating and replaying cryptographic handshake messages.
+When the victim reinstalls the key, associated parameters such as the incremental transmit packet number (i.e. nonce) and receive packet number (i.e. replay counter) are reset to their initial value. Essentially, to guarantee security, a key should only be installed and used once. Unfortunately this is not guaranteed by the WPA2 protocol and by manipulating cryptographic handshakes, this weakness can be abused.
+
+Decryption of packets is possible because the attack causes the transmit nonces ( also called packet numbers or initialization vectors) to be reset to zero. As a result, the same encryption key is used with nonce values that have already been used in the past. In turn, this causes all encryption protocols of WPA2 to reuse keystream when encrypting packets.
+
+In case a message has known content using that keystream , it becomes easy to derive the used keystream and use it to decrypt messages with the same nonce.
+
+## Key Reinstallation attacks: high level description
+
+## Assigned CVE - Common Vulnerabilities and Exposures (CVE) identifiers
+
+The following Common Vulnerabilities and Exposures (CVE) identifiers were assigned to track which products are affected by specific instantiations of key reinstallation attack:
+
+- CVE-2017-13077: Reinstallation of the pairwise encryption key (PTK-TK) in the 4-way handshake.
+- CVE-2017-13078: Reinstallation of the group key (GTK) in the 4-way handshake.
+- CVE-2017-13079: Reinstallation of the integrity group key (IGTK) in the 4-way handshake.
+- CVE-2017-13080: Reinstallation of the group key (GTK) in the group key handshake.
+- CVE-2017-13081: Reinstallation of the integrity group key (IGTK) in the group key handshake.
+- CVE-2017-13082: Accepting a retransmitted Fast BSS Transition (FT) Reassociation Request and reinstalling the pairwise encryption key (PTK-TK) while processing it.
+- CVE-2017-13084: Reinstallation of the STK key in the PeerKey handshake.
+- CVE-2017-13086: reinstallation of the Tunneled Direct-Link Setup (TDLS) PeerKey (TPK) key in the TDLS handshake.
+- CVE-2017-13087: reinstallation of the group key (GTK) when processing a Wireless Network Management (WNM) Sleep Mode Response frame.
+- CVE-2017-13088: reinstallation of the integrity group key (IGTK) when processing a Wireless Network Management (WNM) Sleep Mode Response frame.
+
+Note that each CVE identifier represents a specific instantiation of a key reinstallation attack. This means each CVE ID describes a specific protocol vulnerability, and therefore many vendors are affected by each individual CVE ID.
+
+You can also read vulnerability note VU#228519 of CERT/CC for additional details on which products are known to be affected.
+
+## Patches
+
+Patches are being released to address this security flaw, please check your device/OS manufacturer's website if patches are available to download and install.

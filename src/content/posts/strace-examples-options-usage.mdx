@@ -1,0 +1,243 @@
+---
+title: "Strace Examples, Options & Usage"
+description: "Strace displays c language error codes, Errors (typically a return value of -1) have the errno symbol and error string appended to it."
+pubDate: 2021-08-09
+updatedDate: 2026-06-20
+pageType: reference
+topic: sysadmin
+tier: "TIER 2 (core reference)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+> strace is an important debug tool in Linux and Unix systems to trace system calls and signals. strace is used where the program does not provide sufficient information for the cause of failures and we need to go a level deeper in to system calls and signal levels to find out potential issues.
+
+### What strace is used for ?
+
+strace is used to intercepts the process and displays what system calls are getting executed along with their arguments and status.
+
+strace also displays signals which are received by a process during its execution while the strace is on.
+
+### strace Syntax :
+
+stace &lt;programe Name > ### displays the output on the screen
+
+strace -o &lt;outputfileName> &lt;program Name > ### Redirects strace output to a file.
+
+### strace output format :
+
+Strace output is in multiple lines and each line has
+
+- The name of each system call in the first column
+- its arguments in the the middle portion enclosed by parenthesis.
+- its return value in the last column
+
+**Like** :
+
+**system_call** ( arguments ) = return value
+
+**as in this example :**
+
+**open** ( *AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC* ) = **3**
+**fstat** *(3, &#123;st_mode=S_IFREG|0644, st_size=140857, ...&#125;)* = **0**
+
+## Strace Error Codes
+
+Strace displays c language error codes, Errors (typically a return value of -1) have the errno symbol and error string appended to it.
+
+Some error symbols and their description.
+
+```bash
+EPERM  - Operation not permittedENOENT - No such file or directoryESRCH - No such processEINTR - Interrupted system callEIO - I/O errorENXIO - No such device or addressE2BIG - Argument list too longENOEXEC - Exec format errorEBADF - Bad file numberECHILD - No child processes
+```
+
+**strace Installation :**
+strace may not be installed on all system but can be installed if you have permission to install packages, usually root permission.
+
+1. Redhat and similar distributions
+
+```bash
+yum install strace
+```
+
+2. Debian and similar distributions
+
+apt-get install strace
+**Here are examples with usages of strace command that you can use to debug the programs**
+
+## Running strace on a program
+
+strace can be used with a program or command as argument. The output of the command is displayed on the screen. Given the amount of lines printed it is suggested to put the output in a file to analyses the data using next example.
+
+$strace ls
+
+```bash
+[root@localhost test]# strace ls
+execve("/usr/bin/ls", ["ls"], 0x7ffc2d63c980 /* 37 vars */) = 0
+brk(NULL)                               = 0x558247baa000
+arch_prctl(0x3001 /* ARCH_??? */, 0x7ffe82ba3dc0) = -1 EINVAL (Invalid argument)
+access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=140857, ...}) = 0
+mmap(NULL, 140857, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7fad64bb8000
+close(3)                                = 0
+openat(AT_FDCWD, "/lib64/libselinux.so.1", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0P\210\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=188664, ...}) = 0
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fad64bb6000
+...
+...
+fstat(1, {st_mode=S_IFCHR|0620, st_rdev=makedev(0x88, 0), ...}) = 0
+write(1, "op.sh  test1  testfile1  testfil"..., 39op.sh  test1  testfile1  testfile2  zz
+) = 39
+close(1)                                = 0
+close(2)                                = 0
+exit_group(0)                           = ?
++++ exited with 0 +++
+```
+
+## Send strace output to a file with -o option
+
+It is better to collect the stace date in a file for a analysis. -o option alloes the strace output to be redirected to file.
+
+```bash
+$strace -o /tmp/debug.log ls
+```
+
+## strace a running process and collect its output
+
+strace can take a process id as argument and capture the system call and signal being used. Get the process id using ps -ef command and use -p option to run strace.
+
+```bash
+$strace -o /tmp/strace-ps.log  -p 2212  &$tail -f /tmp/strace-ps.log
+```
+
+## Get list of system calls used by the program.
+
+This a very important option as strace prints out a lot of information and it becomes difficult to read through line by line. with -c option you can see which system calls are used, how much time they took and which one has an error and then you can focus on those system calls as described in next example.
+
+strace -c option gives a list of system calls used by the program.
+
+```bash
+[root@localhost test]# strace -c ls /tmp/test
+op.sh  test1  testfile1  testfile2  zz
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 30.25    0.000549          16        33           mmap
+ 16.14    0.000293          29        10           mprotect
+  8.93    0.000162          18         9           openat
+  6.61    0.000120          10        11           close
+  5.67    0.000103           7        14           read
+  4.52    0.000082           8        10           fstat
+  4.19    0.000076          76         1           munmap
+  3.97    0.000072          36         2           statfs
+  2.37    0.000043           5         8           lseek
+  2.15    0.000039          19         2           rt_sigaction
+  2.04    0.000037          18         2           getdents64
+  1.82    0.000033          16         2           ioctl
+  1.76    0.000032          10         3           brk
+  1.54    0.000028          28         1           write
+  1.38    0.000025          12         2         1 access
+  1.27    0.000023          23         1           prlimit64
+  1.21    0.000022          22         1           set_tid_address
+  1.16    0.000021          21         1           stat
+  1.10    0.000020          20         1           set_robust_list
+  0.99    0.000018          18         1           rt_sigprocmask
+  0.94    0.000017           8         2         1 arch_prctl
+  0.00    0.000000           0         1           execve
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.001815          15       118         2 total
+```
+
+## filter strace for only one type of system call
+
+-e option can be used to return status of system call in the argument. To see just the openat ( open system call in some other systems ) system call :
+
+```bash
+[root@localhost test]# strace  -e openat  ls /tmp/test 
+openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+openat(AT_FDCWD, "/lib64/libselinux.so.1", O_RDONLY|O_CLOEXEC) = 3
+openat(AT_FDCWD, "/lib64/libcap.so.2", O_RDONLY|O_CLOEXEC) = 3
+openat(AT_FDCWD, "/lib64/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
+openat(AT_FDCWD, "/lib64/libpcre2-8.so.0", O_RDONLY|O_CLOEXEC) = 3
+openat(AT_FDCWD, "/lib64/libdl.so.2", O_RDONLY|O_CLOEXEC) = 3
+openat(AT_FDCWD, "/lib64/libpthread.so.0", O_RDONLY|O_CLOEXEC) = 3
+openat(AT_FDCWD, "/usr/lib/locale/locale-archive", O_RDONLY|O_CLOEXEC) = 3
+openat(AT_FDCWD, "/tmp/test", O_RDONLY|O_NONBLOCK|O_CLOEXEC|O_DIRECTORY) = 3
+op.sh  test1  testfile1  testfile2  zz
++++ exited with 0 +++
+```
+
+**Multiple calls can be specified with , separated list as -e syscallA,syscallB**
+
+```bash
+[root@localhost test]# strace  -e openat,close  ls /tmp/test 
+openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+close(3)                                = 0
+openat(AT_FDCWD, "/lib64/libselinux.so.1", O_RDONLY|O_CLOEXEC) = 3
+close(3)                                = 0
+openat(AT_FDCWD, "/lib64/libcap.so.2", O_RDONLY|O_CLOEXEC) = 3
+close(3)                                = 0
+```
+
+## Display timestamps for the system calls
+
+time stamps are helpful when a time specific window has to be analyzed.
+
+-t option provides the time stamps for the process system calls.
+
+```bash
+[root@localhost test]# strace -t   ls /tmp 
+00:38:09 execve("/usr/bin/ls", ["ls", "/tmp"], 0x7ffe8df0fe00 /* 37 vars */) = 0
+00:38:09 brk(NULL)                      = 0x56310fba6000
+00:38:09 arch_prctl(0x3001 /* ARCH_??? */, 0x7ffc87fd0e20) = -1 EINVAL (Invalid argument)
+00:38:09 access("/etc/ld.so.preload", R_OK) = -1 ENOENT (No such file or directory)
+00:38:09 openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+00:38:09 fstat(3, {st_mode=S_IFREG|0644, st_size=140857, ...}) = 0
+00:38:09 mmap(NULL, 140857, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7fa906b5b000
+00:38:09 close(3)                       = 0
+00:38:09 openat(AT_FDCWD, "/lib64/libselinux.so.1", O_RDONLY|O_CLOEXEC) = 3
+00:38:09 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0P\210\0\0\0\0\0\0"..., 832) = 832
+00:38:09 fstat(3, {st_mode=S_IFREG|0755, st_size=188664, ...}) = 0
+00:38:09 mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fa906b59000
+...
+...
+00:38:09 write(1, "aaa\t   Temp-2275cbef-7c2f-4517-a"..., 55aaa	   Temp-2275cbef-7c2f-4517-af1c-adddcb81de95  test
+) = 55
+00:38:09 write(1, "debug.log  Temp-5150a921-0d09-42"..., 81debug.log  Temp-5150a921-0d09-423d-90bc-f3ca29cf11d1  tracker-extract-files.1000
+) = 81
+00:38:09 close(1)                       = 0
+00:38:09 close(2)                       = 0
+00:38:09 exit_group(0)                  = ?
+00:38:09 +++ exited with 0 +++
+```
+
+## Display relative time for each system call.
+
+strace with option -r print a relative timestamp upon entry to each system call. This records the time difference between the beginning of successive system calls. Default is in microseconds.
+
+The measurements can differ from the difference in time reported by the -t option as -r option uses the monotonic clock time for measuring time difference and not the wall clock time
+
+```bash
+[root@localhost test]# strace -r   ls /tmp 
+     0.000000 execve("/usr/bin/ls", ["ls", "/tmp"], 0x7ffc94c600e0 /* 37 vars */) = 0
+     0.001646 brk(NULL)                 = 0x560e70c53000
+     0.004839 arch_prctl(0x3001 /* ARCH_??? */, 0x7ffd2d697060) = -1 EINVAL (Invalid argument)
+     0.000910 access("/etc/ld.so.preload", R_OK) = -1 ENOENT (No such file or directory)
+     0.003056 openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+     0.000128 fstat(3, {st_mode=S_IFREG|0644, st_size=140857, ...}) = 0
+     0.000103 mmap(NULL, 140857, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7fa9561f6000
+     0.000103 close(3)                  = 0
+     0.000116 openat(AT_FDCWD, "/lib64/libselinux.so.1", O_RDONLY|O_CLOEXEC) = 3
+     0.000108 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0P\210\0\0\0\0\0\0"..., 832) = 832
+     0.000151 fstat(3, {st_mode=S_IFREG|0755, st_size=188664, ...}) = 0
+     0.000099 mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fa9561f4000
+     0.000157 mmap(NULL, 181744, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa9561c7000
+     0.000166 mprotect(0x7fa9561ce000, 139264, PROT_NONE) = 0
+     ...
+     ...     
+     0.000174 close(1)                  = 0
+     0.000177 close(2)                  = 0
+     0.000165 exit_group(0)             = ?
+     0.000336 +++ exited with 0 +++
+```

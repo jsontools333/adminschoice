@@ -1,0 +1,124 @@
+---
+title: "Terraform - 7 Essential Commands for Managing Infrastructure"
+description: "Terraform is open-source infrastructure-as-code (IaC) tool developed by HashiCorp."
+pubDate: 2023-03-02
+updatedDate: 2026-06-20
+pageType: reference
+topic: devops
+tier: "TIER 3 (DevOps/Cloud)"
+tags: ["devops"]
+testedOn: ["Linux", "Unix"]
+---
+
+Terraform is open-source infrastructure-as-code (IaC) tool developed by HashiCorp. You can define, manage and automate your infrastructure resources as code using terraform. Terraform uses declarative statements which means that you define the desired final state of your infrastructure and Terraform takes care of provisioning and managing the resources to achieve that state.
+
+With Terraform, you can define your infrastructure resources as code in a language called HashiCorp Configuration Language (HCL). Terraform supports a wide range of cloud and infrastructure providers, including AWS, GCP, Azure, VMware and many others.
+
+terraform stores its configuration in main.tf file which needs to be created based on resource requirements
+
+**sample blocks from main.tf**
+
+```hcl
+provider "aws" {region = "us-west-2"}
+resource "aws_instance" "web" {ami = data.aws_ami.ubuntu.idinstance_type = "t2.micro"vpc_security_group_ids = [aws_security_group.web-sg.id]
+}
+```
+
+complete sample main.tf at github-
+&lt;https://github.com/hashicorp/learn-terraform-github-actions/blob/main/main.tf>
+
+**Here are the 9 Terraform commands with examples to mange your infrastructure.**
+
+## terraform init
+
+This command initializes a new or existing Terraform working directory. It downloads and installs the required provider plugins and modules that are declared in the Terraform configuration files for new installation and implements just the changes for existing installations.
+
+**Example**
+
+```bash
+terraform init
+```
+
+## terraform plan
+
+This command shows the execution plan for the Terraform configuration. It displays a list of resources that will be created, updated or deleted when you apply the configuration.
+
+**Example**
+
+```bash
+terraform plan
+```
+
+## terraform apply
+
+This command applies the changes to the infrastructure described in the Terraform configuration file. It creates, updates, or deletes resources based on the configuration changes.
+
+**Example**
+
+```bash
+terraform apply
+```
+
+## terraform destroy
+
+This command destroys all the resources created by the Terraform configuration. It removes all traces of the infrastructure created by the Terraform configuration.
+
+**Example**
+
+```bash
+terraform destroy
+```
+
+## terraform validate
+
+This command validates the Terraform configuration files. It checks the syntax of the files and validates the references to other resources.
+
+**Example**
+
+```bash
+terraform validate
+```
+
+## terraform state
+
+This command shows the current state of the resources managed by Terraform. It displays the resource attributes and their values.
+
+**Example**
+
+```bash
+terraform state list
+terraform state show aws_instance
+```
+
+## terraform import
+
+This command imports an existing resource into Terraform state. It allows you to start managing existing resources that were not created using Terraform.
+
+**Example**
+
+```bash
+terraform import aws_instance.newone i-1234abcd
+```
+
+These are some of the commonly used Terraform commands. There are many other commands and options available. You can use the --help option with any command to get more information about it.
+
+These are some of the additional terraform commands :
+
+- **version** - Show the current Terraform version
+- **console** - Try Terraform expressions at an interactive command prompt
+- **fmt** - Reformat your configuration in the standard style
+- **force-unlock** - Release a stuck lock on the current workspace
+- **get** - Install or upgrade remote Terraform modules
+- **graph** - Generate a Graphviz graph of the steps in an operation
+- **login** - Obtain and save credentials for a remote host
+- **logout** - Remove locally-stored credentials for a remote host
+- **output** - Show output values from your root module
+- **providers** - Show the providers required for this configuration
+- **refresh** - Update the state to match remote systems
+- **show** Show the current state or a saved plan
+- **state** - Advanced state management
+- **taint** - Mark a resource instance as not fully functional
+- **untaint** - Remove the 'tainted' state from a resource instance
+- **workspace** - Workspace management
+
+Further Reading : [https://developer.hashicorp.com/terraform/language](https://developer.hashicorp.com/terraform/language)

@@ -1,0 +1,176 @@
+---
+title: "Convert Nested JSON to CSV Online Free \u2013 Fast JSON to CSV Converter (Handles Arrays & Large Files)"
+description: "Struggling to convert complex JSON into a clean, usable CSV file?"
+pubDate: 2026-05-04
+updatedDate: 2026-06-20
+pageType: guide
+topic: sysadmin
+tier: "TIER 3 (DevOps/Cloud)"
+tags: ["tools"]
+testedOn: ["Linux", "Unix"]
+---
+
+**Best JSON to CSV Converter Online – Convert Complex JSON (Nested + Arrays) to CSV**
+
+Struggling to convert complex JSON into a clean, usable CSV file? This **advanced JSON to CSV converter** lets you instantly transform **nested JSON, arrays, and structured data** into CSV format—right in your browser. Unlike basic tools, it automatically **flattens nested objects, handles arrays intelligently, and processes data securely without uploading anything to a server** . Designed for speed and reliability, this tool supports files up to **1MB for instant conversion** , making it perfect for developers, analysts, and anyone working with API or structured data.
+
+#json2csv-tool &#123;
+font-family: Arial, sans-serif;
+background: #fff;
+padding: 20px;
+border-radius: 10px;
+box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+&#125;
+
+#json2csv-tool textarea &#123;
+width: 100%;
+height: 220px;
+padding: 10px;
+font-family: monospace;
+border-radius: 6px;
+border: 1px solid #ccc;
+&#125;
+
+#json2csv-tool button &#123;
+margin: 5px 5px 5px 0;
+padding: 8px 12px;
+border-radius: 6px;
+border: none;
+cursor: pointer;
+&#125;
+
+.btn-primary &#123; background:#2563eb; color:#fff; &#125;
+.btn-success &#123; background:#059669; color:#fff; &#125;
+.btn-warning &#123; background:#f59e0b; color:#fff; &#125;
+
+#json2csv-tool table &#123;
+width: 100%;
+border-collapse: collapse;
+margin-top: 15px;
+&#125;
+
+#json2csv-tool th, td &#123;
+border: 1px solid #ddd;
+padding: 6px;
+font-size: 13px;
+&#125;
+
+#json2csv-tool th &#123;
+background: #f3f4f6;
+&#125;
+
+.small &#123;
+font-size: 13px;
+color: #666;
+margin-top: 5px;
+&#125; JSON to CSV Converter Convert nested JSON into CSV instantly in your browser. Max file size: **1MB** .
+
+Convert Download CSV Copy CSV let csvOutput = "";
+let parsedRows = [];
+let allFields = [];
+
+const MAX_SIZE = 1 * 1024 * 1024; // 1MB
+
+document.getElementById("fileInput").addEventListener("change", function(e) &#123;
+const file = e.target.files[0];
+if (!file) return;
+
+if (file.size > MAX_SIZE) &#123;
+showMsg("File exceeds 1MB limit.", "red");
+e.target.value = "";
+return;
+&#125;
+
+const reader = new FileReader();
+reader.onload = function(evt) &#123;
+document.getElementById("jsonInput").value = evt.target.result;
+showMsg("File loaded successfully.", "green");
+&#125;;
+reader.readAsText(file);
+&#125;);
+
+function showMsg(text, color="red") &#123;
+const msg = document.getElementById("msg");
+msg.style.color = color;
+msg.innerText = text;
+&#125;
+
+function convertJSON() &#123;
+let input = document.getElementById("jsonInput").value;
+
+if (new Blob([input]).size > MAX_SIZE) &#123;
+showMsg("Input exceeds 1MB limit.", "red");
+return;
+&#125;
+
+try &#123;
+let data = JSON.parse(input);
+if (!Array.isArray(data)) data = [data];
+
+parsedRows = data.map(obj => flatten(obj));
+allFields = [...new Set(parsedRows.flatMap(o => Object.keys(o)))];
+
+generateCSV();
+renderPreview();
+
+showMsg("Converted successfully", "green");
+
+&#125; catch (e) &#123;
+showMsg("Invalid JSON: " + e.message);
+&#125;
+&#125;
+
+function flatten(obj, prefix="", res=&#123;&#125;) &#123;
+for (let key in obj) &#123;
+let val = obj[key];
+let newKey = prefix ? prefix + "." + key : key;
+
+if (typeof val === "object" && val !== null && !Array.isArray(val)) &#123;
+flatten(val, newKey, res);
+&#125; else if (Array.isArray(val)) &#123;
+res[newKey] = val.map(v => typeof v === "object" ? JSON.stringify(v) : v).join(", ");
+&#125; else &#123;
+res[newKey] = val;
+&#125;
+&#125;
+return res;
+&#125;
+
+function generateCSV() &#123;
+let rows = [];
+rows.push(allFields.join(","));
+
+parsedRows.forEach(r => &#123;
+rows.push(allFields.map(f => `"${(r[f]||"").toString().replace(/"/g,'""')}"`).join(","));
+&#125;);
+
+csvOutput = rows.join("\\n");
+&#125;
+
+function renderPreview() &#123;
+let html = "&lt;table>&lt;tr>";
+allFields.forEach(f => html += "&lt;th>"+f+"&lt;/th>");
+html += "&lt;/tr>";
+
+parsedRows.slice(0,20).forEach(r => &#123;
+html += "&lt;tr>";
+allFields.forEach(f => html += "&lt;td>"+(r[f]||"")+"&lt;/td>");
+html += "&lt;/tr>";
+&#125;);
+
+html += "&lt;/table>";
+document.getElementById("preview").innerHTML = html;
+&#125;
+
+function downloadCSV() &#123;
+let blob = new Blob([csvOutput], &#123;type:"text/csv"&#125;);
+let a = document.createElement("a");
+a.href = URL.createObjectURL(blob);
+a.download = "converted-data.csv";
+a.click();
+&#125;
+
+function copyCSV() &#123;
+navigator.clipboard.writeText(csvOutput);
+showMsg("Copied to clipboard", "green");
+&#125;

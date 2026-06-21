@@ -1,0 +1,161 @@
+---
+title: "Unix Commands Tutorial"
+description: "Learn about the Unix commands with their usages and examples."
+pubDate: 2009-12-20
+updatedDate: 2026-06-20
+pageType: reference
+topic: sysadmin
+tier: "TIER 2 (core reference)"
+tags: ["basics", "featured", "tips"]
+testedOn: ["Linux", "Unix"]
+---
+
+Learn about the Unix commands with their usages and examples. 
+This Unix command tutorial introduces you with some of the most popular and useful commands used in nix operating system to get you started with Unix.
+All Unix OS comes with online manual system, man, which can be used used as ,man
+
+, to get more details and complete set of options.
+
+Coverted in this Unix Command Tutorial
+
+1. **[Wild Cards](#Wild Cards )**
+2. **[Directory operations](#Directory Operations)**
+3. **[File edit/create/view](#File edit/create/view)**
+4. **[File operation](#File Operation)**
+5. **[Find files , directories](#Find Files , Directories)**
+6. **[Process Operations](#Process  Operations)**
+7. **[User administration](#User Administration)**
+8. **[System Status](#System Status)**
+9. **[Environment Variable](#Environment Variable)**
+10. **[Connectivity](#Connectivity)**
+11. **[Backup and Restore](#Backup and Restore)**
+
+| Wild Cards |
+| --- |
+| * | The * wildcard character substitutes for one or more characters in a filename. For instance, to list all the files in your directory that end with .c, enter the command
+ls *.c |
+| ? | ? (question mark) serves as wildcard character for any one character in a filename. For instance, if you have files named prog1, prog2, prog3 , and prog3 in your directory, the Unix command:
+ls prog? |
+
+| Directory Operations |
+| --- |
+| Change | cd dir Change to directory d |
+| Make | mkdir dir Create new directory d |
+| Move | mv dir1 dir2 Rename directory d1 as d2 |
+| Remove | rmdir dir Remove directory d |
+
+| File edit/create/view |
+| --- |
+| vi - vi full screen editor | vi filename , Opens a existing file or creates |
+| ed - Line Text editor | ed filename |
+| count - Line, word, & char | wc filename |
+| Text content display - List contents of file at once | cat filename |
+| Text content display by screen : List contents of file screen by screen | more filename |
+| Concatenate - file1 & file2 into file3 | cat file1 file2 >file3 |
+
+| File Operation |
+| --- |
+| list , no details only names | ls filename , filename with wildcard character/s. |
+| list , details | ls -1 filename , filename with wildcard character/s. |
+| move to directory | mv filename dirname (wildcard character/s supported) |
+| copy file to other/current directory | cp file directory/newfile or cp directory/oldfile . |
+| Delete the file | rm file , rm -rf directory - Recursively remove files & directly without any warning. |
+| file | file filename , file command tries to determine the file type , text , executable etc after comparing the values in /etc/magic . |
+| Change read/write/execute mode of fil | chmod mode file |
+| chown | chown [-R] [-h] owner[:group] file |
+| move (rename ) file | mv file1 file2 Rename file file1 as file2 |
+| Remove | rm file Delete (remove) file f |
+| Compare two files | cmp file1 file2 |
+| Copy file file1 into file2 | cp file1 file2 |
+| Sort Alphabetically | sort file |
+| Sort Numerically | sort -n file |
+| Split f into n-line pieces | split [-n] f |
+| match pattern | grep pattern file Outputs lines that |
+| Lists file differences | diff file1 file2 |
+| head f Output beginning of file | head file |
+| Output end of file | tail file |
+
+| Find Files , Directories |
+| --- |
+| find files , directories | Find command is used to find the files , directories and to run commands on the list of files thus generated .By default, find does not follow symbolic links.
+
+find . -name *.log -print --- Simple find to list log files
+find . -name '*.log' -exec rm &#123;&#125; ; -- Simple find to find log files and delete them .
+find accepts a long list of options to find the files based on different parameters such as create time , modified time , of certain size etc. Please refer to man find for more option. |
+
+| Process Operations |
+| --- |
+| Suspend current process | CTRL/z * |
+| Interrupt processes | CTRL/c * |
+| Stop screen scrolling | CTRL/s * |
+| Resume screen scrolling | CTRL/q * |
+| Sleep for n seconds | sleep n |
+| Print list of jobs | jobs |
+| Kill job n | kill % |
+| Remove process n | kill -9 n |
+| status process status stats | ps |
+| Resume background job n | bg [%n] |
+| Resume foreground job n | fg [%n] |
+| Exit from shell | exit |
+
+| User Administration |
+| --- |
+| add a new user login | # useradd -u 655 -g 20 -d /home/ttes testlogin loginname
+
+-u is userid , if not specified system takes highest available .
+-g group id should be existing in /etc/group , if not specified other or user is assigned.
+-d home directory , default is to use user as the directory name under the home directory.
+loginname - new login name to be created .
+
+#useradd testlogin will create a user by the name 'testlogin' with all default values . |
+| password Change | passwd &lt;user> |
+| alias (csh/tcsh) - Create command | alias name1 name2 |
+| alias (ksh/bash) - Create alias command | alias name1="name2" |
+| alias - Remove alias | unalias name1[na2...] |
+| printer |  |
+| Output file f to line printer | p -d printer file |
+|  |  |
+
+| System Status |
+| --- |
+| Display disk quota | quota |
+| Print date & time | date |
+| List logged in users | who |
+| Display current user | whoami |
+| Output user information | finger [username] |
+| Display recent commands | history |
+
+| Environment Variable |
+| --- |
+| set | set command alone displays the environment variables, it is used to set options in ksh like set -o vi |
+| export | export variable , export makes variable visible in sub shells. |
+| Set environment variable (csh/tcsh) to value v | sentenv name v |
+| Set environment variable (ksh/bash) to value v | export name=v example : export TERM=vt100 |
+
+| Connectivity |
+| --- |
+| Connecting to a remote host | $telnet hostname/ip address or $telnetTelnet brings up the login prompt of remote host and expects you to enter your user name & password .Without argument it enters command mode (telnet>) and accepts command listed by ? at telnet> prompt. Communication is not encrypted between two hosts. |
+| Securely connecting to a remote host | ssh username@hostname or ssh -l username hostname
+Depending on ssh setting for your account you may or may not be asked a password to login. Your login/passwd will be same login password as you would use with telnet connection.
+Communication is encrypted between two hosts so if someone intercepts your communication he will not be able to use it. |
+| Copy files from/to remote host | ftp hostname
+ftp expects you to enter your username/passwd or if it is ftp only account it will require ftp account password .
+put , mput ( multiple put ) command is used to transfer files to remote host.
+get , mget ( multiple put) command is used to transfer files from remote host.
+ftp allows some limited number of commands to be executed at ftp> prompt & summary of ftp command can be found by using ? at ftp> prompt |
+| Securely copy files from/to remote host | sftp username@hostname:remotefile localfile Communication is encrypted between two hosts. |
+| Test the tcp/ip connectivity between two hosts | ping hostname
+If you can ping a host the host is reachable from the machine that you are using .
+Router/firewall configuration may prevent ping to succeed . |
+
+| Backup and Restore |
+| --- |
+| backup and restore using tar , TApeaRchive | tar tvf filename.tar --- View the table of content of a tar archive
+tar xvf filename.tar --- Extract content of a tar archive
+tar cvf filename.tar file1 file2 file3 --- Create a tar archive called filename.tar using file1, file2,file3 .
+tar can't copy the special files , device files .Not suitable for taking root backup. |
+| backup and restore using cpio , CopyInputOutput | cpio is mostly used in conjunction with other commands to generate a list of files to be copied :
+#ls | cpio -o > /dev/rmt/c0t0d0 -- Copy the contents of a directory into a tape archive:
+#find . -depth -print | cpio -pd newdir --- copy entire directory to other place:
+#find . -cpio /dev/rmt/c0t0d0 --- Copy files in current directory to a tape
+cpio can copy special files and hence useful in taking root backup containing device file. |

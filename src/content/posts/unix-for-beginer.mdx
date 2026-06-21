@@ -1,0 +1,273 @@
+---
+title: "Unix Tutorial - Learn Unix OS Basics to get started"
+description: "The table shows the Unix/Linux Directory structure and description of files it stores."
+pubDate: 2009-12-20
+updatedDate: 2026-06-20
+pageType: guide
+topic: sysadmin
+tier: "TIER 2 (core reference)"
+tags: ["basics", "featured"]
+testedOn: ["Linux", "Unix"]
+---
+
+This is a Unix Tutorial where you can learn Unix OS Basics to get started with UNIX and Linux operating systems and covers Unix Directory structure , Unix Commads and Unix Shells
+
+## Unix Dir Structure
+
+The table shows the Unix/Linux Directory structure and description of files it stores.
+
+| Directory | Description |
+| --- | --- |
+| / | Primary hierarchy root and root directory of the entire
+file system hierarchy. |
+| /bin/ | Executable binary command files. |
+| /dev/ | Has nodes for devices , hard disk , tape etc |
+| /etc/ | Host-specific configuration files such as
+/etc/inittab , /etc/hosts |
+| /home/ | Users' home directories . |
+| /lib/ | Libraries needed by various Unix programs. |
+| /mnt/ | Temporary file system mount point . |
+| /opt/ | Optional application software packages installation
+directory . |
+| /proc/ | Virtual file system having kernel process files . |
+| /sbin/ | system binaries files such as init . |
+| /tmp/ | Temporary file system used to store temporary data of
+programs . |
+| /usr/ | user related command , programs , librar |
+| /usr/bin/ | Binary commands for all users . |
+| /usr/include/ | Include files required by programs.. |
+| /usr/lib/ | Libraries for the binaries in /usr/bin/ and /usr/sbin/. |
+| /usr/sbin/ | system binaries for users . |
+| /usr/share/ | shared file system |
+| /usr/src/ | Source code files |
+| /usr/local/ | Optional user programs and packages are installed here . |
+| /var/ | Directory to store dynamic files such as logs . Most
+programs has /var as default location for writing log , lock and spool files . |
+| /var/lock/ | Lock files. |
+| /var/log/ | Log files. |
+| /var/mail/ | Users' mailboxes. |
+| /var/spool/ | Spool for tasks waiting to be processed (e.g. print queues and unread mail). |
+
+## Unix commands
+
+Unix/Linux operating systems comes with online manual system which can be used to see the command details ,syntax options and examples on while working on a Unix system. Unix manual can be accessed using man command , syntax is man &lt;command name>
+
+Unix commands are listed in following sections based on command functionality and you can scroll down to see all the sections.
+
+Unix Command Sections :
+
+1. Wild card,
+2. dir level Operation
+3. File - Listing , moving
+4. File Create , edit , View
+5. File operation 6. Process
+7. User Admin
+8. System System Status
+9. Environment Variable
+10. Connectivity
+11. Backup and recovery
+12. Find files and directories You can also download a one page pdf version of the unix commands listed below.
+
+### Wild Card Characters
+
+Single character and match all wild card characters which can be used in Unix commands to substitute one or more characters
+
+* - The * wildcard character substitutes for one or more characters in a filename. For instance, to list all the files in your directory that end with .c, enter the command, ls *.c
+
+? - ? (question mark) serves as wildcard character for any
+
+one
+
+character in a filename. For instance, if you have files named
+
+prog1, prog2, prog3
+
+, and
+
+prog3
+
+in your directory, the Unix command:,
+
+ls prog?
+
+### Directory level Operation
+
+Commands to Change , make , move and remove the directory entries .
+
+**Change** cd dir Change to directory d **Make** mkdir dir Create new directory d **Move** mv dir1 dir2 Rename directory d1 as d2 **Remove** rmdir dir Remove directory d
+
+### File - Listing , moving
+
+Commands to list ,copy , move , rename , delete and type the files .
+
+list , no details only names ls filename , filename with wildcard character/s. list , details ls -1 filename , filename with wildcard character/s. move to directory mv filename dirname (wildcard character/s supported) copy file to other/current directory cp file directory/newfile or cp directory/oldfile . Copy file file1 into file2 cp file1 file2 move (rename ) file mv file1 file2 Rename file file1 as file2 Delete the file rm file , rm -rf directory - Recursively remove files & directly without any warning. Remove rm file Delete (remove) file f file file filename , file command tries to determine the file type , text , executable etc after comparing the values in /etc/magic .
+
+### File Create , edit , View
+
+Command/s to to create new files , edit & view existing file .
+
+vi - vi full screen editor vi filename , Opens a existing file or creates a new one does not exists. ed - Line Text editor ed filename count - Line, word, & char wc filename Text content display - List contents of file at once cat filename Text content display by screen : List contents of file screen by screen more filename Concatenate - file1 & file2 into file3 cat file1 file2 >file3
+
+### File operation
+
+Commands to change owner of file, compare files , sort a file , split large file , match a pattern in a file , list difference between two files .
+
+Change read/write/execute mode of fil **chmod mode file** chown **chown [-R] [-h] owner[:group] file** Compare two files **cmp file1 file2** Sort Alphabetically **sort file** Sort Numerically **sort -n file** Split f into n-line pieces **split [-n] f** match *pattern* **grep *pattern* file Outputs lines that** Lists file differences **diff file1 file2** head f Output beginning of file **head file** Output end of file **tail file**
+
+### Process
+
+Commands to find the Status of a process , suspend the process , stop the process , interrupt a process & kill a process .
+
+status process status stats **ps** Suspend current process **CTRL/z *** Interrupt processes **CTRL/c *** Stop screen scrolling **CTRL/s *** Resume screen scrolling **CTRL/q *** Sleep for n seconds **sleep n** Print list of jobs **jobs** Kill job n **kill %** Remove process n **kill -9 n** Resume background job n **bg [%n]** Resume foreground job n **fg [%n]** Exit from shell **exit**
+
+### User Admin
+
+Command to add user and change password of a user .
+
+add a new user login to the system **# useradd -u 655 -g 20 -d /home/ttes testlogin loginname** -u is userid , if not specified system takes highest available . -g group id should be existing in /etc/group , if not specified other or user is assigned. -d home directory , default is to use *user* as the directory name under the home directory. loginname - new login name to be created . **#useradd testlogin** will create a user by the name 'testlogin' with all default values . password Change **passwd &lt;user>** alias (csh/tcsh) - Create command **alias name1 name2** alias (ksh/bash) - Create alias command **alias name1="name2"** alias - Remove alias **unalias name1[na2...]**
+
+### System System Status
+
+Command to find quota , date , users , logged in user , finger [username] and history of Unix commands issued .
+
+Display disk quota **quota** Print date & time **date** List logged in users **who** Display current user **whoami** Output user information **finger [username]** Display recent commands **history**
+
+### Environment Variable
+
+Command to set and export system environment variables .
+
+set **set command alone displays the environment variables, it is used to set options in ksh like set -o vi** export **export variable** , export makes variable visible in sub shells. Set environment variable (csh/tcsh) to value v **sentenv name v** Set environment variable (ksh/bash) to value v **export name=v example : export TERM=vt100**
+
+### Connectivity
+
+Commands for connecting to other systems using telnet ,ssh , ftp , sftp , ping
+
+Connecting to a remote host **$telnet hostname/ip address** or **$telnet** Telnet brings up the login prompt of remote host and expects you to enter your user name & password .Without argument it enters command mode (telnet>) and accepts command listed by ? at telnet> prompt. Communication is not encrypted between two hosts. Securely connecting to a remote host **ssh username@hostname or ssh -l username hostname** Depending on ssh setting for your account you may or may not be asked a password to login. Your login/passwd will be same login password as you would use with telnet connection. Communication is encrypted between two hosts so if someone intercepts your communication he will not be able to use it. Copy files from/to remote host **ftp hostname** ftp expects you to enter your username/passwd or if it is ftp only account it will require ftp account password . put , mput (multipleput) command is used to transfer files to remote host. get , mget (multipleput) command is used to transfer files from remote host. ftp allows some limited number of commands to be executed at ftp> prompt & summary of ftp command can be found by using ? at ftp> prompt Securely copy files from/to remote host **sftp username@hostname: *remotefile localfile*** Communication is encrypted between two hosts. Test the tcp/ip connectivity between two hosts **ping hostname** If you can ping a host the host is reachable from the machine that you are using. Router/firewall configuration may prevent ping to succeed .
+
+Unix Shells
+
+Shell in UNIX acts as a command interpreter between user and Unix kernel as well as provides a strong scripting language .
+
+Following are the different types of Unix shells ,
+
+B shell
+
+, /bin/sh - This is the default Unix shell for many Unix operating systems.
+
+> Bourne shell was written by S. R. Bourne and its more emphasis is to use it as a scripting language rather than an interactive shell .
+Some of the features are : Provided support for environment variables using parameters and exportable variables.
+Redirection of program output and error . Command substitution using back quotes: `command`.
+embed a file/commands using input redirector &lt;&lt;
+"for ~ do ~ done" loops
+"case ~ in ~ esac" for selecting and responding to a data value .
+
+C-shell
+
+/bin/csh was designed to provide the interactive features lacking in b shell such as job control and aliasing .
+
+K shell
+
+/bin/ksh - was created by David Korn and has features of both B shell and C shell along with some additional features .
+
+Bash
+
+- the Bourne again shell was developed by GNU project .It is based on B shell language and has features of C and K shells.
+
+tcsh
+
+is the default shell of FreeBSD and its descendants. Essentially it is C shell with programmable command line completion, command-line editing, and a few other features.
+
+Zsh
+
+is a shell designed for interactive use and it has many of the useful features of bash, ksh, and tcsh along with many new features.
+
+### Unix Shells configuration files :
+
+b shell
+
+> shell prompt : $
+executable file : /bin/sh
+
+Read on interactive/non interactive login to bash
+/etc/profile
+~/.profile
+
+bash shell
+
+> shell prompt : $
+executable file : /bin/bash
+
+Read on interactive/non interactive login to bash
+/etc/profile
+~/.profile
+~/.bash_profile
+~/.bash_login
+
+Always read on invoking bash
+~/.bashrc
+
+/etc/profile login login login
+~/.profile login login
+
+csh shell
+
+> shell prompt : %
+executable file : /bin/csh
+
+Read on csh shell invocation .
+/etc/csh.cshrc
+~/.cshrc
+
+Read on interactive/non interactive login to tcsh shell
+/etc/.login
+~/.login
+~/.logout
+/etc/csh.login
+
+ksh
+
+> shell prompt : $
+executable file : /bin/ksh
+
+Read on interactive/non interactive login to bash
+/etc/profile
+~/.profile
+
+tcsh shell
+
+> shell prompt : &
+executable file : /bin/tcsh
+
+Read on tcsh shell invocation .
+~/.tcshrc
+/etc/csh.cshrc
+~/.cshrc
+
+Read on interactive/non interactive login to tcsh shell
+/etc/.login
+~/.login
+~/.logout
+/etc/csh.login
+
+zsh
+
+> shell prompt : $
+executable file : zsh
+
+Configuration files :
+
+Always read on invoking zsh
+~/.zshenv always
+/etc/zshenv always
+
+only read on interactive login to zsh.
+~/.zshrc
+/etc/zshrc
+
+Read on interactive/non interactive login to zsh
+/etc/zprofile login
+/etc/zlogin login
+/etc/zlogout login
+/.zprofile login
+~/.zlogin login
+~/.zlogout login

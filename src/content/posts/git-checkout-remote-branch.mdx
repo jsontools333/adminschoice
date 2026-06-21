@@ -1,0 +1,82 @@
+---
+title: "git checkout remote branch - How to, Examples and Options"
+description: "Branch bugfixes set up to track remote branch bugfixes from origin."
+pubDate: 2020-12-22
+updatedDate: 2026-06-20
+pageType: reference
+topic: sysadmin
+tier: "TIER 2 (core reference)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+```bash
+git checkout command is used to checkout code from your local repository. if you are working in a project where many different teams are collaborating , you will need to use git remote checkout to review and checkout the code from the remote server hosting the repository. find out how to use git remote checkout correctly with examples. Git , the free and open source distributed version control system used by developers and development teams for their code base. Working with different teams and remote repositories may be challenging for developer working with local repositories only. Learn how git checkout remote branch works in git and related commands like fetch, pull and option like -b.
+```
+
+git checkout command is used to checkout code from your local repository. if you are working in a project where many different teams are collaborating , you will need to use git remote checkout to review and checkout the code from the remote server hosting the repository.
+
+## How git remote checkout works ?
+
+normally git checkout works because it knows about local repository and its branches. To checkout from remote git branch you have to make your local system aware of remote branches by fetching the remote branches to your local system and setting up git branch tracking so that your local and remote systems are aware of commit changes.
+
+## git fetch
+
+```bash
+git fetch origin ### origin is name of remote repository
+```
+
+git fetch only downloads the data that have changed, for the first time run it will download all and create the local copy of the branches with same name as remote. fetch doesn't integrate or merge anything so it is safe operation to performs as compared to git pull which tries to merge the code.
+
+git fetch next times refreshes the remote branch view available to you with the changes that other teams have done since your last fetch
+
+by convention git creates the local branches with same name as remote branch names and after git fetch you can checkout the remote branch using same remote branch name. As the changes between local and remote branches are synched real-time , they have to be kept in sync with git fetch.
+
+## git fetch v/s git pull
+
+as compared to git fetch git pull origin master command will pull the remote master and merge into your local master, it may cause code merge issues and conflicts. perform a pull operation when all the changes have been committed.
+
+## git checkout remote branch with tracking
+
+once you have fetched the remote branches in to local system you can setup tracking to keep track of changes that took place since the time you did a fetch or pull from remote branch. Tracking keeps track of commits in local and corresponding remote branch and git can tell you if your local branch is in sync, behind or ahead of commits in remote branch.
+
+> $ git checkout bugfixes
+Branch bugfixes set up to track remote branch bugfixes from origin.
+Switched to a new branch 'bugfixes
+
+git fetch sets the tracking for origin/master branch , explicit tracking for any other branch can be set with --track option
+
+> $ git checkout --track origin/xyzbranch
+
+Branch xyzbranch is set up to track remote branch xyzbranch from origin.
+Switched to a new branch 'xyzbranch'
+Based on the remote branch "origin/newsletter", we now have a new local branch named "xyzbranch"
+
+## git checkout selective remote branch
+
+selective git branch, other than master, can be checkout with creation of new branch with tracking as in following example,
+
+-b option creates new branch with branch name as argument ( same or different from the remote branch name ) and updates it with code from remote branch - origin branch name. without -b option the new branch is created with same name as remote branch.
+
+```bash
+git checkout -b core/bugfixes/urgent origin/core/bugfixes/urgent Message: Branch 'core/bugfixes/urgent ' set up to track remote branch 'core/bugfixes/urgent ' from 'origin'.
+Switched to a new branch 'core/bugfixes/urgent '
+```
+
+Note
+
+: if you get this error message - fatal: git checkout: updating paths is incompatible with switching branches - you have to do a git fetch origin
+
+## git push remote server
+
+git push command is used to push changes to the local copy of remote branches to the remote server. git push command allows you to publish changes and others teams using remote branches can now see your changes.
+
+```bash
+git push
+```
+
+## Cleaning up local branches
+
+--prune option is used to cleanup and remove reference to non existing and removed branches in the remote
+
+> $ git fetch origin --prune

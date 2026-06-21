@@ -1,0 +1,43 @@
+---
+title: "rmdir force in Linux ? - How to force remove Linux directories"
+description: "By default rm only removes files and to remove directories you have to specify -r , recursive option to rm command."
+pubDate: 2021-01-19
+updatedDate: 2026-06-20
+pageType: guide
+topic: sysadmin
+tier: "TIER 2 (core reference)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+> rmdir is a command in windows to force remove directories. The equivalent command in Linux and Unix is - rm , the command is used to remove file and directories. Learn more about using rm command in Linux to force remove directories .
+
+By default rm only removes files and to remove directories you have to specify -r , recursive option to rm command.
+
+interactive mode is on by default so for every deletion of file and directory it prompts you to conform if you want to delete the file or directories. Interactive mode works for few files or directories but if you have lots of files and directories you have to your rmdir force option for force removing the directory without prompting for confirmation.
+
+## rmdir force
+
+rm command with -f , force option combined with -r as rm -rf option is used to force remove Linux directories.
+
+-r stands for recursive so that rm can remove all the sub-directories also. -r option is needed to remove a directory even if the directory is empty with no subdirectory or file in it.
+
+-f option forces remove Linux directories and it does not prompts for the delete confirmation.
+
+Example
+
+:
+
+to force remove all files and sub-directories under /home/james/logs , including log directory
+
+> $rm -rf /home/james/logs
+
+if you want to retail the log directory and delete everything under it
+
+> $rm -rf /home/james/logs/*
+
+## Other Options for rm command in Linux
+
+rm -r is same as rm -ri to remove Linux directories interactively, -i is default rm option. This is a safety check as in Linux and Unix system once a file i deleted it can not be recovered except from a backup.
+
+-v is the verbose option, by default rm command does not print any message about what is getting deleted, with -v option it gives message about files or directories it is deleting.

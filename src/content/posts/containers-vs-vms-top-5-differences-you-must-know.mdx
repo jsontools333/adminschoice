@@ -1,0 +1,53 @@
+---
+title: "Containers Vs VMs : Top 5 Differences you must know"
+description: "Virtual machine ( VM ) have been around for few years from now and containers are picking up as new alternative to VM."
+pubDate: 2021-01-11
+updatedDate: 2026-06-20
+pageType: guide
+topic: sysadmin
+tier: "TIER 2 (core reference)"
+tags: ["linux", "technology", "top 10", "top list"]
+testedOn: ["Linux", "Unix"]
+---
+
+> Virtual Machines and Containers offer virtualization technology for creating scalable solutions. Virtualization allows to quickly build and deploy a large number of hosts or containers in a very short time and saves time and money as compared to installing and deploying physical servers. find out the top differences between VMs and containers.
+
+Virtual machine ( VM ) have been around for few years from now and containers are picking up as new alternative to VM. KVM, Xen, Hyper-V, AND ESXi are some of the popular hypervisor technologies for creating and managing VMs. Linux container technology have been available for more than 10 years in the form of LXC but Docker containers have gained popularity in the last few years. Beside Docker other container technologies are - Solaris Containers, AIX Workload Partitions and FreeBSD jails
+
+Here are top five difference between VMs and Containers.
+
+## Containers and VMs differ in OS & hardware implementation
+
+VM uses complete OS and a slice of hardware resources: Hypervisor allows creating VMs with different OS images utilizing a slice of cpu, memory and network resources of hypervisor.
+
+Containers have to be OS same OS as its hosting server. Containers uses a parent OS kernel & read only copy of parent OS bin/lib files . Hardware resources are shared among the containers on a server.
+
+## Containers and VM has huge difference in size
+
+VM run complete OS and its image can run in multi GB in size, because containers inherit kernel, bin and lib from hosts server, they are just few MB in size.
+
+## VMs are slower to boot, containers are almost instant
+
+VMs boot up like any other machine and takes time to initialize OS services and hardware. Containers are ready to use and can be brought into existence almost instantly.
+
+## VMs provide complete isolated environment, Containers are no so isolated
+
+VMs with their own OS provide complete application isolation from other VMs on same hypervisor. Containers sharing same OS as server do not provide complete application isolated environment.
+
+## Containers are easy to maintain
+
+Each VM needs individual patching and OS updates while the containers sharing the common OS needs just parent OS updated to reflect in all containers.
+
+[caption id="attachment_2552" align="aligncenter" width="479"]
+
+![figure](/images/vm-structure.png)
+
+VM Organization[/caption]
+
+[caption id="attachment_2553" align="aligncenter" width="499"]
+
+![Container Structure](/images/container-structure.png)
+
+Containers Organization
+
+[/caption]

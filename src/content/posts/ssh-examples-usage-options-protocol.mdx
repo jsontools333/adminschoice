@@ -1,0 +1,117 @@
+---
+title: "ssh examples, usage, Options, protocol"
+description: "SSH is used to protect information from others who may use it to hack your system or can misuse it."
+pubDate: 2021-08-20
+updatedDate: 2026-06-20
+pageType: reference
+topic: networking
+tier: "TIER 2 (core reference)"
+tags: ["basics", "security"]
+testedOn: ["Linux", "Unix"]
+---
+
+> The Secure Shell (SSH) Protocol is a protocol for secure remote login and other secure network services over an insecure network. ssh and sftp are two commands used to login and file transfer securely. Learn about ssh usage with examples & available options.
+
+## What is SSH used for?
+
+ssh stands for **S** ecure **SH** ell , it provides secure communicational channel between ssh client and ssh server for login and file transfers. In a non secure login like telnet the communication happens in clear text and anyone observing the network packets can see all the information being sent through. In ssh however the information is transmitted in a encrypted form, this encrypted information can only be decrypted by ssh client and server
+
+telnet -> login > my username/ my password ------my username/ my password------> my username/ my password
+
+```bash
+ssh -> login > my username/ my password ------cskl;csmcxslc86nscljdskcbdhjb0 ------> my username/ my password
+```
+
+SSH why it is used?
+
+SSH is used to protect information from others who may use it to hack your system or can misuse it.
+
+## How do I connect to SSH?
+
+if a system is running a ssh server program , you can connect to it by any of the ssh client programs such as :
+
+native ssh command - ssh command is avaiable in Linux, Unix MacOS systems
+
+ssh clients : there are free ssh clients that you can download from internet and use to connect to ssh server, for example
+
+1. putty - most popular for windows platform , it support ssh and non ssh mode.
+2. Secure CRT - it support ssh and non ssh mode
+3. Terminal - default client application in mac to make a ssh connection
+4. iterm2 - ssh client application in mac with more features than Terminal.
+
+ssh uses key based authentication, which is useful in password less access for login and automated scripts
+
+Complete instructions for ssh passwordless access is here
+
+- [ssh Without Password in Few Simple Steps](/ssh-without-password/)
+
+## What is SSH command?
+
+From a Linux or Unix terminal or from Mac's terminal / iterm2 application type in :
+
+some ssh example to use with user and host combinations.
+
+```bash
+ssh hostname ## it takes same user id as logged in with.
+ssh someuser@hostname ## specify other user id then logged in with,
+ssh -l someuser hostname ## specify other user id then logged in with,
+ssh ip-address
+ssh someuser@ip-address
+ssh -l someuser ip-address by default the secure port number is 22 but it can be specified with -p option.
+```
+
+from ssh client applications , fill in the server name or ip-address and set the port number to 22
+
+click on connect
+
+On the very first connect, the client receives the server host keys and if you accept it from the prompt it saves these keys in ~/.ssh/ authorized_hosts file. Once saved it won't prompt and used stored keys to validate identity of remore host.
+
+In case the remote server OS is redeployed , the server key will change and the connect will prompt that server keys have changed as compared to the stored ones. If you are sure that keys have indeed changed and you are not being redirected to some other server, you can remove the old keys from ~/.ssh/ authorized_hosts file by searching for the host name, deleting the entire line and saving. Next connection attempt will save the new key.
+
+## ssh options
+
+ssh man shows complete details but here are command line options you can use with ssh The following ssh command line options can be used ( openssh version)
+
+- -1 Use protocol version 1 only.
+- -2 Use protocol version 2 only.
+- -4 Use IPv4 addresses only.
+- -6 Use IPv6 addresses only.
+- -A Enable forwarding of the authentication agent connection.
+- -a Disable forwarding of the authentication agent connection.
+- -C Use data compression
+- -c cipher_spec Selects the cipher specification for encrypting the session.
+- -D [bind_address:]port Dynamic application-level port forwarding. This allocates a socket to listen to port on the local side. When a connection is made to this port, the connection is forwarded over the secure channel, and the application protocol is then used to determine where to connect to from the remote machine.
+- -E log_file Append debug logs to log_file instead of standard error.
+- -F configfile Specifies a per-user configuration file. The default for the per-user configuration file is ~/.ssh/config.
+- -g Allows remote hosts to connect to local forwarded ports.
+- -i identity_file A file from which the identity key (private key) for public key authentication is read.
+- -J [user@]host[:port] Connect to the target host by first making a ssh connection to the pjump host[(/iam/jump-host) and then establishing a TCP forwarding to the ultimate destination from there.
+- -l login_name Specifies the user to log in as on the remote machine.
+- -p port Port to connect to on the remote host.
+- -q Quiet mode.
+- -V Display the version number.
+- -v Verbose mode.
+- -X Enables X11 forwarding.
+
+## ssh windows
+
+You can user ssh clients like putty or SecureCRT or user windows PowerShell for ssh command.
+
+## ssh protocol
+
+Core ssh protocol is composed of three major protocols which has been standardized.
+
+he SSH protocol consists of three major components:
+
+1. The Transport Layer Protocol which provides server authentication,
+confidentiality, and integrity with perfect forward secrecy.
+2. The User Authentication Protocol which authenticates the client to the server.
+3. The Connection Protocol which multiplexes the encrypted tunnel into several
+logical channels.
+
+Following RFC documents describe the ssh architecture and protocols in details.
+
+- [RFC 4251 - The Secure Shell (SSH) Protocol Architecture](https://assets.ctfassets.net/0lvk5dbamxpi/7wNRdbPyeUDql7sZjv3ZTp/ef86cf604b532728ee8da263d27883d8/RFC_4251_-_The_Secure_Shell__SSH__Protocol_Architecture)
+- [RFC 4253 - The Secure Shell (SSH) Transport Layer Protocol](https://assets.ctfassets.net/0lvk5dbamxpi/6SgZj3wup1xrZCA7xTGi4C/bb3ccab6e26add8bd827c5b27cb5376b/RFC_4253_-_The_Secure_Shell__SSH__Transport_Layer_Protocol)
+- [RFC 4252 - The Secure Shell (SSH) Authentication Protocol](https://assets.ctfassets.net/0lvk5dbamxpi/4cdqjnczrKu0Ik7kNJRDLL/04a72150bf42d6fa3c3c566acb74bc8a/RFC_4252_-_The_Secure_Shell__SSH__Authentication_Protocol)
+- [RFC 4254 - The Secure Shell (SSH) Connection Protocol](https://assets.ctfassets.net/0lvk5dbamxpi/78J6P4Zl58BtEfH4y9fTU8/8f67e1ed07e439d70703ac94af1e343c/RFC_4254_-_The_Secure_Shell__SSH__Connection_Protocol)

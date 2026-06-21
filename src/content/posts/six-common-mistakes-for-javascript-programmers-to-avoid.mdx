@@ -1,0 +1,168 @@
+---
+title: "Six Common Mistakes For JavaScript Programmers To Avoid"
+description: "JavaScript is one of the leading and most popular programming languages today."
+pubDate: 2019-10-20
+updatedDate: 2026-06-20
+pageType: guide
+topic: shell
+tier: "TIER 2 (core reference)"
+tags: ["programming"]
+testedOn: ["Linux", "Unix"]
+---
+
+JavaScript is one of the leading and most popular programming languages today. But even though it is fairly easy to learn and use, there are still some mistakes that many beginners make. Here are six common mistakes for JavaScript programmers to avoid.
+
+“+” Is For Addition and Concatenation
+
+Unlike some other languages, JavaScript uses the “+” symbol both for addition and concatenation. Consequently, you must always be careful when writing statements in which you use the “+” sign.
+
+For example, here is a code:
+
+var x = 10 + 4
+
+Here,
+
+x
+
+is what you would expect the result to be which is 14. JavaScript requires you to use a mix of strings and numbers because of the user input. So, if you use this code:
+
+var x = 10 + “4”
+
+The x variable will be equal to 104. This is due to “4” being a string and the “+” sign automatically being translated into concatenation when working with strings in JavaScript.
+
+Such a mistake usually happens when you take form submission values as the input itself forgetting the user's input may be a string. In this case, a good idea would be to convert the string value to an integer.
+
+Use “If” Statement Comparison Operator Accordingly
+
+Another very common mistake that happens even to professional JavaScript programmers is the incorrect usage of the “if” statement comparison operator. Even if this is a typo in your code, it can create a huge logic bug in the end. This is why it’s so important to avoid making this mistake at all costs.
+
+The operators in question are “==” and “=”. The “==” operator makes a comparison while the “=” operator assigns a value to a variable. Unlike other programming languages that usually throw an error in this situation, JavaScript will actually evaluate your statement returning a true or false.
+
+For example, let’s look at this statement:
+
+var x = 0;
+
+if (x = 5)
+
+In this example, the “=” operator is used in the “if” statement instead of the “==” operator. In a different language, this would have created an error, but JavaScript reads it as true.
+
+JavaScript Doesn’t Do Block-Level Scope
+
+In many programming languages, you have the ability to define a variable solely for your loop structure. After you loop through the variable, it will be destroyed once the loop exists. To illustrate this better, let’s look at this code:
+
+for (var j = 0; j &lt; 11; j++) &#123; j = j + 1; &#125;
+
+console.log ( j );
+
+The majority of developers would believe
+
+j
+
+here to be null. In some other languages, this
+
+j
+
+variable can be used in the “for” loop and then destroyed after the loop is finished. However, this is not the case for JavaScript.
+
+In JavaScript, the output of the
+
+j
+
+variable would be 10. This is why you need to keep this in mind and be careful when writing your code. It’s common for beginners to miss this difference that sets JavaScript apart from other languages. It can cause serious bugs in your code so it is crucial that you remember about it.
+
+Don’t Use Named Object Indexes as Arrays
+
+JavaScript has arrays that use numeric integer indexes. Objects can also be used similarly to arrays, though they require named indexes. Similarly, if you use a named index in an array, your code will simply return the wrong result.
+
+Here are two examples to illustrate how this works:
+
+var color = [];
+
+color[0] = "blue";
+
+color[1] = "purple";
+
+color[2] = “orange”;
+
+var x = color.length;
+
+var y = color [0];
+
+In this code, the array is “color” and the colors are assigned to the first three indexes. The length is then evaluated and the first color is assigned to the
+
+y
+
+variable. The
+
+x
+
+variable evaluates to 3 while the
+
+y
+
+variable contains value “blue”.
+
+var car = [];
+
+car ["color"] = "red";
+
+car ["make"] = "chevy";
+
+car ["model"] = “corvette”;
+
+var x = car.length;
+
+var y = car [0];
+
+Because of the named indexes, we can understand that this code defines an object. The
+
+car
+
+has three named indexes that define it. Unlike with arrays, the
+
+x
+
+and
+
+y
+
+variables are undefined. This means that they don’t evaluate to valid results with the length property evaluating to 0 and the
+
+y
+
+being assigned “undefined”.
+
+Reference To “This” Correctly
+
+There has been an increase in the proliferation of self-referencing scopes within callbacks and closures. These are a very common source of “this/that confusion”. The context influences this a lot too.
+
+The obvious, traditional solution to this which is compliant with old browsers would be to save your reference “this” in a variable that can be inherited by the closure afterward. Alternatively, for newer browsers, you could use the “bind()” method in order to pass in the proper reference.
+
+Otherwise, you could be getting the “Uncaught TypeError: undefined is not a function” error. It could be the result of “setTimeout()” being invoked as “window.setTimeout()”.
+
+Don’t Confuse Undefined and Null
+
+Unlike in other languages where you can set null to variables, JavaScript uses undefined and null. However, it defaults objects to null and variables to undefined. There are two situations when these values are assigned:
+
+- An incorrect calculation was made.
+- You assigned a null reference to an object.
+
+You have to be careful when comparing objects because an object should be defined for it to be null.
+
+Consider this code:
+
+if (object !== null && typeof object !== "undefined")
+
+It will give you an error if the object is undefined. What you want to do is to first check whether or not the object is undefined. Only then should you identify if it’s null:
+
+if (typeof object !== "undefined" && object!== null)
+
+It’s an easy mistake to make, but it’s not that difficult to avoid if you stay alert at all times.
+
+Final Thoughts
+
+All in all, avoiding these mistakes will help you prevent your code from turning into an incomprehensible mess. Follow the tips in this article and you will become a better programmer by mastering JavaScript.
+
+**Author Bio :**
+
+Frank Hamilton has been working as a translator at translation service [TheWordPoint](https://thewordpoint.com/) . He is a professional writing expert in such topics as blogging, digital marketing and self-education. He also loves traveling and speaks Spanish, French, German and English.

@@ -1,0 +1,105 @@
+---
+title: "3 very Easy ways to install python in Linux"
+description: "Python is a high-level programming language that is easy to learn and use."
+pubDate: 2022-12-22
+updatedDate: 2026-06-20
+pageType: guide
+topic: python
+tier: "TIER 2 (core reference)"
+tags: ["basics", "python for beginners"]
+testedOn: ["Linux", "Unix"]
+---
+
+Python is a high-level programming language that is easy to learn and use. It has an English-like syntax, making it easy to read and understand. it was designed with the goal of being very readable as well as straightforward for beginners to learn how to program in it. Find out how you can easily install it in Linux OS.
+
+## How to Install Python in Linux systems
+
+## Install Python in Ubuntu Linux
+
+Check if you have python already installed
+
+**open a terminal and on the shell prompt run**
+
+Try both python commands to see if older or newer version exists
+
+> $ python --version
+OR
+$ python3 --version
+
+## Use apt-get to install python3 from apt-get repo
+
+**Refresh repo to get the latest available version of python.**
+
+$ sudo apt-get update
+
+**Install python version 3**
+
+$ sudo apt-get install python3
+
+**To Install other newer or older versions of python**
+
+Use Deadsnakes PPA. Personal Package Archives (PPA) are repositories that has all python versions
+
+**Install prerequisite package first - software-properties-common**
+
+$ sudo apt-get install software-properties-common
+
+**Add PPA repo to local repo**
+$ sudo add-apt-repository ppa:deadsnakes/ppa
+
+**Update repo and install python 3**
+$ sudo apt-get update
+$ sudo apt-get install python3.8
+
+## Install Python in other Linux distributions using dnf
+
+use dnf Package management utility for RHEL, Fedora, and CentOS (replaces yum), DNF or **Dandified YUM** is the next-generation version of the Yellowdog Updater, Modified (yum), a package manager for . rpm-based Linux distributions.
+
+> $ sudo dnf install python3
+
+## Install Python 3 From Source Code
+
+You can download and compile the source code after downloading it from python.org download site.
+
+URL : [https://www.python.org/downloads/source/](https://www.python.org/downloads/source/)
+
+Steps :
+
+**Update your system's local repository list:**
+
+> $sudo apt update
+
+**Install supporting dependencies**
+
+```bash
+sudo apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget
+```
+
+**Create directory to keep the Python source files:**
+
+```bash
+mkdir /python
+cd /python
+```
+
+**Download the Python source code to this directory**
+
+```bash
+wget https://www.python.org/ftp/python/3.11.1/Python-3.11.1.tgz
+```
+
+**Extract the compressed tgz file that you just downloaded**
+
+```bash
+tar -xvf Python-3.11.1.tgz
+```
+
+**Build the package with make install**
+
+```bash
+sudo make install
+```
+
+Watch this quick video to learn about installing python in Linux.
+
+&lt;https://youtu.be/bgU93PqbGlw>

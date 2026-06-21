@@ -1,0 +1,142 @@
+---
+title: "chmod Quick Referance with Examples"
+description: "Following examples sets the setuid , setguid on file along with normal 755 permission."
+pubDate: 2017-03-01
+updatedDate: 2026-06-20
+pageType: reference
+topic: sysadmin
+tier: "TIER 2 (core reference)"
+tags: ["basics"]
+testedOn: ["Linux", "Unix"]
+---
+
+### What is chmod ?
+
+```bash
+chmod (
+```
+
+Ch
+
+ange
+
+Mod
+
+e ) is a command line utility in Unix , Linux and other Unix like systems to change the read, write, execute permissions of a file for owner , group and others.
+
+### How to use chmod?
+
+Chmod command is used in two ways :
+
+1. Using octal value & position
+
+: Sets the permission for owner, group and others with octal values , 4 for read , 2 for write , 1 for execute and any sum of these number to get cumulative permissions.
+
+```bash
+chmod syntax using octal mode
+chmod [OPTION] MODE FILE
+```
+
+2. Using symbolic values to add, remove the file permission
+
+u for user , g for group , o for others a for all ; r for read , w for write , x for execute , + , - & = for adding , removing and assigning r w x permissions.
+
+```bash
+chmod syntax for symbolic values
+chmod [OPTION] MODE1,MODE2 FILE
+```
+
+### chmod options
+
+-R - Recursively change the permissions in the file under the directory.
+
+## chmod examples using octal mode :
+
+- First column shows the chmod command ,
+- second column shows how the value is calculated for the permission
+- last columns of owner, group, others shows individual octal values and actual bit set on file as seen by ls -l.
+- For setting any other permission combination for owner, group & other , pick corresponding value from each column and use with chmod command , for example chmod 264 file , chmod 400 file , chmod 755 file etc.
+
+|  |  | OWNER | GROUP | OTHERS |
+| --- | --- | --- | --- | --- |
+| Permissions | Value | octal value & bit set |
+| rwx
+Read write Execute
+$chmod 777 file | 4+2+1 | 7
+rwx | 7
+rwx | 7
+rwx |
+| rw
+Read & Write
+$chmod 666 file | 4+2 | 6
+rw_ | 6
+rw_ | 6
+rw_ |
+| rx
+Read & Execute
+$chmod 555 file | 4+1 | 5
+r_ x | 5
+r_ x | 5
+r_ x |
+| r
+Read only
+$chmod 444 file | 4 | 4
+r_ _ | 4
+r_ _ | 4
+r_ _ |
+| w
+Write only
+$chmod 222 file | 2 | 2
+_w_ | 2
+_w_ | 2
+_w_ |
+| x
+Execute only
+$chmod 111 file | 1 | 1
+_ _ x | 1
+_ _ x | 1
+_ _ x |
+
+## chmod examples using symbolic mode :
+
+Symbol are used to assign the permissions :
+
+- **u** - user , **g** - group, **o** - others , **a** - all
+- **+** to add permission , **-** to remove permission , **=** to assign permission
+- **r w x** is used for read , write,execute , **s** is used to set the sticky bit
+
+### Examples
+
+- chmod ug+x file ; assign execute permission to user and group in file
+- chmod a+x &lt;file> ; assign execute permission to all in file
+- chmod o-x &lt;file> ; remove execute permission to others in file
+- chmod go+r &lt;file> ; assign read permission to group & others in file
+- chmod u+rwx ,g+rw,o+r file
+
+### Special permissions - sticky bit , setuid , setguid bit
+
+### sticky bit
+
+when sticky bit is set the file or script is kept in swap space and loaded in to memory on next request. This makes memory loading faster.
+
+sticky bit is represented by t in symbol mode , for example
+
+> $chmod +t file.sh
+
+In octal mode sticky bit is represented by 1
+
+> $chmod 1755 file.sh
+
+### Set user id - setuid and set group id - setguid bits
+
+when these bits are set for user or groups , they are given effective permission of owner of the file during run time
+
+for example , if file.txt is owned by root and you need to give just run time root permission to some user , you can set the setuid for file.
+
+Following examples sets the setuid , setguid on file along with normal 755 permission.
+
+> $chmod 4755 file.txt
+
+you need to give just run time root permission to some group of users , you can set the setgid for file.
+
+> $chmod 4755 file.txt

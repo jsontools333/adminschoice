@@ -1,0 +1,358 @@
+---
+title: "Application Monitoring"
+description: "Discussion on application monitoring should start early at least from the time when deployment details are being worked out."
+pubDate: 2016-07-20
+updatedDate: 2026-06-20
+pageType: reference
+topic: sysadmin
+tier: "TIER 2 (core reference)"
+tags: ["featured", "monitoring", "performance"]
+testedOn: ["Linux", "Unix"]
+---
+
+Application monitoring is a very important aspect of a project but unfortunately not much attention is paid to develop the effective monitoring while the projects are still movingh to completions. Once project is complete & live lack of proper monitoring costs in terms of downtime when support persons are not aware if application is having some problems or application not working at all.
+Discussion on application monitoring should start early at least from the time when deployment details are being worked out. Some application may require some specific scripts or tools or authorizations, an early discussion on monitoring will make it in a better position to address the
+delays in its implementation.
+
+This document gives a blue print to get start building a application monitoring framework in your organization by providing a basic introduction to the challenges, type of monitoring and best practices. 
+
+Following topics are covered in this article. 
+1. Challenges in application monitoring
+2. Types of Monitoring for application
+3. Best Practices in application monitoring
+4. Implementation of application monitoring
+
+Challenges in Application monitoring
+
+1. Proactive Monitoring
+
+: Proactive monitoring means
+monitor the system and application health and take corrective
+action when it reaches a certain threshold level .The threshold level is
+defined as the level where application is not showing deterioration but can
+deteriorate if corrective actions are not taken . The biggest challenges
+is to gather the statistics to workout a threshold and number of parameters
+and process that needs to be monitor . Applications which interact
+directly with the customer for example eCommerce, banking needs to be monitored proactively so that problems are
+detected even before it impacts the end user customer.
+
+2. Complexity & number of applications
+
+: An application may
+become more complex if it has a global user base. The application has to
+support multiple languages, culture and currencies. Application may have
+multiple instances located in different regions of the world and may be using
+different time or logging format. To effectively monitor global
+applications one has to under stand the application instances their
+inter connectivity, flow coordinate with regional teams and in most cases
+depend on regional teams for monitoring the application.
+
+3. Shared Systems
+
+: Applications are often shared in a system in
+order to utilize the full capacity of the hardware and this implementation brings
+in its own set of challenges. For a single application system it is
+easier to track the resources like memory, CPU, disk, network bandwidth but in
+shared application environment some application may take the resources and
+others may get impacted for apparently no fault of their own. Sometime
+application owners may not be contactable to take corrective actions.
+
+4. Clustered Systems
+
+: To avoid a single point of failure
+applications are hosted in a clustered environment with number of machines
+in different network and locations. From monitoring perspective it poses
+another challenge of keeping track of the request &
+failure logs , memory , CPU network , disk resources as one has to look
+at all the cluster component machines logs and resource just to isolate which
+one is giving bad performance .
+
+5. Limited Logging in production environment
+
+: Since volume of
+transactions are very high and application code has already been run
+through performance, reliability and quality assurance cycles the
+application code in the production environment is generally enabled for
+minimum logging information . This may lead to situation when actually
+indicator of a problem may not show up in the logs . The logs may not
+show the error message until the logging level increased .
+
+6. Custom logging in production
+
+: Logging in online production
+environments at the most can be changed to higher level as provided by the
+code. In case of particular problem when logging and other debugging methods
+does not provide a clue to the problem special instrumented code has to
+be developed and deployed to capture error condition events . The instrumented
+code has to be deployed in production environment only since the problem
+could not be replicated under test conditions .Deploying a custom code in
+production calls for application downtime which may not be acceptable to
+the application owners and business groups involved and also require considerable efforts on part of supporting team to maintain it . This custom code may get overwritten by the next release cycle code .
+
+Types of Monitoring for applications
+
+: 
+Applications are simultaneously monitored at various points to ensure its availability and monitoring as a whole falls under
+following categories :
+
+1. Health Monitoring
+
+: As a proactive step application
+health has to be monitored constantly in order to address any issue
+before it becomes a serious issue . Health monitoring in a simple
+arrangement will consists of taking a snapshot of system &
+application parameters and comparing it to the standard benchmarks . For
+example in a system if a transaction is known to take around one second to
+complete and we can monitor this response time and setup alerts if the
+response time increases . Automated monitoring of health parameters is the
+best way of ensuring high availability of an application environment.
+
+2. Error Monitoring
+
+: Errors in any application can impact the user
+experience adversely. An error condition in an application can cause user
+experience to fail out rightly or can cause unexpected errors such as time
+outs or failure to submit or display the requested data . Errors can
+arise either due to software problem , relating to application
+code , web server , application server or database server or due
+to an hardware issues relating to memory , CPU processing , disk space or
+network issues .
+
+These type of errors are monitored differently , application errors are
+mostly monitored by analyzing the application , web server , application
+server logs , understanding the error message and using that error
+message to find the nature of problem . For example an application
+may stop processing new requests and from log files we may find the
+possible reason for this behavior if the application is not able to
+process the requests due to resource shortage like cpu , memory ,network
+bandwidth , database performance etc. Application monitoring requirement
+and tools to monitor can be designed by studying the application
+documentation , architecture , platform , error messages etc.
+
+Hardware monitoring is done using the standard tools and commands available
+for the particular hardware. Every operating system has tools and commands to
+monitor memory usage , CPU usage and disk usage but to monitor & report
+these resources on a regular basis custom scripts can be written which
+is independent of application code .
+
+3. Performance Monitoring
+
+: Performance of an application is
+critical to create good user experience. An application which responds
+to user requests in reasonable amount of time will have a good impact on
+user whereas an application which takes seconds or minutes to respond
+will cause users to abandon the application . Application Performance is
+derived from application code and supporting hardware . The code ensures that
+the program routines incorporated in the program are capable of handling at
+least desired number of actual user requests and hardware provides the
+necessary memory and processing capabilities..
+
+Application performance can be monitored from the application access
+time , request processing time & time reported for various transactions in
+the application logs . While the application logs may provide some data about
+the processing time actual user experience can be simulated by sending
+requests to applications from different locations and measuring the resulting
+application response time in real-time.
+
+4.Configuration Monitoring
+
+: Applications releases and
+operating system changes can impact the hardware and software configuration of
+a machine .It is very important to monitor configuration to avoid any
+undocumented and untested configuration element .Each of the configuration
+change needs to be documented and monitored for any unauthorized change
+. The best way to monitor configuration is through a change control process
+where a change is submitted approved and them implemented . The change control
+process keeps record for all the changes and allows to monitor
+the changes by the persons responsible for the applications.
+
+5. Security Monitoring
+
+: In today's global scenario it is very
+important to monitor applications for security . Security monitoring
+involves ensuring latest security patches are implemented in application
+servers , web servers & database servers . Software
+companies frequently issues security warning in their software
+products and these security warnings should be carefully studied
+& implemented to ensure compliance and protection against hackers . At any given point of time the software versions should be monitored to understand if they poses any security threat and update them with newer & secure safe version .
+
+Some companies have security teams who constantly monitor hardware and
+software for possible security breach and send their recommendations but
+generally support team should subscribe to the newsletters from software
+companies which informs about the later security threats .
+
+Best Practices for application monitoring
+
+Systems can fail due to various reasons related to hardware ,
+operating system , network or applications itself . Sometimes despite
+good efforts systems and applications fail . Although one can not
+assure always available status of these components there are some best
+practices which can be followed to ensure high availability of applications
+
+1. Plan Early
+
+: If there is a new application or software
+component is becoming live and needs monitoring it is better to involve in
+early discussions of architecture and design to get an overview of
+things to come . This give time to think and implement the monitoring solution
+when required. In many cases it will help as monitoring solution may not be a
+straight forward and may require additional resources and efforts.
+
+2. Monitoring proactively
+
+: Don't let system/applications
+go down and its failure be used as a point to start corrective
+action . Monitor systems and applications proactively for the symptoms of
+problem so that corrective action can be initiated before system/application
+fails . Proactive monitoring can achieved by monitoring some
+threshold values for resources utilization like CPU memory , network
+bandwidth and application health parameters . If the system crosses the
+threshold values a system health check has to be performed which include
+finding the running processes , memory utilization by various process ,
+monitoring application logs etc . The health check and corrective action
+proactively can avoid system and application crash.
+
+3. Balance the Load
+
+: Load balancers are used to distribute
+the load on to the servers which can handle the load . In the event of one
+server being heavily loaded or down the load balancers can automatically
+direct the traffic to the healthy server . This operation by load balancers is
+transparent to the users and they will not notice the difference. Load
+balancers can be hardware or software based and if not present has to be
+used for a high transaction application.
+
+4. Cluster the servers
+
+: Clustering removes the single point of
+failure by providing multiple points for request processing . In the event of
+one server being down due to hardware failure , network failure or
+heavily load on resources , requests are sent and processed by
+other members of the cluster .
+
+5. Create a Recovery Plan
+
+: To avoid delay online applications
+should have a well documented & tested recovery plan . The plan should
+cover the steps and checklists to be followed in the event of a application
+failure. A simple example would be to test the fail over feature of a server
+and observe the total requests failure and time taken to failover etc. which
+can give a estimated time when a alternate server will be up . Having a plan
+at the time of failure avoid time wastage to look for alternatives.
+
+6. Deploy application code from a trusted & tested source
+
+:
+Application code should be released from the trusted & tested source such
+as version control system , staging or quality assurance environments . No
+code should be released which has external changes other then trusted source
+where only authorized persons have access . Using code in this way presents a
+opportunity to simulate any code problems and examine the code base itself by the development teams.
+
+7. Create a Service Level Agreement
+
+: A service level agreement in
+writing emphasize the need and scope of monitoring . It provides
+monitoring requirements for the support team and a standard
+to measure the application availability by the business groups.
+This document will give a estimated time to respond and fix the issues and
+teams can work in advance to create a recovery plan which meets the service
+level agreement .
+
+8. Use Good hardware
+
+: Hardware which is proven to be reliable in
+the industry should be used for production environment . All the additional
+component cabling etc should be of high standard to avoid problems due to
+hardware failures . Replacement components should be of exact specifications
+as original. The hardware should have support mechanism with manufacturing
+company or other company which can supply the components and
+troubleshooting expertise in case of a failure.
+
+9. Seek Professional Help
+
+: If your application is mission critical
+,involves impact to customers and revenue then it is not sufficient to relay
+on home grown solutions for monitoring but you should seek professional advice
+from the companies which have been doing monitoring for other companies. These
+companies besides monitoring applications can provide you with different type
+of reports like response time , downtime , uptime etc. which may be helpful in
+marinating and planning for the application resources.
+
+Implementation
+
+To implement effective application monitoring one has to under stand
+the nature of application , what exactly it is trying to do . For this one
+doesn't have to have the full application code knowledge but the basic flow
+of information should be clear .
+
+1. Uptime Monitoring
+
+For setting this type of monitoring applications are monitored if they are
+up and running . A simple monitor can be setup by monitoring the server urls
+or server processes . The problem with this type is that it can tell if
+a application is up it does not tell if application can process
+the transactions .
+
+2. Transaction Monitoring
+
+Transaction based applications are best monitored using transaction monitor
+. If the application involves some form submissions and displaying a success
+message ,the same behavior can be simulated using some scripts and
+status can be captured to find success status. The script can do the
+transactions at repeated intervals and send alerts if something fails.
+
+This can be used effectively in proactive monitoring if the application can
+return back the transaction processing time or some other status which can be
+quantified . The transaction completion time/status can be
+monitored and compared with expected times . If a transaction takes much time
+one can look at the application logs to figure out the problem &
+take corrective action to avoid a crash.
+
+3. Data files monitoring
+
+In some application environments transactions happen offline
+where the data travels in an offline manner from one point to another like
+businesses sending their daily sales data to their head office every night in
+the form of a data file. This type of flow can be monitored by constantly
+monitoring the various drop and pick points of the data files . At
+frequent intervals counts can be taken at drop and pickup points to ensure the
+files are moving properly .
+
+This also provides a means to proactively monitor the flow as the
+problem will be known when files starts to accumulate at a drop point on
+its first occurrence and system can be prevented from clogging by looking into
+the cause which resulted in accumulation of files.
+
+4. Database Monitoring
+
+Applications uses databases and databases should be monitored for its
+uptime state as transaction state . Uptime state is easy to monitor by
+monitoring some key processes we can determine if data base is up or not. To
+monitor the transaction health of a database some monitoring transactions
+like creating records , updating the records etc can be done and the time
+taken for each transaction and their final status is noted.
+
+When the transactions starts to fail we can know that database is having
+some issues but as proactive monitoring we can monitor the time taken to
+complete each transaction . In most of the cases if system becomes overloaded
+the transaction time will be higher and that can give a vital clue to look the
+problem area in database and correct it before it goes down .
+
+5. Resource Monitoring
+
+CPU , Memory , network disk ,monitoring is equally important as the above
+ones . constantly monitoring the system resources can prevent
+application and operating system slow down and crash.
+
+If the CPU and memory is reaching its peak the application can go into a
+hung state . If disk space is full applications can crash right away as they
+may not be able to write logs etc on the disk.
+
+Network bandwidth over utilization can also causes application crash where
+by the request queues starts building up due to slow network.
+
+All the resources offer quantitative measurements and can be mentored
+using the scripts using existing system utilities . For proactive monitoring
+threshold values can be set for each resource and on reaching the
+threshold one can investigate the cause of over utilization of resources.

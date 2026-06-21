@@ -1,0 +1,439 @@
+---
+title: "awk Commands, Examples & Meaning"
+description: "The name awk comes from the initials of its creators: Alfred V."
+pubDate: 2016-08-09
+updatedDate: 2026-06-20
+pageType: reference
+topic: shell
+tier: "TIER 2 (core reference)"
+tags: ["basics", "featured", "linux", "tips"]
+testedOn: ["Linux", "Unix"]
+---
+
+Learn to use awk for text and data extraction, data processing, validation, generate reports for analysis, automation with with the help of examples of if else , compare & arrays plus regular expressions & built in operational variables, meaning, examples &command syntax.
+
+### awk name & History
+
+The name awk comes from the initials of its creators: Alfred V. Aho, Peter J. Weinberger, and Brian W. Kernighan.
+Original version of awk was written in 1977 at AT&T Bell Laboratories. Paul Rubin wrote gawk ( gnu awk ) in 1986.
+
+### Using awk
+
+awk can be used directly on a command line, executed as program file or from a program file referenced by command line awk .
+
+### awk Command Line
+
+awk can be used in command line as a tool to process and format the data from one or more input files or output of another program .
+
+Syntax to use data file as input and run awk command to process data
+
+```bash
+awk '<awk command>' <file>
+```
+
+or
+Use command output as data input using PIPE processing
+
+> Command output | awk '&lt;awk command>'
+
+### awk variable assignments
+
+:
+awk works on lines and columns and process data line by line and assigns variables to each line and column.
+
+```hcl
+$0 = Entire line
+$1 = First Column
+$2 = Second Column
+$3 = Third Column
+```
+
+and so on
+column is defined as a word/characters surrounded by space/s . Common Linux/Unix commands like df ,ls , ps gives columnar outputs and awk is very useful in getting listing and processing column data. A print statement is used to print variables .
+
+### Working with awk commands
+
+awk commands are enclosed in single quotes, any single quote after awk options is considered as awk command and a matching single quote is taken as as end of command.
+Next Page -
+
+**Awk Examples**
+
+### awk Examples
+
+1. Extract the used space ( fifth field in df output ) column by mount points using df output
+
+```hcl
+localhost ~]$ df | awk '{print $3 }'
+Used
+10831280
+0
+252
+1020
+0
+176
+123767
+51118256
+66006
+```
+
+Similar operation to extract 1st and 4tgh column from a file called testfile containing following lines
+column1 column2 column3 column4
+1111 2222 3333 4444
+1111 2222 3333 4444
+1111 2222 3333 4444
+
+```hcl
+localhost ~]$ awk '{print $1,$4}' testfile
+column1 column4
+1111 4444
+1111 4444
+1111 4444
+```
+
+Comma separating fields gives a default space between the output data fields. For large number of fields a special awk variable, Output Field Separator, OFS is used . Default is a space and it can be assign to any other value , such as a pipe symbol , | , in the example below.
+
+```hcl
+localhost ~]$ awk '{OFS="|" ; print $3,$4}' testfile
+column3|column4
+3333|4444
+3333|4444
+3333|4444
+```
+
+### awk BEGIN and END statement
+
+Multi-line program uses BEGIN and END statements to execute statements once at the beginging and at the end.
+basic construction is :
+BEGIN &lt;statment>
+&lt;processing statments >
+END &lt;statment>
+
+Example:
+
+```hcl
+localhost ~]$ awk 'BEGIN { print "Count Records " }
+/4444/ { ++num }
+END { print "Recs " num }' testfile
+Count Records
+Recs 3
+```
+
+### awk program File
+
+awk programs can be written and invoked from a file by providing awk interpreter location in the first liner ,
+Syntax :
+$awk -f &lt;program file> &lt;datafile>
+Create a awk program test file, chkrec as below.
+
+```hcl
+#! /bin/awk -f
+BEGIN { print "Count Records " }
+/4444/ { ++num }
+END { print "Recs " num }
+Execute file with -f option
+localhost ~]$ awk -f chkrec testfile
+Count Records
+Recs 3
+or make it executable & directly execute with data file as argument
+localhost ~]$ chmod 755 chkrec
+localhost ~]$ ./chkrec testfile
+Count Records
+Recs 3
+```
+
+### Awk Example programs
+
+#### Compare values
+
+print Available Use% Mounted columns if used percentage is more than 60%
+
+```hcl
+localhost ~]$ df| awk '$5 > "60" { print $4,$5,$6}'
+Available Use% Mounted
+4522188 92% /home
+32298 68% /boot/efi
+```
+
+#### awk Sum operations
+
+Add file sizes for selective files, /var/log/yum* and total sum is printed , column from each line is added in variable n and total is printed with END statement.
+
+```hcl
+localhost ~]$ ls -l /var/log/yum* | awk '{ n += $5 }
+END { print "Total bytes = ", n }'
+Total bytes = 63665
+```
+
+#### awk if else conditions
+
+Check available space , print ok in front of the output if less than 60% and Problem if more than 60%
+
+```hcl
+$df | awk '{ if ($5 > 60) print "Problem "$0
+else
+print "ok ", $0
+};'
+Problem Filesystem 1K-blocks Used Available Use% Mounted on
+ok /dev/mapper/fedora-root 51475068 10831316 38005928 23% /
+ok devtmpfs 1956180 0 1956180 0% /dev
+ok tmpfs 1966388 252 1966136 1% /dev/shm
+ok tmpfs 1966388 992 1965396 1% /run
+ok tmpfs 1966388 0 1966388 0% /sys/fs/cgroup
+ok tmpfs 1966388 176 1966212 1% /tmp
+ok /dev/sda9 487652 123767 334189 28% /boot
+Problem /dev/mapper/fedora-home 58642620 51118476 4522188 92% /home
+Problem /dev/sda2 98304 66006 32298 68% /boot/efi
+```
+
+#### awk for loop
+
+Print 1 to 5 numbers using a for loop by proving initial value , final value and increment function.
+
+```hcl
+localhost ~]$ awk 'BEGIN { for (i = 1; i <= 5; ++i) print i }'
+1
+2
+3
+4
+5
+```
+
+#### awk Arrays , creating and sorting
+
+Create a array by assigning values to array indexes :
+
+```hcl
+A["ZZ"] = "Last"
+A["DD"] = "Middle"
+A["AA"] = "First"
+```
+
+#### Sorting arrays
+
+```hcl
+asorti - Array Sort by Indices
+asort - Array Sort by value
+asort(A)
+A["AA"] = "First"
+A["ZZ"] = "Last"
+A["DD"] = "Middle"
+asorti - Array Sort by Indices
+asprti(A)
+A["AA"] = "First"
+A["DD"] = "Middle"
+A["ZZ"] = "Last"
+```
+
+Next Page -
+
+**awk regular expressions**
+
+### awk regular expressions
+
+#### gsub
+
+Global substitution for the pattern in target
+gsub(regexp, replacement [, target])
+
+#### gensub()
+
+it is a general substitution function providing more features than the standard sub() and gsub() functions- the ability to specify components of a regexp in the replacement text
+
+```hcl
+localhost ~]$ df  | awk '{ print gensub(/\%/, " Percent", 1) }'
+Filesystem              1K-blocks     Used Available Use Percent Mounted on
+/dev/mapper/fedora-root  51475068 10831316  38005928  23 Percent /
+devtmpfs                  1956180        0   1956180   0 Percent /dev
+/dev/sda9                  487652   123767    334189  28 Percent /boot
+/dev/mapper/fedora-home  58642620 51118476   4522188  92 Percent /home
+/dev/sda2                   98304    66006     32298  68 Percent /boot/efi
+```
+
+#### index(in, find)
+
+Find the index value of a sub string .
+
+```hcl
+localhost ~]$ awk 'BEGIN { print index("SomeLongString", "tr") }'
+10
+```
+
+#### length([string])
+
+Find the length of string, length of lines in the example below
+
+```hcl
+localhost ~]$ awk ' { print length($0) }' testfile
+31
+29
+29
+29
+```
+
+#### match(string, regexp [, array])
+
+match alphabet characters in file and print whole line
+
+```hcl
+localhost ~]$ awk ' match($0, /[a-z]/) { print $0 }' testfile
+column1 column2 column3 column4
+```
+
+#### split(string, array [, fieldsep [, seps ] ])
+
+Split a list of rpm names at dashes.
+
+content of the files - rpms
+
+libhbalinux-1.0.16-2.fc20.x86_64
+gucharmap-3.10.1-1.fc20.x86_64
+libplist-1.11-2.fc20.x86_64
+libgcc-4.8.3-7.fc20.i686
+glx-utils-8.1.0-4.fc20.x86_64
+vlgothic-fonts-20140801-1.fc20.noarch
+
+Split along dashes , keep in array and print selected index values , keep separators in a array called sep .
+
+```hcl
+localhost ~]$ cat rpms | awk '{split($0, ary, "-", seps) ; print ary[1],ary[2],ary[3]}'
+libhbalinux 1.0.16 2.fc20.x86_64
+gucharmap 3.10.1 1.fc20.x86_64
+libplist 1.11 2.fc20.x86_64
+libgcc 4.8.3 7.fc20.i686
+glx utils 8.1.0
+vlgothic fonts 20140801
+```
+
+#### print both arrays , ary and sep , the seprator arry contents
+
+```hcl
+localhost ~]$ cat rpms | awk '{split($0, ary, "-", seps) ; print ary[1],ary[2],ary[3],seps[1],seps[2]}'
+libhbalinux 1.0.16 2.fc20.x86_64 --
+gucharmap 3.10.1 1.fc20.x86_64 --
+libplist 1.11 2.fc20.x86_64 --
+libgcc 4.8.3 7.fc20.i686 --
+glx utils 8.1.0 --
+vlgothic fonts 20140801 --
+```
+
+#### sub(regexp, replacement [, target])
+
+Substitute a pattern with a string , in the example below replace dash followed by any number with -->
+
+> localhost ~]$ cat rpms | awk 'sub(/-[0-9]/, " --> " )';
+libhbalinux --> .0.16-2.fc20.x86_64
+gucharmap --> .10.1-1.fc20.x86_64
+libplist --> .11-2.fc20.x86_64
+libgcc --> .8.3-7.fc20.i686
+glx-utils --> .1.0-4.fc20.x86_64
+vlgothic-fonts --> 0140801-1.fc20.noarch
+
+#### substr(string, start [, length ])
+
+```hcl
+Get a  substring of defined length  from  a given position
+Lets use this file having two fields
+localhost ~]$ cat nums
+123456789 abcdef
+find 3rd position and print two values from first field.
+
+localhost ~]$ awk '{print substr($1,3,2) }' nums
+34
+find 3rd position and print two values from second field.
+localhost ~]$ awk '{print substr($2,3,2) }' nums
+cd
+```
+
+#### tolower(string)
+
+Convert alphabet string into lower case
+
+tolower("MiXeD cAsE 123") returns "mixed case 123".
+Changing entire files to lowercase in the example below
+
+> localhost ~]$ cat letters
+This is Just Some Random Text Here ..
+
+```hcl
+localhost ~]$ awk '{ print tolower($0)}' letters
+
+this is just some random text here ..
+```
+
+toupper(string)
+Convert alphabet string into upper case
+
+```hcl
+localhost ~]$ awk '{ print toupper($0)}' letters
+
+THIS IS JUST SOME RANDOM TEXT HERE ..
+```
+
+Selective fields can be used for this operation, to make only first field as upper case:
+
+```hcl
+awk '{ print toupper($1)}' letters
+THIS
+```
+
+Next Page -
+
+**awk Built in Operational Variables**
+
+### awk Built in Operational Variables
+
+Following environmentatl variables are defined as per tghe requirment of awk program.
+
+#### IGNORECASE=
+
+If IGNORECASE is nonzero or non-null, then all string comparisons and all regular expression matching are case-independent.
+
+#### OFS
+
+The Output Field Separator . It is output between the fields printed by a print statement. Its default value is " ", a string consisting of a single space.
+localhost ~]$ awk '&#123; OFS="|" ; print $1,$2,$3,$4&#125;' testfile
+
+> column1|column2|column3|column4
+1111|2222|3333|4444
+1111|2222|3333|4444
+1111|2222|3333|4444
+
+it can be defined by -F option also , following example define field separator as : and print first field.
+awk -F: '&#123; print $1&#125;' /etc/passwd
+
+#### ORS - Output Record Seprator
+
+oeparator determines how records/ lines are separated default value is "\n", the newline character.
+Lets use earlier used rpms file to print lines separated by an || operator.
+
+```hcl
+localhost ~]$ awk '{ ORS="||" ; print $0}' rpms
+libhbalinux-1.0.16-2.fc20.x86_64||gucharmap-3.10.1-1.fc20.x86_64||libplist-1.11-2.fc20.x86_64||libgcc-4.8.3-7.fc20.i686||glx-utils-8.1.0-4.fc20.x86_64||vlgothic-fonts-20140801-1.fc20.noarch||
+```
+
+#### NF - Number of Fields, separated by space or designated by FS value
+
+Example : count number of fields separated by :
+
+```hcl
+localhost ~]$ awk -F: '{ print $0,NF}' /etc/passwd
+root:x:0:0:root:/root:/bin/bash 7
+bin:x:1:1:bin:/bin:/sbin/nologin 7
+daemon:x:2:2:daemon:/sbin:/sbin/nologin 7
+adm:x:3:4:adm:/var/adm:/sbin/nologin 7
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin 7
+sync:x:5:0:sync:/sbin:/bin/sync 7
+```
+
+#### RS
+
+The input record separator. default is a new line but can be changed to other values depending on the input file.
+
+#### ARGC, ARGV
+
+The command-line arguments available to awk programs are stored in an array called ARGV.
+
+> ARGC is the number of command-line arguments
+ARGV is the value of argument. present and is indexed from 0 to ARGC -1
+AWKPATH
+awk gets its search path from the AWKPATH environment variable. If that variable does not exist, or if it has an empty value, gawk uses a default path ‘.:/usr/local/share/awk’.

@@ -1,0 +1,648 @@
+---
+title: "Veritas Volume Manager - vxdiskadm"
+description: "Veritas Volume Manager is used to manage disk storage spread over an array of disks."
+pubDate: 2009-12-03
+updatedDate: 2026-06-20
+pageType: reference
+topic: legacy
+tier: "TIER 4 (Solaris/legacy Unix)"
+tags: ["volumes"]
+testedOn: ["Linux", "Unix"]
+---
+
+Veritas Volume Manager is used to manage disk storage spread over an array of disks.
+
+The main features of volume manager are following
+
+1. Allows creation of logical volumes spanning over multiple disks. This overcomes the physical limit of the disk .
+2. Provides high availability storage solutions through RAID ,Mirroring of disks .
+3. Provides fail over features by providing transferable disk group ownership between systems.
+4. Dynamic reconfiguration of disk storage in an online system state. what is veritas volume manager .
+
+The following article describes the volume manager objects and configuration of these objects using a text menu based utility called vxdiskadm .
+
+Table of Contents :
+1. Volume Manager Objects
+1.1 Disks
+1.2 Disk groups
+1.3 Volume Manager disks
+1.4 Subdisks
+1.5 Plexes
+1.6 Volumes
+1.7 Volume Manger Objects & their Relationship
+
+2. Volume Manager Configuration ( options menu)
+2.1 Add or initialize one or more disks
+2.2 Encapsulate one or more disks
+2.3 Remove a disk
+2.4 Remove a disk for replacement
+2.5 Replace a failed or removed disk
+2.6 Mirror volumes on a disk
+2.7 Move volumes from a disk
+2.8 Enable access to (import) a disk group
+2.9 Remove access to (deport) a disk group
+2.10 Enable (online) a disk device
+2.11 Disable (offline) a disk device
+2.12 Mark a disk as a spare for a disk group
+2.13 Turn off the spare flag on a disk
+
+1.0 Volume Manager Objects
+
+Disks
+
+Disks are referred in volume manager by two terms - device name and disk name . The device name specifies controller , target id and slice of the disk . Disk name is the common name given to the device name as an easy to remember name .
+
+For example device name c2t3d0s2 represents controller number 2 , target id 3 , disk group 0 and slice 2 and disk01 may be its disk name . While device name is system dependent based on controller and disk id the disk name is user defined .
+
+Disk groups
+
+* A disk group is a collection of volume manager disks grouped together to hold the data . All the configuration changes made to a disk group are applied to the disks in that disk group only.
+* Volume Manager objects cannot span disk groups i.e. all the operations on a particular disk group remains confined to that particular group .
+* Disk groups enable high availability as these can be shared by two or more hosts but can be accessed by only one host at a time. In two hosts and a shared storage situation one host can take over the ownership of the disk groups and drives in case other host fails.
+
+Volume Manager disks
+
+* Adding physical disks to the volume manager results in creation of public and private region in the disk by the volume manager .The public region is the disk space available for volume space and the private region stores the configuration information.
+* A Volume Manager disks are created from the public region of a physical disk that is under Volume Manager control. Each volume manager disk corresponds to one physical disk.
+* A volume manager disk is given a disk media name when it is added to a disk group which can be default or unique user defined..
+* Once a volume manager disk is assigned a disk media name, the disk is no longer referred to by its physical address of c#t#d#. The physical address of c#t#d# becomes known as the disk access record.
+
+Subdisks
+
+* A subdisk is a subsection of a disk's public region and is the smallest unit of storage in Volume Manager.
+* A subdisk is defined by an offset and a length in sectors on a volume manager disk.
+* A volume manager disk can contain multiple subdisks but subdisks cannot overlap or share the same portions of a volume manager disk.
+* volume manager disk space that is not reserved or that is not part of a subdisk is free space. You can use free space to create new subdisks.
+
+A subdisk is similar to a partition but with following differences :
+* The maximum number of partitions to a disk is eight.
+* There is no theoretical limit to number of subdisks that can be attached to a single plex, but it has been limited to a default value of 4096. If required, this default can be changed, using the vol_subdisk_num tunable parameter.
+
+Plexes
+
+* A plex is a structured or ordered collection of subdisks that represents one copy of the data in a volume. A plex consists of one or more subdisks located on one or more physical disks.
+* A plex is also called a mirror. The terms plex and mirror can be used interchangeably, even though a plex is only one copy of the data. The terms "mirrored" or "mirroring" imply two or more copies of data.
+* The length of a plex is determined by the last block that can be read or written on the last subdisk in the plex.
+* The default naming convention for plexes in a volume is volumename-##. The default plex name consists of the volume name, a hyphen, and a two-digit number
+
+Volumes
+
+* A volume is composed of one or more plexes not restricted by the physical size of the disk.
+* A volume can span across multiple disks.
+* Volume Manager uses the default naming convention vol## for volumes, where ## represents a two-digit number but can be user defined as per requirement.
+
+**[Volume Manager Objects and Their Relationship]()**
+
+|  |  |
+| --- | --- |
+|  |
+
+2.0 Volume Manager Configuration
+
+Volume configuration consists of adding two or more disks to form disk group and create volume/s from this disk group. File system can be created on these volumes or these can be accessed as raw devices for some database applications. First step in volume manager configuration consists of adding and initializing disks under volume manager which creates a public region which is bulk of disk space available for volume space .Private region which is generally of a few megabytes stores the disk configuration information .
+
+Most of the volume manager operation related to disks & volume can be performed by a character based menu utility call vxdiskadm
+
+#vxdiskadm
+
+Typing vxdiskadm brings up a menu based utility (text) . The options , their explanation and screen shots
+are given below .Most of the options need a disk name , device name or disk group name and you can have this information by typing list in the vxdiskadm menu .The list menu option is used to display a list of disks attached to your system. This also lists removed or failed disks. Most useful to get a quick view of all disks or list details of a single disk - its name , volume association and status.
+
+A disk needs to be formatted in order to be included in volume manager . volume manager will report unformatted disk as invalid and a will only recognize after formatting
+
+By default all the available disks in the system are considered for inclusion as volume manager disk however to exclude certain disks, list the names of the disks to be excluded in the file /etc/vx/disks.exclude before the initialization or encapsulation. Similarly, you can exclude all disks on specific controllers from initialization or encapsulation by listing those controllers in the file /etc/vx/cntrls.exclude.
+
+? & ?? options provide help about the menu item and menu system.
+
+```bash
+#vxdiskadm
+
+Volume Manager Support Operations
+Menu: VolumeManager/Disk
+
+1    Add or initialize one or more disks
+2    Encapsulate one or more disks
+3    Remove a disk
+4    Remove a disk for replacement
+5    Replace a failed or removed disk
+6    Mirror volumes on a disk
+7    Move volumes from a disk
+8    Enable access to (import) a disk group
+9    Remove access to (deport) a disk group
+10   Enable (online) a disk device
+11   Disable (offline) a disk device
+12   Mark a disk as a spare for a disk group
+13   Turn off the spare flag on a disk
+list List disk information
+
+?    Display help about menu
+??   Display help about the menuing system
+q    Exit from menus
+
+Select an operation to perform
+2.1  Add or initialize one or more disks
+```
+
+The formatted disks can be added or initialized with volume manager . Disk groups needs to be given for making a new group or adding disks in existing group. Default disk group is rootdg and if none is specified the disks are added to volume manager and are kept as hot spares which can be used in place of a failed disk.
+
+Select 1 (Add or initialize one or more disks) from the vxdiskadm main menu.
+
+Add or initialize disks
+
+Menu: VolumeManager/Disk/AddDisks
+
+Use this operation to add one or more disks to a disk group. You can add the selected disks to an existing disk group or to a new disk group that will be created as a part of the operation. The selected disks may also be added to a disk group as spares. The selected disks may also be initialized without adding them to a disk group leaving the disks available for use as replacement disks.
+
+More than one disk or pattern may be entered at the prompt. Here are some disk selection examples:
+
+all: all disks
+c3 c4t2: all disks on both controller 3 and controller 4,target 2
+c3t4d0: a single disk
+
+Select disk devices to add:
+[,all,list,q,?]list
+
+can be a single or more disks and/or controllers. If
+consists of multiple items, those items must be separated by white space.
+
+list at the prompt displays a list of the disks available to the system, followed by a prompt at which you should type the device name of the disk to be added:
+
+DEVICE DISK GROUP STATUS
+c0t0d0 disk01 rootdg online
+c0t1d0 disk02 rootdg online
+c0t2d0 disk03 rootdg online
+c0t3d0 - - online
+c1t0d0 disk10 rootdg online
+c1t0d1 - - error
+.
+.
+.
+c3t0d0 - - error
+c3t1d0 disk33 rootdg online
+c3t2d0 disk34 rootdg online
+c3t3d0 disk35 rootdg online
+
+Select disk devices to add:
+[,all,list,q,?] c1t0d1
+
+All disks attached to the system are recognized by the Volume Manager and displayed here.. Error status indicates disks not recognized by volume manager as part of volume manager and can be used to add in the volume manager .. Disks with a name , group and online status are present in volume manager in a valid volume manager disk group .One or more disks separated by space can be selected for adding into volume manager.
+
+Here is the disk selected. Output format: [Device_Name]
+c1t2d0
+Continue operation? [y,n,q,?] (default: y) y
+
+You can choose to add this disk to an existing disk group, a
+new disk group, or leave the disk available for use by future
+add or replacement operations. To create a new disk group, select a disk group name that does not yet exist. To leave the disk
+available for future use, specify a disk group name of "none".
+
+Which disk group [,none,list,q,?] (default: rootdg)
+
+Use a default disk name for the disk? [y,n,q,?] (default: y)
+
+Add disk as a spare disk for rootdg? [y,n,q,?] (default: n) n
+
+The selected disks will be added to the disk group rootdg with
+default disk names.
+
+c1t2d0
+
+Continue with operation? [y,n,q,?] (default: y) y
+
+The following disk device has a valid VTOC, but does not appear to have
+been initialized for the Volume Manager. If there is data on the disk
+that should NOT be destroyed you should encapsulate the existing disk
+partitions as volumes instead of adding the disk as a new disk.
+Output format: [Device_Name]
+c1t2d0
+Encapsulate this device? [y,n,q,?] (default: y) n
+c1t2d0
+Instead of encapsulating, initialize? [y,n,q,?] (default: n) y
+Initializing device c1t2d0.
+Adding disk device c1t2d0 to disk group rootdg with disk
+name disk39.
+Add or initialize other disks? [y,n,q,?] (default: n)
+2.2 Encapsulate one or more disks
+
+This is used to bring the disk under volume manager , which are already present in the system with data but without volume manager . Data on these disks are not disturbed and if these disks meets certain volume manager requirements these are added under volume manager.
+
+System needs rebooting if encapsulation is used for disk with mounted filesystem or running applications . Also the old device names needs to be changed in applications/scripts to reflect the new volume name.
+
+vfstab information is updated automatically but it is worthwhile to check vfstab if changes are proper as any discrepancy in vfstab may cause system boot failure on next reboot.
+
+Encapsulation preserves any existing data on the disk when the disk is placed under volume manager control. To reduce the
+
+chance of encapsulation failure, make sure that the disk meets the following requirements:-
+
+* It has a small amount of free space (at the beginning or end of the disk) that does not belong to any partition
+* It has two free partitions
+* It has an s2 slice that represents the whole disk
+
+One of the most common application is encapsulation of root disk to bring it under volume manager and then mirror it to have an alternate boot disk .
+
+The EEPROM variable use-nvramrc? must be set to true and an alternate boot disk alias name needs to be defined to access the second boot disk by an alternate alias name in case primary disk fails.
+
+ok>eeprom use-nvramrc?=true
+
+Procedure for encapsulating a disk for volume manager use is as follows:
+
+Select menu item 2 (Encapsulate one or more disks) from the vxdiskadm main menu and follow the prompts
+
+Encapsulate one or more disks
+
+Menu: VolumeManager/Disk/Encapsulate
+
+Use this operation to convert one or more disks to use the Volume Manager.
+This adds the disks to a disk group and replaces existing
+partitions
+with volumes. Disk encapsulation requires a reboot for the
+changes to take effect.
+
+More than one disk or pattern may be entered at the prompt. Here
+are some disk selection examples:
+
+all: all disks
+c3 c4t2: all disks on both controller 3 and controller 4, target 2
+c3t4d0: a single disk
+
+Select disk devices to encapsulate:
+[all,list,q,?] c2t5d0
+
+can be a single disk, or a series of disks and/or controllers (with optional targets). If
+consists of multiple items, those items must be separated by white space.
+
+Here is the disk selected. Output format: [Device_Name]
+c2t5d0
+Continue operation? [y,n,q,?] (default: y) y
+
+You can choose to add this disk to an existing disk group or to
+a new disk group. To create a new disk group, select a disk group name that does not yet exist.
+
+Which disk group [,list,q,?] (default: rootdg)
+Use a default disk name for the disk? [y,n,q,?] (default: y)
+The selected disks will be encapsulated and added to the rootdg
+disk group with default disk names.
+
+c2t5d0
+
+Continue with operation? [y,n,q,?] (default: y) y
+The following disk has been selected for encapsulation. Output format:
+[Device_Name]
+
+c2t5d0
+
+Continue with encapsulation? [y,n,q,?] (default: y) y
+
+The disk device c2t5d0 will be encapsulated and added to the disk
+group rootdg with the disk name disk01.
+The c2t5d0 disk has been configured for encapsulation.
+The first stage of encapsulation has completed successfully. You
+should now reboot your system at the earliest possible opportunity.
+The encapsulation will require two or three reboots which will happen automatically after the next reboot. To reboot execute the command:
+shutdown -g0 -y -i6
+This will update the /etc/vfstab file so that volume devices are
+used to mount the file systems on this disk device. You will need to update any other references such as backup scripts, databases,
+or manually created swap devices.
+
+Encapsulate other disks? [y,n,q,?] (default: n) n
+
+The disk device c2t5d0 will be encapsulated and added to the disk group rootdg with the disk name disk01.
+The encapsulation operation failed with the following error:
+It is not possible to encapsulate c2t5d0, for the following reason:
+
+Hit RETURN to continue.
+
+Encapsulation may fail if there is not enough free space available on the disk to accommodate volume manager. If this happens, the procedure above will end abruptly with an error message as above .
+
+2.3 Remove a disk
+
+This option is used to remove a disk from a disk group provided there is no active volume using this disk .. If there are some volumes using the disk the those have to be either moved to some other disk or removed if they are no longer needed.
+
+However since a diskgroup must have at least one disk you can not remove all the disks from a disk group . To remove all disks from a diskgroup you have to disable the volume group with the exception of rootdg disk group which can not be disabled .
+
+Select menu item 3 (Remove a disk) from the vxdiskadm main menu.
+
+Remove a disk
+Menu: VolumeManager/Disk/RemoveDisk
+
+Use this operation to remove a disk from a disk group. This
+operation takes, as input, a disk name. This is the same name
+that you gave to the disk when you added the disk to the disk
+group.
+
+Enter disk name [,list,q,?] disk01
+
+Requested operation is to remove disk disk01 from group rootdg.
+
+Continue with operation? [y,n,q,?] (default: y)
+
+Removal of disk disk01 is complete.
+
+Remove another disk? [y,n,q,?] (default: n)
+
+2.4 Remove a disk for replacement
+
+This option is used for removing the disk but retaining the name of the disk so that it can be used by the newly replaced disk . The replacement disk can be a newly added disk or already available disk in the other disk groups
+
+Select menu item 4 (Remove a disk for replacement) from the vxdiskadm main menu.
+
+Remove a disk for replacement
+Menu: VolumeManager/Disk/RemoveForReplace
+
+Use this menu operation to remove a physical disk from a disk
+group, while retaining the disk name. This changes the state
+for the disk name to a removed disk. If there are any
+initialized disks that are not part of a disk group, you will be
+given the option of using one of these disks as a replacement.
+
+Enter disk name [,list,q,?] disk02
+
+Additional screens display if there are volumes associated with the disk you want to remove. You have to decide if data is needed or not needed and answer the prompts as asked .
+
+The following devices are available as replacements:
+c1t1d0
+
+You can choose one of these disks now, to replace disk02.
+Select "none" if you do not wish to select a replacement disk.
+
+Choose a device, or select "none"
+[,none,q,?] (default: c1t1d0)
+
+Requested operation is to remove disk disk02 from group rootdg.
+The removed disk will be replaced with disk device c1t1d0.
+
+Continue with operation? [y,n,q,?] (default: y)
+
+Removal of disk disk02 completed successfully.
+
+Proceeding to replace disk02 with device c1t1d0.
+
+Disk replacement completed successfully.
+
+Remove another disk? [y,n,q,?] (default: n)
+
+2.5 Replace a failed or removed disk
+
+This option is used to replace a failed or removed disk . The new disk can be initialized or non initialized as this option does initialization .
+
+Select menu item 5 (Replace a failed or removed disk) from the vxdiskadm main menu.
+
+Replace a failed or removed disk
+Menu: VolumeManager/Disk/ReplaceDisk
+
+Use this menu operation to specify a replacement disk for a disk
+that you removed with the "Remove a disk for replacement" menu
+operation, or that failed during use. You will be prompted for
+a disk name to replace and a disk device to use as a replacement.
+You can choose an uninitialized disk, in which case the disk will
+be initialized, or you can choose a disk that you have already
+initialized using the Add or initialize a disk menu operation.
+
+Select a removed or failed disk [,list,q,?] disk02
+
+The following devices are available as replacements:
+c1t0d0s2 c1t1d0s2
+
+You can choose one of these disks to replace disk02.
+Choose "none" to initialize another disk to replace disk02.
+
+Choose a device, or select "none"
+[,none,q,?] (default: c1t0d0s2)
+
+The requested operation is to use the initialized device c1t0d0s2
+to replace the removed or failed disk disk02 in disk group rootdg.
+
+Continue with operation? [y,n,q,?] (default: y)
+
+Replacement of disk disk02 in group rootdg with disk device
+c1t0d0s2 completed successfully.
+
+2.6 Mirror volumes on a disk
+
+volumes can be mirrored to another disk with available space however it can not be used to mirror existing mirrors or mirrors spanning more than one sub disk .
+
+To mirror volumes on a disk, make sure that the target disk has an equal or greater amount of space as the originating disk and then do the following
+
+Select menu item 6 (Mirror volumes on a disk) from the vxdiskadm main menu.
+
+Mirror volumes on a disk
+Menu: VolumeManager/Disk/Mirror
+
+This operation can be used to mirror volumes on a disk. These
+volumes can be mirrored onto another disk or onto any
+available disk space. Volumes will not be mirrored if they are
+already mirrored. Also, volumes that are comprised of more than
+one subdisk will not be mirrored.
+
+Mirroring volumes from the boot disk will produce a disk that can
+be used as an alternate boot disk.
+
+Enter disk name [,list,q,?] disk02
+
+You can choose to mirror volumes from disk disk02 onto any
+available disk space, or you can choose to mirror onto a specific
+disk. To mirror to a specific disk, select the name of that disk.
+To mirror to any available disk space, select "any".
+
+Enter destination disk [,list,q,?] (default: any) disk01
+
+Note - Be sure to always specify the destination disk when you are creating an alternate root disk. Otherwise, the volume manager will select space available in the disk group which might span disk and will result in boot failure from this disk.
+
+2.7 Move volumes from a disk
+
+This option is used in case the disk is to be replaced or removed and has active volumes on the disk. . Also volumes can be moved to different disk groups for better space , performance etc.
+
+Select menu item 7 (Move volumes from a disk) from the from the from the from the vxdiskadm main menu.
+
+Move volumes from a disk
+Menu: VolumeManager/Disk/Evacuate
+
+Use this menu operation to move any volumes that are using a
+disk onto other disks. Use this menu immediately prior to
+removing a disk, either permanently or for replacement. You can
+specify a list of disks to move volumes onto, or you can move the
+volumes to any available disk space in the same disk group.
+
+NOTE: Simply moving volumes off of a disk, without also removing
+the disk, does not prevent volumes from being moved onto
+the disk by future operations. For example, using two
+consecutive move operations may move volumes from the
+second disk to the first.
+
+Enter disk name [,list,q,?] disk01
+
+You can now specify a list of disks to move onto. Specify a list
+of disk media names (e.g., disk01) all on one line separated by
+blanks. If you do not enter any disk media names, then the
+volumes will be moved to any available space in the disk group.
+
+Requested operation is to move all volumes from disk disk01 in
+group rootdg.
+
+NOTE: This operation can take a long time to complete.
+
+Continue with operation? [y,n,q,?] (default: y)
+
+Move volume vol3 ...
+Move volume vol3-bk00 ...
+Evacuation of disk disk01 is complete.
+
+Move volumes from another disk? [y,n,q,?] (default: n)
+
+2.8 Enable access to (import) a disk group
+
+Used in enabling ownership of the other system to a disk group which has been deported by the other system. Used in failover configurations where the ownership of a shared disk/disk group is transferred to the other system in case of failure of current system.
+
+Select menu item 8(Enable access to (import) a disk group) from the vxdiskadm main menu.
+
+Enable access to (import) a disk group
+Menu: VolumeManager/Disk/EnableDiskGroup
+
+Use this operation to enable access to a disk group. This can be
+used as the final part of moving a disk group from one system to
+another. The first part of moving a disk group is to use the
+"Remove access to (deport) a disk group" operation on the
+original host.
+
+A disk group can be imported from another host that failed without
+first deporting the disk group. Be sure that all disks in the disk
+group are moved between hosts.
+
+If two hosts share a SCSI bus, be very careful to ensure that the
+other host really has failed or has deported the disk group. If
+two active hosts import a disk group at the same time, the disk
+group will be corrupted and will become unusable.
+
+Select disk group to import [,list,q,?] (default: list)
+newdg
+The import of newdg was successful.
+
+Select another disk group? [y,n,q,?] (default: n)
+
+2.9 Disable access to (deport) a disk group
+
+Disk group is deported if disks groups ownership needs to be transferred to another system or all the disks in a disk groups needs to be freed from group. Disks in a disk groups to be deported should not be active.
+
+Select menu item 9 (Remove access to (deport) a disk group) from the vxdiskadm main menu.
+
+Remove access to (deport) a disk group
+Menu: VolumeManager/Disk/DeportDiskGroup
+
+Use this menu operation to remove access to a disk group that is
+currently enabled (imported) by this system. Deport a disk
+group if you intend to move the disks in a disk group to another
+system. Also, deport a disk group if you want to use all of the
+disks remaining in a disk group for some new purpose.
+
+You will be prompted for the name of a disk group. You will also
+be asked if the disks should be disabled (offlined). For
+removable disk devices on some systems, it is important to
+disable all access to the disk before removing the disk.
+
+Enter name of disk group [,list,q,?] (default: list) newdg
+
+The requested operation is to disable access to the removable
+disk group named newdg. This disk group is stored on the
+following disks:
+newdg01 on device c1t1d0s2
+
+You can choose to disable access to (also known as "offline")
+these disks. This may be necessary to prevent errors if
+you actually remove any of the disks from the system.
+
+Disable (offline) the indicated disks? [y,n,q,?] (default: n)
+Continue with operation? [y,n,q,?] (default: y)
+
+Removal of disk group newdg was successful.
+
+Disable another disk group? [y,n,q,?] (default: n)
+
+2.10 Enable (online) a disk device
+
+Disks which are turned offline by volume manager , or which are to be imported can be enabled by this option. This operation causes disks to be scanned and find out the disk belonging to a disk group.
+
+Select menu item 10 (Enable (online) a disk device) from the vxdiskadm main menu.
+
+Enable (online) a disk device
+Menu: VolumeManager/Disk/OnlineDisk
+
+Use this operation to enable access to a disk that was disabled
+with the "Disable (offline) a disk device" operation.
+
+You can also use this operation to re-scan a disk that may have
+been changed outside of the Volume Manager. For example, if a disk
+is shared between two systems, the Volume Manager running on the
+other system may have changed the disk. If so, you can use this
+operation to re-scan the disk.
+
+NOTE: Many vxdiskadm operations re-scan disks without user
+intervention. This will eliminate most needs to online a
+disk directly, except when the disk is directly offlined.
+
+Select a disk device to enable [list,q,?] c1t1d0
+
+Enable another device? [y,n,q,?] (default: n)
+
+2.11 Disable (offline) a disk device
+
+This option disables all access to a disk which is not part of any disk group . This is used to remove disk from volume group. Some systems do not support disks that can be removed from a system during normal operation. On such systems, the offline operation is not very useful.
+
+Select menu item 11 (Disable (offline) a disk device) from the vxdiskadm main menu.
+
+Disable (offline) a disk device
+Menu: VolumeManager/Disk/OfflineDisk
+
+Use this menu operation to disable all access to a disk device
+by the Volume Manager. This operation can be applied only to
+disks that are not currently in a disk group. Use this operation
+if you intend to remove a disk from a system without rebooting.
+
+NOTE: Many systems do not support disks that can be removed from
+a system during normal operation. On such systems, the
+offline operation is seldom useful.
+
+Select a disk device to disable [list,q,?] c1t1d0
+
+Disable another device? [y,n,q,?] (default: n)
+
+2.12 Mark a disk as a spare for a disk group
+
+This is used to reserve the disk as an automatic replacement disk ( hot-relocation) in case of another disk in the disk group fails. Hot-relocation relocates redundant subdisks to other disks and restores the affected volume manager objects and data. If a disk has already been designated as a spare in the disk group, the subdisks from the failed disk are relocated to the spare disk. Otherwise, any suitable free space in the disk group is used.
+
+Select menu item 12 (Mark a disk as a spare for a disk group) from the vxdiskadm main menu.
+
+Mark a disk as a spare for a disk group
+Menu: VolumeManager/Disk/MarkSpareDisk
+
+Use this operation to mark a disk as a spare for a disk group.
+This operation takes, as input, a disk name. This is the same name
+that you gave to the disk when you added the disk to the disk group.
+
+Enter disk name [,list,q,?] disk01
+Marking of disk01 in rootdg as a spare disk is complete.
+
+Mark another disk as a spare? [y,n,q,?] (default: n)
+
+Any VM disk in this disk group can now use this disk as a spare in the event of a failure. If a disk fails, hot-relocation should automatically occur .The failed disk needs to be replaced.
+
+2.13 Turn off the spare flag on a disk
+
+This is used to remove a VM Disk From the Hot-Relocation Pool & free hot-relocation spare disks for use as regular volume manager disks While a disk is designated as a spare, the space on that disk is not used as free space for the creation of volume manager objects within its disk group and this option makes this space available.
+
+Select menu item 13 (Turn off the spare flag on a disk) from the vxdiskadm main menu.
+
+Turn off the spare flag on a disk
+Menu: VolumeManager/Disk/UnmarkSpareDisk
+
+Use this operation to turn off the spare flag on a disk.
+This operation takes, as input, a disk name. This is the same
+name that you gave to the disk when you added the disk to the
+disk group.
+
+Enter disk name [,list,q,?] disk01
+
+Disk disk01 in rootdg no longer marked as a spare disk.
+
+Turn-off spare flag on another disk? [y,n,q,?] (default: n)
+
+After using the vxdiskadm for configuring disks and diskgroups next step is to configure volumes and then use them for storage operations . The second part of this article discusses this aspect of volume manager .

@@ -1,0 +1,231 @@
+---
+title: "DNS Sinkhole Setup : Your defense against Bot net controllers"
+description: "A botnet consists of a number of compromised hosts controlled by botnet controller managed by third parties ."
+pubDate: 2021-01-03
+updatedDate: 2026-06-20
+pageType: guide
+topic: networking
+tier: "TIER 2 (core reference)"
+tags: ["dns", "security"]
+testedOn: ["Linux", "Unix"]
+---
+
+> DNS sink hole is a process to identify the bot net master hosting malware software servers and assign the dns record of these hosts to localhost, non-existing or unused ip address . A valid ip is not returned for these host resolution and the infected host never connects to the bot net master server
+
+According to statistics published in
+
+csoonline.com
+
+cyber crimes damages will hit 6 trillion by 2021 and 6 billion people target ( 75% of projected 8 billion population). As the access to network is increasing, hacking and committing cyber crime has become as easy as sending an email with malware link and its clicking by unsuspecting victims.
+A botnet consists of a number of compromised hosts controlled by botnet controller managed by third parties . Bot net constitutes a major security threat and used to deploy malware, steal sensitive data, orchestrate DDoS attack. Once systems inside a network are compromised by installing malware it becomes very difficult to detect as the theft of data and sources of DDoS is orchestrated from within the network.
+
+DNS sink hole is a process to identify the bot net master hosting malware software servers and assign the dns record of these hosts to localhost, non-existing or unused ip address . A valid ip is not returned for these host resolution and the infected host never connects to the bot net master server.
+
+In order to understand how DNS Sink hole work we need to understand the bot net structure and its organization.
+
+## How a bot network is organized and activated ?
+
+The initial part involves getting access to inside corporate network. This can be achieved in many ways like using brute force method to crack the passwords and encrypted data and other approach is rather simple, involving sending a link in email and betting on the chances that some users will click the link and deploy malware on their computers.
+
+Getting access inside the network using a email malware distribution takes place in following steps:
+
+1. An email with enticing subject line containing malware link is sent to internal email addresses.
+2. The email is opened and the link is clicked by some users.
+3. The link points to the bot net controller. A request is sent to internal or external dns servers to resolve the url and provide a corresponding ip address to the host computer. For unsuspecting DNS servers, the bot net controller's address are resolved by DNS and it returned to host.
+4. Host now has ip address of bot net controller, it connects to the server and download malware on the local computer. The malware now gains an inside access to the corporate network.
+5. Once malware gets inside access on a compromised hosts, the hosts becomes bot and get periodic instructions from bot net master server to scan network, steal information, infect other hosts or participate in botnet attack.
+
+![botnet system](/images/bot-net-system-setup.png)
+
+## Creating a DNS Sink hole
+
+A DNS sinkhole is setup by identifying the malware servers and blocking access to these servers. The list of these offending servers is available from several online sites like
+
+spamhaus.org
+
+Blocking access require configuring DNS zone entries for the offending servers and returning the unreachable, unused ip address or just the local host ip address.
+
+Here is the sequence of events happens when a DNS sink hole is configured:
+
+1. An email with malware link is sent to internal email addresses.
+2. The link is clicked by some users
+3. The bot net controller DNS address is resolved by DNS and instead of real bot net controller's ip address it returns a sink hole address which is a unreachable /unused or local ip address.
+4. Compromise hosts fails to connect to the bot net controller and it goes to sink hole address.
+5. DNS query logs are analyzed to find the compromised hosts trying to reach the bot net controller.
+6. Compromised hosts are isolated from network and disinfected to prevent further damage.
+
+![dns-sinkhole-setup](/images/dns-sinkhole-setup.png)
+
+## Seting up a local DNS server or modify existing DNS server to work as DNS sinkhole
+
+Some organizations may not have their own DNS and if they want to create their own DNS server to create sink hole and block access to certain websites from within the network , here are the step to setup DNS and create sink hole.
+
+### Deploy Bind
+
+BIND is open source software to publish and resolve DNS information over the internet. The name BIND stands for “Berkeley Internet Name Domain” due to its origin at University of California at Berkeley in 1980. It is by far the most widely used DNS software on the Internet.
+
+Here are the steps to install BIND in Linux
+
+> *#dnf -y install bind bind-utils*
+
+### Create zone configuration file
+
+Create a zone configuration file with sink hole zones for the blocked domains, the list of domains to be blocked can be your custom list or you can have a publicly available list of known bad domain to create zone file.
+
+The bind installation provides a empty named.empty file, which returns 127.0.0.1 for the domains in the zone and this can be used in zone file of blocked domains.
+
+Following is the the sample file and its entries:
+
+Example file name
+
+:
+
+> /etc/named.conf.blockeddomains
+
+Sample entries :
+
+```hcl
+zone "somemalwaredomain.com" {type master; file "named.empty";};
+zone "somebotnetdomain.com" {type master; file "named.empty";};
+zone "someattackdomain.com" {type master; file "named.empty";};
+```
+
+### Modify /etc/named.conf file
+
+Modify the existing dns configuration file and add following entry at the end of /etc/named.conf file
+
+> *include "/etc/named.conf.blockeddomains";*
+
+### Restarts DNS service
+
+> *#systemctl restart named.service*
+
+### Point the /etc/resolve.conf to the DNS server ip address
+
+> *nameserver 127.0.0.1*
+
+### Test the Setup
+
+Using digg command
+
+Lets test the setup using digg and nslookup to see if domains are getting blocked and our DNS is resolving correctly.
+
+Following samples demonstrates the outputs and the bold letters confirms the DNS source. The confirmation we are looking for is in bold below.
+
+> [root@localhost named]# dig somemalwaredomain.com
+
+; &lt;&lt;>> DiG 9.9.4-P2-RedHat-9.9.4-18.P2.fc20 &lt;&lt;>> somemalwaredomain.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 8671
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 1, ADDITIONAL: 2
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;somemalwaredomain.com. IN A
+
+;; ANSWER SECTION:
+somemalwaredomain.com. 10800 IN A 127.0.0.1
+
+;; AUTHORITY SECTION:
+somemalwaredomain.com. 10800 IN NS somemalwaredomain.com.
+
+;; ADDITIONAL SECTION:
+somemalwaredomain.com. 10800 IN AAAA ::1 **;; Query time: 2 msec** **;; SERVER: 127.0.0.1#53(127.0.0.1)** **;; WHEN: Mon Jan 01 21:17:55 PST 2018** ;; MSG SIZE rcvd: 104
+
+Using nslookup
+
+> [root@localhost named]# nslookup somemalwaredomain.com
+Server: 127.0.0.1 **Address: 127.0.0.1#53** Name: somemalwaredomain.com
+Address: 127.0.0.1
+
+### Capture log to find the infected hosts
+
+These DNS requests can be logged and analyzed using network analysis tool like wireshark by setting a filter to udp.port==53 and exporting the packet data to a file ( File ->export packet Dissection )
+
+The captured information can be used to identify the compromised hosts and isolate & implement the cleanup operations.
+
+### Examples files
+
+Following are the example files used in the references above, these can be oped and used to create and test you setup.
+
+/etc/named.conf
+
+//
+// named.conf
+//
+// Provided by Red Hat bind package to configure the ISC BIND named(8) DNS
+// server as a caching only nameserver (as a localhost DNS resolver only).
+//
+// See /usr/share/doc/bind*/sample/ for example named configuration files.
+//
+
+options &#123;
+listen-on port 53 &#123; 127.0.0.1; &#125;;
+listen-on-v6 port 53 &#123; ::1; &#125;;
+directory "/var/named";
+dump-file "/var/named/data/cache_dump.db";
+statistics-file "/var/named/data/named_stats.txt";
+memstatistics-file "/var/named/data/named_mem_stats.txt";
+allow-query &#123; localhost; &#125;;
+recursion yes;
+
+dnssec-enable yes;
+dnssec-validation yes;
+dnssec-lookaside auto;
+
+/* Path to ISC DLV key */
+bindkeys-file "/etc/named.iscdlv.key";
+&#125;;
+
+logging &#123;
+
+syslog daemon;
+severity notice;
+&#125;;
+channel default_stderr &#123;
+null;
+&#125;;
+channel null &#123;
+null;
+&#125;;
+
+// These categories log DNS names
+category dnssec &#123; null; &#125;;
+category edns-disabled &#123; null; &#125;;
+category lame-servers &#123; null; &#125;;
+category resolver &#123; null; &#125;;
+category security &#123; null; &#125;;
+&#125;;
+
+zone "." IN &#123;
+type hint;
+file "named.ca";
+&#125;;
+
+include "/etc/named.rfc1912.zones";
+include "/etc/named.conf.blockeddomains";
+
+### 
+
+### /etc/named.conf.blockeddomains
+
+zone "somemalwaredomain.com" &#123;type master; file "named.empty";&#125;;
+zone "somebotnetdomain.com" &#123;type master; file "named.empty";&#125;;
+zone "someattackdomain.com" &#123;type master; file "named.empty";&#125;;
+
+### 
+
+### /var/named/named.empty
+
+$TTL 3H
+@ IN SOA @ rname.invalid. (
+0 ; serial
+1D ; refresh
+1H ; retry
+1W ; expire
+3H ) ; minimum
+NS @
+A 127.0.0.1
+AAAA ::1

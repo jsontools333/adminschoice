@@ -1,0 +1,468 @@
+---
+title: "Domain Name Service"
+description: "Domain name services resolves names to the ip addresses of clients and vice verse."
+pubDate: 2009-12-20
+updatedDate: 2026-06-20
+pageType: reference
+topic: sysadmin
+tier: "TIER 2 (core reference)"
+tags: ["dns"]
+testedOn: ["Linux", "Unix"]
+---
+
+DNS Server Setup & Configuration in Unix
+
+Domain name services resolves names to the ip addresses of clients and vice verse. Domain name system provides a convenient way of finding computer systems in network based on its name and ip address . With increased internet usage and globalization of companies setting up of DNS servers has become a major responsibility of system administrators worldwide .
+
+The following article describes in simple step the how to setup a DNS server. Though the article focus on Solaris but any operating system which uses BIND the procedure will remain the same.
+
+Contents
+
+1.0 Introduction to dns
+2.0 Requirements for setting up dns server
+3.0 DNS server Installation
+4.0 named.conf file in dns server configuration
+4.1 options statement in dns server configuration
+4.2 Zone in dns server configuration
+4.3 Logging in dns server
+5.0 Zone File in dns server
+6.0 Dns Client configuration
+7.0 Signals in dns server process - named
+
+1.0 Introduction
+
+Domain name system is a hierarchical system where we have a top level domain serving sub domain and clients with names & ip address.
+
+The system that runs the name services to resolve names into ip addresses is called name server and the software is generally BIND (Berkley Internet Domain) .
+
+Core process of DNS is a daemon called named . Depending on the role assigned the name servers can be a primary, secondary, caching or forwarding only. Secondary server takes over when primary is down and is updated automatically. Caching server provide only the caching information to the clients and forwarding dns simply forwards the requests to another dns.
+
+DNS Forwarding is can be used for two main scenario
+
+1. Creating a large site wide cache
+
+on different servers thereby using less network bandwidth.
+
+2. For servers which do not have a direct access to the internet
+
+but have to lookup for the external names.
+Forwarding occurs only for names for which the server is not authoritative, and it does not have the answer in its cache.
+
+Each of domain or sub domain have information (in zone files or data files) about its clients and is called authoritative for these clients . For other clients for which it doesn't have any information or it is not authoritative, it passes query to its higher domain .
+
+The client knows about their name servers through a file called resolve.conf which contains addresses of the name servers (Primary secondary and Caching) along with their domain name.
+
+The main files in serve are named.conf which contains server parameters and reference to other data files containing client information.
+
+2.0 Requirements
+
+1) BIND (Berkely Internet Domain) software
+
+.
+Source code can be downloaded and compiled for your platform from internet at
+
+isc.org/downloadables
+
+However BIND may be available in pre compiled version along with OS so check your OS if it is already there . The situation you may want to compile from source code is that you want to customize it differently by giving different configuration options at compiling time
+
+2)
+
+Root cache file
+
+from internic at ftp://internic.com/pub/root
+
+3)
+
+C Compiler
+
+to compile the bind source distribution .
+
+3.0 Installation and configuration
+
+Download the BIND software from from www.isc.org if you want to build it from source code.
+Make a directory to store and compile dns distribution source say /usr/dns/src
+
+Unzip the distribution using gzip command
+
+#gzip -d bind-9.2.5.tar.gz
+unpack using tar
+#tar xvf bind-9.2.5.tar
+compilation require a c compiler if you don't have one you can download from gnu site (www.gnu.org).
+#./configure
+#make
+#make install
+make install will ultimately place named , configuration file named.conf and related commands in /etc and /usr/local/bin directory .
+
+4.0 named.conf file
+
+This is the main configuration file in BIND which defines the name servers and zones with the name and ip address of the hosts.
+
+The named.conf has a number of options for starting the name server which can be configured as per requirement. A list of complete options can be seen using man named command.
+
+By default you will find zone files for local host by the name localhost and 127.0.0.in-addr.arpa . For additional zones you need to create the the files and put a reference in named.conf .
+
+Below is a basic functional named.conf file which is installed after the BIND 8..2.P5 is installed This can be used for starting name server , all you need to do is to put your hosts entries in the zone files referenced here .You will find explanation of terms used in this configuration file after this listing of named.conf.
+
+// This is a configuration file for named (from BIND 8.1 or later).
+// It would normally be installed as /etc/named.conf.
+
+options &#123; directory "/var/named";
+check-names master warn; /* default. */
+datasize 20M;
+deallocate-on-exit yes;
+listen-on &#123;10.20.30.100;
+&#125;;
+forward first;
+&#125;;
+zone "localhost" IN &#123;
+type master;
+file "/var/named/localhost.zone";
+check-names fail;
+allow-update &#123; none; &#125;;
+allow-transfer &#123; any; &#125;;
+&#125;;
+zone "0.0.127.in-addr.arpa" IN &#123;
+type master;
+file "/var/named/127.0.0.zone";
+check-names fail;
+allow-update &#123; none; &#125;;
+allow-transfer &#123; any; &#125;;
+&#125;;
+zone "." IN &#123;
+type hint;
+file "/var/named/root.hint";
+&#125;;
+logging &#123;
+channel xfer-log &#123;
+file "/var/tmp/bind-xfer.log" versions unlimited size 10m;
+print-category yes;
+print-severity yes;
+print-time yes;
+severity info;
+&#125;;
+category xfer-in &#123; xfer-log; &#125;;
+category xfer-out &#123; xfer-log; &#125;;
+category notify &#123; xfer-log; &#125;
+
+category load &#123; xfer-log; &#125;;
+&#125;;
+zone "30.20.10.in-addr.arpa" IN &#123;
+type master;
+file "/var/named/100.30.20.10.zone";
+check-names fail;
+allow-update &#123; none; &#125;;
+allow-transfer &#123; any; &#125;;
+&#125;;
+zone "mydomain.com" &#123;
+type master;
+file "/var/named/mydomain.com.hosts";
+&#125;;
+
+Explanation of the terms used in named.conf above
+
+4.1 options statement
+
+The options lists working directory for the named - the name server daemon to read the configurations files and port to listen on (default is port 53) .
+
+&#123; directory "/var/named";
+
+This directive defines the working directory of the name server where main configuration file named.conf will be located
+
+check-names master warn; /* default. */
+
+The ``check-names'' directive tells BIND to check names in master zone and give a warning in system's log files if there is any discrepancy. Names are considered good if they match RFC 952's expectations (if they are host names), or if they consist only of printable ASCII characters (if they are not host names).
+
+Other options are fail and ignore in that case bind will follow these directives
+
+datasize 20M;
+
+datasize The maximum amount of data memory the server may
+use. The default is system dependent.
+
+deallocate-on-exit yes;
+
+deallocate the memory on exit otherwise it will be left to os to clear the memory.
+
+listen-on &#123;10.20.30.100&#125;;
+
+Host address and port for listening ; if port is not mentioned it is default 53.
+
+forward first
+
+forward
+
+This option specify where to query the name first - 'first' directive will cause query to send to forwarder first and check itself if it fails .'Only' - directive will query the forwarders only .
+forwarders
+Specifies the IP addresses to be used for forwarding. The default is no forwarding.
+
+4.2 Zones statements
+
+zone "localhost" IN &#123;
+type master;
+file "/var/named/localhost.zone";
+check-names fail;
+allow-update &#123; none; &#125;;
+allow-transfer &#123; any; &#125;;
+&#125;;
+
+Zone statement declares a zone name , its type - master , slave or stub, files containing the zone data and options relating to zone - update , checking , transfer etc.
+
+localhost and 0.0.127.in-addr.arpa are default for the localhost and points to file of this name
+
+Zone types
+
+There are three types of zone .
+
+Master
+
+This is the master copy of the data in a zone.
+
+Slave
+
+This is a replica of a master zone. The masters list specifies one or more IP addresses that the slave contacts to update its copy of the zone. If file is specified then the replica will be written to the file. Use of file is recommended, since it often speeds server start up and eliminates a needless waste of bandwidth.
+
+stub
+
+A stub zone is like a slave zone, except that it replicates only the NS records of a master zone instead of the entire zone.
+
+Hint
+
+The initial set of root name servers is specified using a hint zone. When the server starts up, it uses the root hints to find a root name server and get the most recent list of root name servers.
+previous releases of BIND used the term primary for a master zone, secondary for a slave zone, and cache for a hint zone.
+
+Zone Directives
+
+allow-update
+Specifies which hosts are allowed to submit dynamic DNS updates to the server. The default is to deny updates from all hosts.
+allow-transfer
+Specifies which hosts are allowed to receive zone transfers from the server. allow-transfer may also be specified in the zone section, in which case it overrides the options allow-transfer statement. If not specified, the default is to allow transfers from all hosts.
+
+zone "." refers to the root file for the domains - and contains references to the root servers at network solutions to resolve the names which are beyond the current domain . you can download the root cache file from ftp://internic.com/pub/root
+
+4.3 Logging statement
+
+logging &#123;
+channel xfer-log &#123;
+file "/var/tmp/bind-xfer.log" versions unlimited size 10m;
+print-category yes;
+print-severity yes;
+print-time yes;
+severity info;
+&#125;;
+
+The logging statement specifies logging channel/s which logs various categories of messages. In statement above a channel xfer-log - a user defined name , is defined. Each time name server is started it starts writing to the defined log file , size limits the maximum size of log file and once the limit is reached it stops writing the file. Each individual start or restart of named causes a new version of log file to be created. Version statement defines how many versions are allowed for the log file , unlimited option will allow any number of version,
+
+Only one logging statement is used to define as many channels and categories as are wanted. If there are multiple logging statements in a configuration, the first definition determines the logging and warnings are issued for the other logging statements .
+
+If there is no logging statement, the default logging configuration is used which is
+
+logging &#123;
+category default &#123; default syslog; default_debug;&#125;;
+category panic &#123; default syslog; default_stderr;&#125;;
+category packet &#123; default_debug;&#125;;
+category eventlib &#123; default_debug;&#125;;
+&#125;;
+
+The default debug file is named.run .
+
+Channel Phrase
+
+All log output goes to one or more "channels"; you can make as many of them as you want. Every channel definition must include a clause that says whether messages selected for the channel go to a file, to a particular syslog facility, or are discarded. It can optionally also limit the message severity level that will be accepted by the channel (default is "info"), and whether to include a named-generated time stamp, the category name and/or severity level (default is not to include any).
+
+The word null as the destination option for the channel will cause all messages sent to it to be discarded; other options for the channel are meaningless.
+
+The file clause defines size and versions of the file which will be saved each time the file is opened. if the file ever exceeds the size, then named will just not write anything more to it . The default behavior is to not limit the size of the file.
+
+As per selection the log messages will either go to syslog() or a file and severity level determines which type of messages goes there . Default severity level is info. and it can be critical , error , debug and dynamic.
+
+Note that only syslog messages can go to syslog .
+
+Print-time , print-category - logs the time & category of the messages . The print- options can be used in any combination but will always be printed in the following order: time, category, severity.
+
+category xfer-in &#123; xfer-log; &#125;;
+category xfer-out &#123; xfer-log; &#125;;
+category notify &#123; xfer-log; &#125;
+
+These directives put diffrent categories of log messages in to xfer-log channel
+
+Category option mentions the category of the log and file name for logging
+
+logging &#123;
+channel xfer-log &#123;
+file "/var/tmp/bind-xfer.log" versions unlimited size 10m;
+print-category yes;
+print-severity yes;
+print-time yes;
+severity info;
+&#125;;
+
+this defines a channel called xfer-log with various options.
+
+these categories directs various types of logs into the channel
+
+5.0 ZONE files
+
+Zone files are used to define the name and ip addresses of the hosts in a domain .Generally two zone files are defined for a particular zone - one file maps the the name to the ipaddress of the host machines and other is used for reverse lookup i.e. ipaddress to name .address .
+
+Each master zone file should begin with an SOA (Start of Authority) record for
+the zone. The SOA specifies a serial number, which should be changed
+each time the master file is changed. it is 32 bit size field . Slave servers check the serial no. at refresh time and if the detect changed serial no in master zone transfer is carried out to keep its zone files updated.
+
+If a master server cannot be contacted within the interval given by the expire time, all data from the zone is discarded by slave servers.
+The minimum value is the time-to-live (``TTL'') used by records in the file with no explicit time-to-live value.
+
+The details of all type of records used in a zone file are given below
+
+Type of records
+
+SOA
+
+marks the start of a zone of authority (domain of originating host, domain address of maintainer, a serial number and the following parameters in seconds: refresh, retry, expire and minimum TTL. (see RFC 883)).
+
+NULL
+
+a null resource record (no format or data)
+
+RP
+
+a Responsible Person for some domain name
+
+PTR
+
+a domain name pointer (domain)
+
+HINFO
+
+host information (cpu_type OS_type)
+
+A
+
+a host address (dotted quad)
+
+NS
+
+an authoritative name server (domain)
+
+MX
+
+a mail exchanger (domain), preceded by a preference value (0..32767), with lower numeric values representing higher logical preferences.
+
+CNAME
+
+the canonical name for an alias (domain)
+
+Following are the three functional zone files representing local host and a master zone.
+
+The explanation of the terms are at the end.
+
+/var/named/localhost
+
+localhost. 1D IN SOA localhost.mydomainr.com. hostmaster.mydomain.com. (
+42 ; serial
+3H ; refresh
+15M ; retry
+1W ; expiry
+1D ) ; minimum
+localhost. NS dns
+localhost. A 127.0.0.1
+
+/var/named/ 0.0.127.in-addr.arpa
+
+0.0.127.in-addr.arpa IN SOA localhost. root.localhost. (
+42 ; serial
+3H ; refresh
+15M ; retry
+1W ; expiry
+1D ) ; minimum
+
+0.0.127.in-addr.arpa IN NS dns.mydomain.com
+1.0.0.127.in-addr.arpa. PTR localhost
+
+/var/named/mydomain.com
+
+mydomain.com. IN SOA dns.mydomain.com hostmaster.dns. (
+200010016 ;serial
+10800
+3600
+3600
+86400 )
+mydomain.com. 1D IN NS dns.mydomain.com.
+IN MX 20 mx1.domaingateway.net.
+IN MX 10 mail-in.mydomain.com.
+
+;mydomain hosts below
+
+www IN CNAME mydomain.com.
+localhost IN A 127.0.0.1
+mail IN A xxx.xxx.xxx.xxx
+ns1 IN A xxx.xxx.xxx.xxx
+dns IN A xxx.xxx.xxx.xxx
+news IN A xxx.xxx.xxx.xxx
+
+root cache file
+
+localhost. NS dns
+
+this is declaration of the type of localhost it declares that local host is a name server with hostname dns
+
+localhost. A 127.0.0.1
+
+this declares the address of local host.
+
+0.0.127.in-addr.arpa IN NS dns.mydomain.com
+1.0.0.127.in-addr.arpa. PTR localhost
+
+Similarly in reverse zone map file reverse address is declared as ns record of name dns and a pointer record ptr , points this rev address to the localhost.
+
+Resource records normally end at the end of a line, but may be continued across lines between opening and closing parentheses. Comments are introduced by semicolons and continue to the end of the line.Note that there are other resource record types, not shown where. You should consult the BIND Operations Guide (BOG') for the complete list. Some resource record types may have been standardized in newer RFC's but not yet implemented in this version of BIND.
+
+6.0 Client Configuration
+
+Each client need a configuration file /etc/resolv.conf which informs it about the domain name server . This is a editable text file with following entries :
+
+domainname yourdomainname.com
+nameserver 10.20.30.40
+nameserver 10.20.30.41
+
+7.0 Signals
+
+The following signals have the specified effect when sent to the server process named using the kill command.
+
+SIGHUP
+
+Causes server to read named.boot and reload the database. If the server is built with the FORCED_RELOAD compile-time option, then
+
+SIGHUP
+
+will also cause the server to check the serial number on all secondary zones. Normally the serial numbers
+are only checked at the SOA-specified intervals.
+
+SIGINT
+
+: Dumps the current data base and cache to /var/named/named_dump.db
+
+SIGIOT
+
+: Dumps statistics data into /var/named/named.stats .if the server is compiled with -DSTATS. Statistics data is appended to the file. Some systems use SIGABRT rather than SIGIOT for this.
+
+SIGSYS
+
+: Dumps the profiling data in /var/named if the server is compiled with profiling (server forks, chdirs and exits).
+
+SIGTERM
+
+- Dumps the primary and secondary database files.
+Used to save modified data on shutdown if the
+server is compiled with dynamic updating enabled.
+
+SIGUSR1
+
+- Turns on debugging; each SIGUSR1 increments debug level. (SIGEMT on older systems without SIGUSR1)
+
+SIGUSR2
+
+- Turns off debugging completely. (SIGFPE on older
+systems without SIGUSR2)
+SIGWINCH - Toggles logging of all incoming queries via sys-
+log(8) (requires server to have been built with the
+QRYLOG option)

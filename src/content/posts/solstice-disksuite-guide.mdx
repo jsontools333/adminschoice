@@ -1,0 +1,689 @@
+---
+title: "Solstice DiskSuite - Admin's Guide"
+description: "Learn about in good details ghow you can configure and use solstice disksuite."
+pubDate: 2009-12-29
+updatedDate: 2026-06-20
+pageType: reference
+topic: legacy
+tier: "TIER 4 (Solaris/legacy Unix)"
+tags: ["volumes"]
+testedOn: ["Linux", "Unix"]
+---
+
+Solstice disksuite is used to create Metadevices, virtual device composed of several physical devices slices/disks and use them to create different type of RAIDS to protect against disk failures 
+Learn about in good details ghow you can configure and use solstice disksuite.
+
+| 1.Advantages of Disksuite
+2. Disksuite terms
+3. Disksuite Packages
+4. Installing
+DiskSuite 4.2.1 in Solaris 8
+5. Creating State
+Database 
+6. Creating MetaDevices
+6.1. Concatenated
+Metadevice
+6.2. Striped
+Metadevice
+6.3 Mirrored Metadevice
+6.3.1 Simple mirror
+6.3.2 Mirroring a unmountable Partition 
+6.3.3 root mirroring & /usr mirroring
+6.3.4 Making alternate root disk bootable
+6.3.5 Setting
+alternate boot path for root mirror
+6.4 RAID 5 | 6.5 TransMeta Device
+6.5.1 TransMeta device for unmountable partition
+6.5.2 TransMeta device for non unmountable partition.
+6.5.3 TransMeta
+device using Mirror
+6.6 Hotspare Pool
+6.6.1 Adding a Hotspare to Mirror
+6.6.2 Adding a Hotspare to RAID5
+6.6.3 Adding a disk to Hotspare Pool.
+6.7 disksets
+6.7.1 Creating two diskset 
+6.7.2 Adding disk to diskset 
+6.7.3 Creating Mirror in Diskset
+7. TroubleShooting 
+7.1) Recovering from Stale State Database replicas
+7.2) Metadevice Errors |
+| --- | --- |
+
+1.
+
+Advantages of Disksuite
+
+Solstice disk suite provides three major functionalities :
+
+1.
+
+Over come the disk size limitation by providing for joining of
+multiple disk slices to form a bigger volume.
+
+2.
+
+Fault Tolerance by allowing mirroring of data from one disk to another
+and keeping parity
+information in RAID5.
+
+3.
+
+Performance enhancement by allowing spreading the data space over
+multiple disks .
+
+ 
+
+2.
+
+[]() Disksuite terms
+
+**Metadevice :** A virtual device composed of several physical devices -
+slices/disks . All the operations are carried out using metadevice
+name and transparently implemented on the individual device. **RAID :** A group of disks used for creating a virtual volume is called array and
+depending on disk/slice arrangement these are called various types of RAID
+(Redundant Array of Independent Disk ).
+
+> RAID 0 Concatenation/Striping RAID 1 Mirroring RAID 5 Striped array with rotating parity.
+
+Concatenation :
+
+Concatenation is joining of two or more disk slices to add up the disk space
+. Concatenation is serial in nature i.e. sequential data operation are performed
+serially on first disk then second disk and so on . Due to serial nature new
+slices can be added up without having to take the backup of entire concatenated
+volume ,adding slice and restoring backup .
+
+Striping
+
+:Spreading of data over multiple disk drives mainly to enhance the performance
+by distributing data in alternating chunks - 16 k interleave across the stripes
+. Sequential data operations are performed in parallel on all the stripes by
+reading/writing 16k data blocks alternatively form the disk stripes.
+
+Mirroring
+
+: Mirroring provides data redundancy by simultaneously writing data on to two
+sub mirrors of a mirrored device . A submirror can be a stripe or concatenated
+volume and a mirror can have three mirrors . Main concern here is that a mirror
+needs as much as the volume to be mirrored.
+
+RAID 5
+
+: RAID 5 provides data redundancy and advantage of striping and uses less space
+than mirroring . A RAID 5 is made up of at least three disk which are striped
+with parity information written alternately on all the disks . In case of a
+single disk failure the data can be rebuild using the parity information from
+the remaining disks .
+
+3.
+
+[]() Disksuite Packages :
+
+Solstice disk suite is a part of server edition of the Solaris OS and is not
+included with desktop edition . The software is in pkgadd format & can be
+found in following locations in CD :
+
+Solaris 2.6 - “Solaris Server Intranet Extensions 1.0” CD. Solaris 7 - “Solaris Easy Access Server 3.0” Solaris 8 - “Solaris 8 Software 2 of 2”
+
+Solaris 2.6 & 2.7 Solstice Disk suite version is 4.2 . Following packages are part of it but only the "SUNWmd" is the
+minimum required package and a patch.
+
+SUNWmd - Solstice DiskSuite SUNWmdg - Solstice DiskSuite Tool SUNWmdn - Solstice DiskSuite Log Daemon Patch No. 106627-04 (obtain latest revision)
+
+Solaris 8 DiskSuite version is 4.2.1 .Following are the minimum required packages ..
+
+SUNWmdr Solstice DiskSuite Drivers (root) SUNWmdu Solstice DiskSuite Commands SUNWmdx Solstice DiskSuite Drivers (64-bit)
+
+4.
+
+[]() Installing DiskSuite 4.2.1 in Solaris 8
+
+#
+
+cd /cdrom/sol_8_401_sparc_2/Solaris_8/EA/products/DiskSuite_4.2.1/sparc/Packages
+
+# pkgadd -d .
+
+The following packages are available: 1 SUNWmdg Solstice DiskSuite Tool (sparc) 4.2.1,REV=1999.11.04.18.29 2 SUNWmdja Solstice DiskSuite Japanese
+localization (sparc) 4.2.1,REV=1999.12.09.15.37 3 SUNWmdnr Solstice DiskSuite Log Daemon
+Configuration Files (sparc) 4.2.1,REV=1999.11.04.18.29 4 SUNWmdnu Solstice DiskSuite Log Daemon (sparc) 4.2.1,REV=1999.11.04.18.29 5 SUNWmdr Solstice DiskSuite Drivers (sparc) 4.2.1,REV=1999.12.03.10.00 6 SUNWmdu Solstice DiskSuite Commands (sparc) 4.2.1,REV=1999.11.04.18.29 7 SUNWmdx Solstice DiskSuite Drivers(64-bit) (sparc) 4.2.1,REV=1999.11.04.18.29 Select 1,3,4,5,6,7 packages .
+
+Enter ‘yes’ for the questions asked during installation and reboot the
+system after installation .
+
+Put /usr/opt/SUNWmd/bin in root PATH as the DISKSUITE commands are located in
+this directory
+
+5.
+
+[]() Creating State Database :
+
+State meta database , metadb , keeps information of the metadevices and is
+needed for Disksuite operation . Disksuite can not function without metadb so a
+copy of replica databases is placed on different disks to ensure that a copy is
+available in case of a complete disk failure .
+
+Metadb needs a dedicated disk slice so create partitions of about 5 Meg. on
+the disks for metadb. If there is no space available for metadb then it can be
+taken from swap . Having metadb on two disks can create problems as DISKSUITE
+looks for database replica number > 50% of total replicas and if one of the
+two disks crashes the replica falls at 50% . On next reboot system will go to
+single user mode and one has to recreate additional replicas to correct the
+metadb errors.
+
+The following command creates three replicas of metadb on three disk slices.
+
+#metadb -a -f -c 3 /dev/dsk/c0t1d0s6
+/dev/dsk/c0t2d0s6 /dev/dsk/c0t3d0s6
+
+6.
+
+Creating
+
+MetaDevices :
+
+Metadevices can be created in two ways
+
+> 1. Directly from the command line 2. Editing the /etc/opt/SUNWmd/ &lt;md.tab.html> file as per example given in the md.tab and initializing devices on command
+line using metainit &lt;device name> .
+
+6.
+
+1 ) Creating a concatenated Metadevice :
+
+**# metainit d0
+3 1 /dev/dsk/c0t0d0s4 1 /dev/dsk/c0t0d0s4
+1 /dev/dsk/c0t0d0s4**
+
+d0 - metadevice name 3 - Total Number of Slices 1 - Number of Slices to be added followed by slice name.
+
+6.2
+
+) Creating a stripe
+
+of 32k interleave
+
+# **metainit d10 1 2 c0t1d0s2 c0t2d0s2 -i 32k**
+
+d0 - metadevice name 1 - Total Number of Stripe 2- Number of Slices to be added to stripe followed by slice name . -i chunks of data written alternatively on stripes.
+
+6.
+
+3 ) Creating a Mirror :
+
+> A **mirror** is a metadevice composed of one or more **submirrors** . A
+submirror is made of one or more striped or concatenated metadevices. Mirroring
+data provides you with maximum data availability by maintaining multiple copies
+of your data. The system must contain at least three state database replicas
+before you can create mirrors. Any file system including root (/ ), swap , and /usr ,
+or any application such as a database, can use a mirror.
+
+6.3.1 ) Creating a simple mirror from new partitions
+
+1. Create two stripes for two submirors as d21 & d22
+
+# **metainit d21 1 1 c0t0d0s2**
+
+d21: Concat/Stripe is setup # **metainit t
+d22 1 1 c1t0d0s2**
+
+d22: Concat/Stripe is setup
+
+2. Create a mirror device (d20) using one of the submirror (d21)
+
+# **metainit d20 -m d21**
+
+d20: Mirror is setup
+
+3. Attach the second submirror (D21) to the main mirror device (D20)
+
+# **metattach d20 d22**
+
+d50: Submirror d52 is attached.
+
+4. Make file system on new metadevice
+
+#newfs /dev/md/rdsk/d20
+
+edit /etc/vfstab to mount the /dev/dsk/d20 on a mount point.
+
+6.3.2.) Mirroring a Partitions with data which can be unmounted
+
+# **metainit f
+d1 1 1 c1t0d0s0**
+
+d1: Concat/Stripe is setup # **metainit d2 1
+1 c2t0d0s0**
+
+d2: Concat/Stripe is setup # **metainit d0 -m
+d1**
+
+d0: Mirror is setup # **umount /local**
+
+(Edit the /etc/vfstab file so that the file system references the mirror) # **mount /local**
+
+# **metattach d0 d2**
+
+d0: Submirror d2 is attached
+
+6.3.3 ) Mirroring a Partitions with data which can not be unmounted - root and /usr
+
+> []() · **[]() /usr mirroring**
+
+# **metainit -f d12 1 1 c0t3d0s6**
+
+d12: Concat/Stripe is setup # **metainit d22 1 1 c1t0d0s6**
+
+d22: Concat/Stripe is setup # **metainit d2 -m d12**
+
+d2: Mirror is setup (Edit the /etc/vfstab file so that /usr references the mirror) # **reboot**
+
+... ... # **metattach d2 d22**
+
+d2: Submirror d22 is attached
+
+> []() · **[]() root mirroring**
+
+# **metainit -f d11 1 1 c0t3d0s0**
+
+d11: Concat/Stripe is setup # **metainit d12 1 1 c1t3d0s0**
+
+d12: Concat/Stripe is setup # **metainit d10 -m d11**
+
+d10: Mirror is setup # **metaroot d10**
+
+# **lockfs -fa**
+
+# **reboot**
+
+… … # **metattach d10 d12**
+
+d10: Submirror d12 is attached
+
+6.3.4 )
+
+Making Mirrored disk bootable
+
+a.) # installboot /usr/platform/`uname -i`/lib/fs/ufs/bootblk
+/dev/rdsk/c0t1d0s0
+
+6.3.5 )
+
+Creating alterbate name for Mirrored boot disk
+
+a.) Find physical path name for the second boot disk
+
+# **ls -l /dev/rdsk/c1t3d0s0**
+
+lrwxrwxrwx 1 root root 55 Sep 12 11:19 /dev/rdsk/c1t3d0s0 ->../../devices/sbus@1,f8000000/esp@1,200000/sd@3,0:a
+
+**b** .) Create an alias for booting from disk2
+
+**ok>** **nvalias bootdisk2 /sbus@1,f8000000/esp@1,200000/sd@3,0:a**
+
+**ok>** **boot bootdisk2**
+
+6.
+
+4
+
+Creating a RAID 5 volume :
+
+The system must contain at least three state
+database replicas before you can create RAID5 metadevices.
+
+A RAID5 metadevice can only handle a single
+slice failure.A RAID5 metadevice can be grown by concatenating additional slices
+to the metadevice. The new slices do not store parity information, however they
+are parity protected. The resulting RAID5 metadevice continues to handle a
+single slice failure.
+
+Create a RAID5 metadevice from a slice that
+contains an existing file system.will erase the data during the RAID5
+initialization process .The interlace value is key to RAID5 performance. It is
+configurable at the time the metadevice is created; thereafter, the value cannot
+be modified. The default interlace value is 16 Kbytes which is reasonable for
+most of the applications.
+
+6.4.1.) To setup raid5 on three slices of different disks .
+
+**# metainit d45 -r c2t3d0s2 c3t0d0s2 c4t0d0s2** d45: RAID is setup
+
+6.
+
+5.)
+
+Creating a Trans Meta Device :
+
+Trans meta devices enables ufs logging . There is one logging device and a
+master device and all file system changes are written into logging device and
+posted on to master device . This greatly reduces the fsck time for very large
+file systems as fsck has to check only the logging device which is usually of 64
+M. maximum size.Logging device preferably should be mirrored and located on a different drive
+and controller than the master device .
+
+Ufs logging can not be done for root partition.
+
+6.5.1)
+
+Trans Metadevice for a File System That Can Be Unmounted
+
+> · **/home2**
+
+1. Setup metadevice
+
+# **umount /home2**
+
+# **metainit d63 -t c0t2d0s2 c2t2d0s1**
+
+d63: Trans is setup
+
+Logging becomes effective for the file system when it is remounted
+
+2. Change vfstab entry & reboot
+
+from
+
+/dev/md/dsk/d2 /dev/md/rdsk/d2 /home2 ufs 2 yes - to
+
+/dev/md/dsk/d63 /dev/md/rdsk/d63 /home2 ufs 2 yes -
+
+# **mount /home2**
+
+Next reboot displays the following message for logging device # **reboot**
+
+... /dev/md/rdsk/d63: is logging
+
+6.5.2
+
+)
+
+Trans Metadevice for a File System That Cannot Be Unmounted
+
+> · **/usr**
+
+1.) Setup metadevice
+
+# **metainit -f d20 -t c0t3d0s6 c1t2d0s1**
+
+d20: Trans is setup
+
+2.) Change vfstab entry & reboot:
+
+**from**
+
+**/dev/dsk/c0t3d0s6 /dev/rdsk/c0t3d0s6 /usr ufs 1 no -** **to** **/dev/md/dsk/d20 /dev/md/rdsk/d20 /usr ufs 1 no -**
+
+# **reboot**
+
+6.5.3 ) TransMeta device using Mirrors
+
+1.) Setup metadevice
+
+#umount /home2 #metainit d64 -t d30 d12
+
+d64 trans is setup
+
+2.) Change vfstab entry & reboot:
+
+from
+
+**/dev/md/dsk/d30 /dev/md/rdsk/d30 /home2 ufs 2 yes**
+
+to
+
+/dev/md/dsk/d64 /dev/md/rdsk/d64 /home2 ufs 2 yes
+
+6.6 )
+
+HotSpare Pool
+
+A hot spare pool is a collection of slices reserved by DiskSuite to be
+automatically substituted in case of a slice failure in either a submirror or
+RAID5 metadevice . A hot spare cannot be a metadevice and it can be associated
+with multiple submirrors or RAID5 metadevices. However, a submirror or RAID5
+metadevice can only be asociated with one hot spare pool. .Replacement is based on a first fit for the failed slice and they need to be
+replaced with repaired or new slices. Hot spare pools may be allocated,
+deallocated, or reassigned at any time unless a slice in the hot spare pool is
+being used to replace damaged slice of its associated metadevice.
+
+[]() 6.6.1) Associating a Hot Spare Pool with Submirrors
+
+# **metaparam -h hsp100
+d10**
+
+# **metaparam -h hsp100
+d11**
+
+# **metastat d0**
+
+d0: Mirror Submirror 0: d10 State: Okay Submirror 1: d11 State: Okay ... d10: Submirror of d0 State: Okay Hot spare pool: hsp100 ... d11: Submirror of d0 State: Okay Hot spare pool: hsp100
+
+6.6.2 ) Associating or changing a Hot Spare Pool with a RAID5 Metadevice
+
+#metaparam -h
+hsp001 d10 **#metastat d10** d10:RAID State: Okay Hot spare Pool: hsp001
+
+[]() 6.6.3 ) Adding a Hot Spare Slice to All Hot Spare Pools
+
+# **metahs -a -all
+/dev/dsk/c3t0d0s2**
+
+hsp001: Hotspare is added hsp002: Hotspare is added hsp003 **:** Hotspare is added
+
+6.
+
+7 )
+
+Disksets
+
+Few important points about disksets :
+
+- A diskset is a set of shared *disk drives* containing
+DiskSuite objects that can be shared exclusively (but not concurrently)
+by one or two hosts. Disksets are used in high availability failover
+situations where the ownership of the failed machine’s diskset is
+transferred to other machine . Disksets are connected to two hosts for
+sharing and must have same attributes , controller/target/drive ,
+in both machines except for the ownership .
+
+- DiskSuite must be installed on each host that will be connected to the
+diskset.There is one metadevice state database per shared diskset and one on
+the "local" diskset. Each host must have its local metadevice
+state database set up before you can create disksets.
+
+Each host in a diskset must have a local diskset besides a shared diskset.A diskset can be created seprately on one host & then
+added to the second host later.
+
+- Drive should not be in use by a file system, database, or any other
+application for adding in diskset .
+
+When a drive is added to disksuite it is
+repartitioned so that the metadevice state database replica for
+the diskset can be placed on the drive. Drives are repartitioned when
+they are added to a diskset only if Slice 7 is not set up correctly. A
+small portion of each drive is reserved in Slice 7 for use by DiskSuite.
+The remainder of the space on each drive is placed into Slice 0.. After
+adding a drive to a diskset, it may be repartitioned as necessary,
+provided that no changes are made to Slice 7 . If Slice 7 starts
+at cylinder 0, and is large enough to contain a state database replica,
+the disk is not repartitioned.
+
+When drives are added to a diskset, DiskSuite re-balances the state
+database replicas across the remaining drives. Later, if necessary, you
+can change the replica layout with the metadb(1M)
+command.
+
+To create a diskset, root
+must be a member of Group 14, or the ./rhosts
+file must contain an entry for each host.
+
+6.7.1 )
+
+Creating Two Disksets
+
+host1# **metaset -s diskset0
+-a -h host1 host2**
+
+host1# **metaset -s
+diskset1 -a -h host1
+host2** host1# **metaset**
+
+Set name = diskset0, Set number = 1 Host Owner host1 host2 Set name = diskset1, Set number = 2 Host Owner host1 host2
+
+6.7.2 )
+
+Adding Drives to a Diskset
+
+host1# **metaset -s
+diskset0 -a c1t2d0 c1t3d0 c2t2d0
+c2t3d0 c2t4d0 c2t5d0** host1# **metaset** Set name = diskset0, Set number = 1 Host Owner host1 Yes host2 Drive Dbase c1t2d0 Yes c1t3d0 Yes c2t2d0 Yes c2t3d0 Yes c2t4d0 Yes c2t5d0 Yes Set name = diskset1, Set number = 2 Host Owner host1 host2
+
+6.7.3 )
+
+Creating a Mirror in a Diskset
+
+# **metainit -s diskset0 d51 1
+1 /dev/dsk/c0t0d0s2**
+
+diskset0/d51: Concat/Stripe is setup # **metainit -s diskset0 d52 1
+1 /dev/dsk/c1t0d0s2**
+
+diskset0/d52: Concat/Stripe is setup # **metainit -s diskset0 d50 -m
+d51**
+
+diskset0/d50: mirror is setup # **metattach -s diskset0 d50
+d52**
+
+diskset0/d50: Submirror d52 is attached
+
+7.0
+
+Trouble Shooting
+
+7. []() 1 ) Recovering from Stale State Database Replicas
+
+**Problem :** State database
+corrupted or unavailable . **Causes :** Disk failure , Disk I/O
+error. **Symptoms :** Error message at the booting time if databases are &lt;=
+50% of total database. System comes to Single user mode.
+
+ok **boot** ...
+Hostname: host1
+metainit: Host1: stale databases
+Insufficient metadevice database replicas located.
+Use metadb to delete databases which are broken.
+Ignore any "Read-only file system" error messages.
+Reboot the system when finished to reload the metadevice
+database.
+After reboot, repair any broken database replicas which were
+deleted.
+Type Ctrl-d to proceed with normal startup,
+(or give root password for system maintenance): &lt; root-password >
+Entering System Maintenance Mode.
+
+1.) Use the
+
+metadb
+
+command to look at the metadevice state database
+and see which state database replicas are not available. Marked by unknown and M
+flag.
+
+# **/usr/opt/SUNWmd/metadb -i** flags first blk
+block count
+a m p lu 16
+1034
+/dev/dsk/c0t3d0s3
+a p l
+1050
+1034
+/dev/dsk/c0t3d0s3
+M p
+unknown unknown
+/dev/dsk/c1t2d0s3
+M p
+unknown unknown
+
+2.) Delete the state database replicas on the bad disk using the -d option to the metadb(1M) command. At this point, the root ( / ) file system
+is read-only. You can ignore the mddb.cf error messages: # **/usr/opt/SUNWmd/metadb -d -f
+c1t2d0s3** metadb: demo: /etc/opt/SUNWmd/mddb.cf.new: Read-only file system . Verify deletion # **/usr/opt/SUNWmd/metadb -i** flags first blk
+block count
+a m p lu
+16
+1034 /dev/dsk/c0t3d0s3
+a p l
+1050 1034
+/dev/dsk/c0t3d0s3
+
+3.) Reboot.
+
+4.) Use the
+
+metadb
+
+command to add back the state database replicas
+and to see that the state database replicas are correct.
+
+# **/usr/opt/SUNWmd/metadb -a -c 2 c1t2d0s3** # **/usr/opt/SUNWmd/metadb** flags first blk
+block count
+a m p luo
+16
+1034 dev/dsk/c0t3d0s3
+a p luo
+1050
+1034 dev/dsk/c0t3d0s3
+a
+u
+16
+1034 dev/dsk/c1t2d0s3
+a
+u
+1050
+1034 dev/dsk/c1t2d0s3
+
+7. []() 2 ) Metadevice Errors :
+
+**Problem** : Sub Mirrors out of sync in
+"Needs maintainence" state , **Causes** : Disk problem / failure ,
+improper shutdown , communication problems between two mirrored disks . **symptoms** : "Needs maintainence" errors in metastat output
+
+| # /usr/opt/SUNWmd/metastat
+d0: Mirror
+Submirror 0: d10
+State: Needs maintenance
+Submirror 1: d20
+State: Okay
+...
+d10: Submirror of d0
+State: Needs maintenance
+Invoke: "metareplace d0 /dev/dsk/c0t3d0s0 &lt;new device>"
+Size: 47628 blocks
+Stripe 0:
+Device Start Block Dbase State Hot Spare
+/dev/dsk/c0t3d0s0 0 No Maintenance
+
+d20: Submirror of d0
+State: Okay
+Size: 47628 blocks
+Stripe 0:
+Device Start Block Dbase State Hot Spare
+/dev/dsk/c0t2d0s0 0 No Okay |
+| --- |
+
+Solution :
+
+1.) If disk is all right - enable the
+failed metadevice with metareplace command . If disk is failed - Replace
+disk create similar partitions as in failed disk and enable new device with
+metareplace command. # **/usr/opt/SUNWmd/metareplace -e d0 c0t3d0s0** Device /dev/dsk/c0t3d0s0 is enabled
+
+2.) If disk has failed and you want to move the failed devices to
+new disk with different id (CnTnDn) - add new disk , format to create
+a similar partition scheme as in failed disk and use metarepalce command # **/usr/opt/SUNWmd/metareplace d0 c0t3d0s0
+&lt;new device name>**
+
+The metareplace command above can also be used for concate or strip
+replacement in a volme but that would involve restoring the backup if it
+is not mirrored.

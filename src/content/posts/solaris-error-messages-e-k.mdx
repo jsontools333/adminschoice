@@ -1,0 +1,734 @@
+---
+title: "Solaris  Error messages E-K"
+description: "Solaris / Unix error messages are very short and often we need some more information about the origin of an error and a possible steps to fix the issues."
+pubDate: 2009-12-20
+updatedDate: 2026-06-20
+pageType: reference
+topic: legacy
+tier: "TIER 4 (Solaris legacy)"
+tags: ["errors"]
+testedOn: ["Linux", "Unix"]
+---
+
+Solaris / Unix error messages are very short and often we need some more information about the origin of an error and a possible steps to fix the issues.
+
+Here is a list of Solaris / Unix error messages for your reference, most of the error messages are generic Unix error messages but many are specific Solaris Error Messages. Please comment if you can provide some more details about these errors.
+
+This is a multi part document , this part covers error messages starting from E to K
+Please scroll down to related posts section for other parts of this document.
+
+[]() E
+
+55.
+
+error: DPS has not initialized or server connection failed
+
+56.
+
+ERROR: missing file arg (cm3)
+
+57.
+
+ERROR [SCCS/s.variable]: writable `variable' exists (ge4)
+
+58.
+
+esp0: data transfer overrun
+
+59.
+
+Event not found
+
+60.
+
+EXCESSIVE BAD BLKSI=N CONTINUE?
+
+61.
+
+EXCESSIVE DUP BLKS I=N CONTINUE?
+
+62.
+
+Exec format error
+
+[]() F
+
+63.
+
+fd0: unformatted diskette or no diskette in the drive
+
+64.
+
+File exists
+
+65.
+
+File locking deadlock
+
+66.
+
+filemgr: mknod: Permission denied
+
+67.
+
+File name too long
+
+68.
+
+FILE SYSTEM STATE IN SUPERBLOCK IS WRONG; FIX?
+
+69.
+
+File table overflow
+
+70.
+
+File too large
+
+71.
+
+FREE BLK COUNT(S) WRONG IN SUPERBLK SALVAGE?
+
+72.
+
+fsck: Can't open /dev/dsk/variable
+
+73.
+
+fsck: Can't stat /dev/dsk/variable
+
+[]() G
+
+74.
+
+giving up
+
+75.
+
+Graphics Adapterdevice /dev/fb is of unknown type
+
+76.
+
+group.org_dir: NIS+ servers unreachable
+
+[]() H
+
+77.
+
+/home/variable: No such file ordirectory
+
+78.
+
+Host is down
+
+79.
+
+host name configuration error
+
+80.
+
+hosts.org_dir: NIS+ servers unreachable
+
+[]() I
+
+81.
+
+I can't read your attachments. What mailer are you using?
+
+82.
+
+ie0: Ethernet jammed
+
+83.
+
+ie0: no carrier
+
+84.
+
+Illegal Instruction
+
+85.
+
+Illegal instruction "0xN" was encounteredat PC 0xN
+
+86.
+
+Illegal seek
+
+87.
+
+Image Tool: Unable to open XIL Library.
+
+88.
+
+Inappropriate ioctl for device
+
+89.
+
+INCORRECT BLOCK COUNT I=N (should be N) CORRECT?
+
+90.
+
+inetd[N]: execv /usr/sbin/in.uucpd: No such file or directory
+
+91.
+
+inetd[N]: variable/tcp: unknown service
+
+92.
+
+inetd[N]: variable/udp:unknown service
+
+93.
+
+inetd: Too many open files
+
+94.
+
+INIT: Cannot create /var/adm/utmp or /var/adm/utmpx
+
+95.
+
+InitOutput: Error loading module for /dev/fb
+
+96.
+
+Interrupted system call
+
+97.
+
+Invalid argument
+
+98.
+
+Invalid null command
+
+99.
+
+I/O error
+
+100.
+
+Is a directory
+
+**K**
+
+101.
+
+kernel read error
+
+102.
+
+Killed
+
+103.
+
+kmem_free block already free
+
+[]() error: DPS has not initialized or server connection failed
+
+> This message appears when trying to run AnswerBook with a generic
+X11 window server or on a generic X terminal.Running AnswerBook requires Display PostScript (DPS), or a NeWS
+server, or the Adobe DPS NS remote display software. In addition,
+a complete LaserWriterII Type-1 font set (including Palatino)
+should be installed on the X server. To find out if your X server
+has DPS, run xdpyinfo(1) to verify the presence of an "Adobe-
+DPS-Extension" line. X servers without this line don't know about
+DPS.
+
+[]() ERROR: missing file arg (cm3)
+
+> An attempt was madd to run some sccs(1) operation that requires a
+filename, such as create, edit, delget, or prt.Supply the appropriate filename after the SCCS operation.
+
+[]() ERROR [SCCS/s.variable]: `SCCS/p.variable' nonexistent (ut4)
+
+> An attempt was made to sccs edit or sccs get a file that is not
+yet under SCCS control.
+Run sccs create on that file to place it under SCCS control.
+
+[]() ERROR [SCCS/s.variable]: writable `variable' exists (ge4)
+
+> An attempt was made to sccs edit a file that is writable,
+probably because it is already checked out.Run sccs info to see who has the file checked out. If it is you,
+go ahead and edit it. If it is somebody else, ask that personto
+check in the file.
+
+esp0: data transfer overrun
+
+> When a user tries to mount a CDROM on a third-party CD drive,
+mount(1M) fails with the above error, followed by the "sr0: SCSI
+transport failed" message. The CD drive probably comes from a
+vendor unknown to the system.Third-party CD drives generally have an 8192 block size, as
+opposed to the 512 block size on supported Sun drives. Check with
+the vendor to see if any special configuration is possible to
+allow the drive to operate on a Sun workstation.
+
+[]() Event not found
+
+> This C shell message indicates that a user tried to repeat a
+command from the history list, but that command or number does
+not exist in the list.Run the C shell history command to display recent events in the
+history list. If a user often tries to run commands that have
+disappeared from the history list, make the list longer by
+setting history to a higher value.For more information about the C shell, see csh(1).
+
+[]() EXCESSIVE BAD BLKSI=N CONTINUE?
+
+> During phase 1, fsck(1M) found more than 10 bad (out-of-range)
+blocks associated with the specified inode number.With this many bad blocks, it might be preferable to restore the
+filesystem from backup tapes
+
+[]() EXCESSIVE DUP BLKS I=N CONTINUE?
+
+> During phase 1, fsck(1M) found more than 10 duplicate (previously
+claimed) blocks associated with the specified inode number.With this many duplicate blocks, it might be preferable to
+restore the filesystem from backup tapes.
+
+string.
+
+[]() Exec format error
+
+> This often happens when trying to runsoftware compiled for
+different systems or architectures, such as when executing
+Solaris 2.x programs on a SunOS 4.1.x system, or when trying to
+execute SPARC-specific programs on an x86 machine. On a Solaris
+2.x system, it can also occur if the BinaryCompatibility Package
+was not installed.
+Make sure that the software matches the architecture and system
+you're using. The file(1) command can help you determine the
+target architecture. If you're using SunOS 4.1.x softwareon a
+Solaris 2.x system, make sure that the Binary Compatibility
+Package is installed. You can check for it using this command:$ pkginfo | grep SUNWbcpA request was made to execute a file that, although it has the
+appropriate permissions, does not start with a valid format.
+
+[]() fd0: unformatted diskette or no diskette in the drive
+
+> This message appears on the system console to indicate that the
+floppy driver fd(7) could not read the label on a diskette.
+Usually this is either because a new diskette has not yet been
+formatted, or a formatted diskette has become corrupted. This
+message often appears along with "read failed" and "bad
+format"
+messages after volcheck(1) is run.If you are certain that the diskette contains no data, run
+fdformat -d to format the diskette in DOS format. (You can also
+format a diskette in UFS format if you like, although then it is
+not transportable to most other systems.) When the diskette is
+formatted, you can write on it, if it was not corrupted beyond
+repair.
+
+[]() File exists
+
+> The name of an existing file was mentioned in an inappropriate
+context. For example,it is not allowed to establish a link to an
+existing file, or to overwrite an existing file when the csh(1)
+noclobber option is set.Look at the names of files in the directory, then try again with
+a different name or after renaming or removing the existing file.The symbolic name for this error is EEXIST, errno=17.
+
+[]() File locking deadlock
+
+> This is a programming problem, in some cases unavoidable.All a user can do is restart the program and hope deadlock does
+not reoccur.Inthe file locking subsystem, two processes tried to modify some
+lock at the same time. In the multithreading subsystem, two
+threads became deadlocked and could not continue. When a program
+using the threads library encounters this error, it should
+restart the deadlocked threads.The symbolic name for this error is EDEADLOCK, errno=56.
+
+[]() filemgr: mknod: Permission denied
+
+> File Manager issues this message and fails to come up whenever
+the /tmp/.removable directory is owned by another user and is not
+1777 mode. This can happen, for example, when multiple users
+share a workstation.Have the original owner change the mode ((chmod(1)) of this file
+back to 1777, its default creation mode. Rebooting the
+workstation also resolves this problem.
+
+[]() File name too long
+
+> The specified file name has too many characters.If a file name or path name component is too long, devise a
+shorter name. If the totalpath name is longer than PATH_MAX
+characters, first change to an intermediate directory, then
+specify a shorter path name. Newly-created data will be lost
+unless written to another file with a shorter name.In a UFS or NFS-mounted UFS filesystem, the length of a path name
+component exceeds MAXNAMLEN (255) characters, or the total length
+of the path name exceeds PATH_MAX (1024) characters. In a System
+V filesystem, the length of a path name component exceeds
+NAME_MAX (14) characters while no-truncation mode is in effect.
+These values are defined in the /usr/include/limits.h(4) file.The symbolic name for this error is ENAMETOOLONG, errno=78.
+
+[]() FILE SYSTEM STATE IN SUPERBLOCK IS WRONG; FIX?
+
+> The fsck(1M) command has just checked a filesystem, and has
+determined that the filesystem is clean. The filesystem's
+superblock, however, still thinks the filesystem is "dirty" in
+some way.If you believe that the filesystem is adequately repaired, answer
+yes to mark the filesystem as clean.Different "dirty" filesystem types are listed in
+/usr/include/sys/fs/ufs_fs.h, and include FSACTIVE, FSBAD, FSFIX,
+FSLOG, and FSSUSPEND.
+
+[]() File table overflow
+
+> The kernel file table is full because too many files are open on
+the system. Temporarily, no more files can be opened. New data
+created under this condition will probably be lost.Simply waiting often gives the system time to close files.
+However, if this message occurs often, reconfigure the kernel to
+allow more open files. To increasethe size of the file table in
+Solaris 2.x, increase the value of maxusers in the /etc/system
+file. The default maxusers value is the amount of main memory in
+MB, minus 2.The symbolic name for this error is ENFILE, errno=23.
+
+[]() File too large
+
+> The file size exceeded the limit specified by ulimit(1), or the
+file size exceeds the maximum supported by the file system. New
+data created under this condition will probably be lost.In the C shell, use the limit command to see or set the default
+file size. In the Bourne or Korn shells, use the ulimit -a
+command. Even when the shells claim that the file size is
+unlimited, in fact the system limit is FCHR_MAX (usually 1
+gigabyte).
+The symbolic name for this error is EFBIG, errno=27.
+
+[]() FREE BLK COUNT(S) WRONG IN SUPERBLK SALVAGE?
+
+> During phase 5, fsck(1M) detected that the actual number of free
+blocks in the filesystem did not match the superblock's free
+block count.The df(1M) command accesses this free block count
+when measuring filesystem capacity.Generally you can answer yes to this question without harming the
+filesystem.For more information on superblocks, see the section on checking
+filesystem integrity in the System Administration Guide, Volume
+I. If you are using the AnswerBook, "bad superblock" is a good
+search string.
+
+[]() fsck: Can't open /dev/dsk/variable
+
+> The fsck(1M) command cannot open the disk device, because
+although a similar filesystem exists, the partition specified
+does not.
+Run the mount(1M) or the format(1M) command to see what
+filesystems are configured on the machine. Then run fsck again on
+an existing partition.
+
+[]() fsck: Can't stat /dev/dsk/variable
+
+> The fsck(1M) command cannot open the disk device, because the
+specified filesystem does not exist.
+Run the mount(1M) or the format(1M) command to see what
+filesystems are configured on the machine. Then run fsck again on
+an existing filesystem.
+
+[]() giving up
+
+> This message appears in the SCSI log to indicate that a read or
+write operation has been retried until it timed out. With SCSI
+disk the timeout period is usually 30 seconds; with tape the
+period is usually 20 attempts. Timeout periods are generally
+coded into the drivers.Check that all SCSI devices are connected and powered on. Make
+sure that SCSI target numbers are correct and not in conflict.
+Verify that all cables are no longer than six meters, total, and
+that all SCSI connections are properly terminated.
+The scsi_log(9F) routine usually displays messages on the system
+console and in the /var/adm/messages file. Run the dmesg(1M)
+command to see the most recent message buffer.
+
+[]() Graphics Adapterdevice /dev/fb is of unknown type
+
+> The /dev/fb driver is either missing or corrupted.
+See "InitOutput: Error loading module for /dev/fb" for details.
+
+[]() group.org_dir: NIS+ servers unreachable
+
+> This is the second of three messages that an NIS+ client prints
+when it cannot locate an NIS+ server on the network.
+See the message "hosts.org_dir: NIS+ servers unreachable" for
+details.
+
+[]() /home/variable: No such file ordirectory
+
+> An attempt was made to change to a user's home directory, but
+either that user does not exist or the user's fileserver has not
+shared (exported) that filesystem.To check on the existence of a particular user, run the
+ypmatch(1) or nismatch(1) command, specifying the user name and
+then the passwd map.To export filesystems from the remote fileserver, become
+superuser on that system and run the share(1M) command with the
+appropriate options. If that system is sharing (exporting)
+filesystems for the first time, also invoke
+/etc/init.d/nfs.server start to begin NFS service.For more information on sharing filesystems.
+
+[]() Host is down
+
+> A transport connection failed because the destination host was
+down. For example, mail delivery was attempted over several days,
+but the destination machine was not available during any of these
+attempts.Report this error to the system administrator for the host. If
+you are the person responsible for this system, check to see if
+the machine needs repair or rebooting.This error results from status information delivered by the
+underlying communication interface. If there is no known
+connection to the host, a different message usually results. See
+"No route to host" for details.The symbolic name for this error is EHOSTDOWN, errno=147.
+
+[]() host name configuration error
+
+> This is an old sendmail message, which replaced "I refuse to talk
+tomyself" and is now replaced by the "Local configuration error"
+message.See the message "554 variable... Local configuration error" for
+details.
+
+[]() hosts.org_dir: NIS+ servers unreachable
+
+> This is the third of three messages that an NIS+ client prints
+when it cannot locate an NIS+ server on the network.If other NIS+ clients are behaving normally, check the Ethernet
+cabling on the workstation showing this message. On SPARC
+machines, disconnected network cablingalso produces a series of
+"no carrier" messages. On x86 machines, the NIS+ messages might
+be your only indication that network cabling is disconnected.If many NIS+ clients on the network are giving this message, go
+to the NIS+ server in question and reboot or repair it, as
+necessary. When the server machine is back in operation, NIS+
+clients will give an "NIS server for domain OK" message.
+
+[]() ie0: Ethernet jammed
+
+> This message can appear on SPARCservers or x86 machines with an
+Intel 82586 Ethernet chip. It indicates that 16 successive
+transmission attempts failed, causing the driver to give up on
+the current packet.If this error occurs sporadically or at busy times, it probably
+means that the network is saturated. Wait for network traffic to
+clear. If bottlenecks arise frequently, think about reconfiguring
+the network or adding subnets.Another possible cause of this message is a noise source
+somewhere in the network, such as a loose transceiver connection.
+Use snoop(1M)or a similar program to isolate the problem area,
+then check and tighten network connectors as necessary.
+
+[]() ie0: no carrier
+
+> This message can appear on SPARCservers or x86 machines with an
+Intel 82586 Ethernet chip. It indicates that thechip has lost
+input to its carrierdetect pin while trying to transmit a
+packet, causing the packet to be dropped.Check that the Ethernet connector is not loose or disconnected.
+Other possible causes include an open circuit somewhere in the
+network and noise on the carrier detect linefrom the
+transceiver. Use snoop(1M) or a similar program to isolate the
+problem area, then check the network connectors and transceivers,
+as needed.
+
+[]() Illegal Instruction
+
+> A process has received a signal indicating that it attempted to
+execute an instruction that is not allowed by the kernel. This
+usually results from running programs compiled for a slightly
+different machine architecture. This message is usually
+accompanied by a core dump, excepton read-only filesystems.If you are booting from CDROM or from the net, check README files
+to make sure you are using an image appropriate for your machine
+architecture. Run df to make sure there is enough swap space on
+the system; too little swap space can cause this error. If you
+recently upgraded your CPU to a new architecture, replace your
+operating system with one that supports the new architecture (an
+operating system upgrade might be required).Sometimes this condition results from programming error, such as
+when a program attempts to execute data as instructions. This
+condition can also indicate device file corruption on your
+system.
+
+[]() Illegal instruction "0xN" was encountered at PC 0xN
+
+> The machine is trying to boot from a non-boot device, or from a
+boot device for a different hardware architecture.If you are booting from the net, check README files to make sure
+you are using a boot image for that architecture. If you are
+booting from disk, make sure the system is looking at the right
+disk, which is usually SCSI target 3. Failing these solutions,
+connect a CD drive to the system and boot from CDROM.
+
+[]() Illegal seek
+
+> Using a pipe ("|") on the command line doesn't work here.
+Rather than using a pipe on the command line, redirect the output
+of the first program into a file and then run the second program
+on that file.A call to lseek(2) was issued to a pipe. This error condition can
+also be fixed by altering the program to avoid using lseek().The symbolic name for this error is ESPIPE, errno=29
+
+.
+
+[]() Image Tool: Unable to open XIL Library.
+
+> This message follows multiple multi-line "XilDefaultErrorFunc"
+errors, indicating that ImageTool could not locate the X Imaging
+Library. Many OpenWindows and CDE deskset programs require XIL.Run pkginfo(1) to determine what packages are installed on the
+system. If the following packages are not present, install them
+from CDROM or over thenet: SUNWxildg, SUNWxiler, SUNWxilow, and
+SUNWxilrt.
+
+[]() Inappropriate ioctl for device
+
+> This is a programming error.
+Ask the program's author to fix this condition. The program needs
+to be changed so it employs a device driver that can accept
+special character device controls.The ioctl() system call was given as an argument for a file that
+is not a special character device. This message replaces the
+traditional but puzzling "Not a typewriter" message.
+The symbolic name for this error is ENOTTY, errno=25.
+
+[]() INCORRECT BLOCK COUNT I=N (should be N) CORRECT?
+
+> During phase 1, fsck(1M) determined that the specified inode
+pointed to a number of bad or duplicate blocks, sothe block
+count should be corrected to the actual number shown.
+Generally you can answer yes to this question without harming the
+filesystem.For more information on bad blocks.
+
+[]() inetd[N]: execv /usr/sbin/in.uucpd: No such file or directory
+
+> This message indicates that the Internet services daemon
+inetd(1M) tried to start up the UUCP service without the UUCP
+daemon existing on the system.The SUNWbnuu package must be installed before the machine can run
+UUCP. Run pkgadd(1M) to install this package from the
+distribution CDROM or over the network.
+
+[]() inetd[N]: variable/tcp: unknown service
+
+> This message indicates that the Internet services daemon
+inetd(1M) could not locate the TCP service specified after the
+first colon.Check the current machine's /etc/services file, and the NIS
+services map, to see if the service is described. To start this
+service, add an appropriate entry into the /etc/services file and
+possibly the services map as well. Note that NIS+ does not
+consult the local /etc/services file unless you put "files" right
+after "nisplus" on the services line of the system's
+/etc/nsswitch.conf file.If you do not want to start this service, edit the system's
+/etc/inetd.conf file and delete the entry that tries to start it
+up.
+
+[]() inetd[N]: variable/udp:unknown service
+
+> This message indicates that the Internet services daemon
+inetd(1M) could not locate the UDP service specified after the
+first colon.See the message "inetd[N]: variable/tcp: unknown service" fora
+solution.
+
+[]() inetd: Too many open files
+
+> This message can appear when someone runs a command from the
+shell or uses a third-party application. The sar(1M) command does
+not indicate that the system-wide open file limit has been
+exceeded.The probable cause for this is that the shell limit has been
+exceeded. The default open file limit is 64, but can be raised to
+256.
+
+[]() INIT: Cannot create /var/adm/utmp or /var/adm/utmpx
+
+> This console message indicates that init(1M) cannot write in the
+/var directory, which is usually part of the / (root) filesystem.
+Some other messages follow, andthe system usually comes up
+single-user. The problem is often that / or /var is mounted
+read-only. Sometimes a brief power outage leaves the system
+believing that many filesystems are still mounted.If /var is a separate filesystem on the machine, andis not yet
+not mounted, mount it now. If the filesystem containing /var is
+mounted read-only, remount it read-write with a command similar
+to this:# mount -o rw,remount /Then type Control-d and try to bring up the system multi-user. If
+that fails, the root filesystem is probably corrupted. Run
+fsck(1M) on the root filesystem, halt the machine, power cycle
+the CPU, and wait for the system to reboot. Should this problem
+still occur, restore the root filesystem from backup tapes, or
+re-install the system from net or CDROM to replace the root
+filesystem.
+
+[]() InitOutput: Error loading module for /dev/fb
+
+> This fatal X server error message indicates that /dev/fb, the
+"dumb frame buffer," is either missing or corrupted. It is
+usually followed by a "giving up" message and a few xinit errors.If other devices on the system are working correctly, the most
+likely reason for this error is that the SUNWdfb package was
+removed or never installed. Insert the installation CD-ROM,
+change to the Solaris_2.xdirectory, and run the following
+command to install the packages SUNWdfbh and SUNWdfb (for your
+machine architecture):
+pkgadd -d .If other devices on the system are not working correctly, the
+system might havea corrupt /devices directory. Halt the system
+and boot using the -r (reconfigure) option. The system will run
+fsck(1M) if the /devices filesystem is corrupted, most likely
+fixing the problem.
+
+[]() Interrupted system call
+
+> The user issued an interrupt signal (usually Control-c) while the
+system was in the middle of executing a system call. When network
+service is slow, interrupting cd(1) to a remote-mounted directory
+can produce this message.Proceed with your work, this message is purely informational.
+An asynchronoussignal (such as interrupt or quit), which a
+program was set up to catch, occurred during an internal system
+call. If execution is resumed after processing the signal, it
+will appear as if the interrupted programming function returned
+this error condition, so the program might exit with an incorrect
+error message.The symbolic name for this error is EINTR, errno=4.
+
+[]() Invalid argument
+
+> An invalid parameter was specified that the system cannot
+interpret. For example, trying to mount an uncreated filesystem,
+printing without sufficient system support, or providing an
+undefined signal to a signal(3c) library function, can all
+produce this message.
+If you see this message when you are trying to mount a
+filesystem, make sure that you have run newfs(1M) to create the
+filesystem. If you see this message when you are trying to read a
+diskette, make sure that the diskette was properly formatted with
+fdformat(1), either in DOS format (pcfs) or as a UFS filesystem.
+If you see this message while you are trying to print, make sure
+that the print service is configured correctly.The symbolic name for this error is EINVAL, errno=22.
+
+[]() Invalid null command
+
+> This C shell message results from a command line with two pipes
+(|)in a row or from a pipe without a command afterwards.Change the command line so that each pipe is followed by a
+command.
+
+[]() I/O error
+
+> Some physical Input/Output error has occurred. If the process was
+writing a file, data corruption is possible.First find out which device is experiencing the I/O error. If the
+device is a tape drive, make sure a tape is inserted into the
+drive. When this error occurs with a tape in the drive, it is
+likely that the tape contains an unrecoverable bad spot.If the device is a floppy drive, an unformatted or defective
+diskette could be at fault. Format the diskette, or obtain a
+replacement.If the device is a hard disk drive, you might need to run
+fsck(1M) and possibly even reformat the disk.
+In some cases this error might occur on a call following the one
+to which it actually applies.The symbolic name for this error is EIO, errno=5.
+
+[]() Is a directory
+
+> An attempt was made to read or write a directory as if it were a
+file.Look at a listing of all the files in the current directory and
+try again, specifying a file instead of a directory.The symbolic name for this error is EISDIR, errno=21.
+
+[]() kernel read error
+
+> This message appears when savecore(1M), if activated, tries to
+copy a debugging image of kernel memory to disk but cannot read
+various kernel data structures correctly. Generally this occurs
+after a system panic has corrupted main memory. Data corruption
+on the systemis possible.Look at the kernel error messages that preceded this one to try
+to determine the cause of the problem. Error messages such as
+"BAD TRAP" usually indicate faulty hardware. Until the problem
+that caused the kernel panic is resolved, a kernel core image
+cannot be saved for debugging.
+
+[]() Killed
+
+> This message is purely informational. If the killed process was
+writing a file, some data might be lost.Continue with your work.This message from the signal handler or various shells indicates
+that a process has been terminated with a SIGKILL. However, if
+you don't see this message and cannot terminate a process with a
+SIGKILL, you might have to reboot the machine to get rid of that
+process.
+
+[]() kmem_free block already free
+
+> This is a programming error,probably from a device driver.Determine which driver is giving this message and contact the
+vendor for a software update, as this message indicates a bug in
+the driver.
+This message is from the DDI programming function kmem_free(9F),
+which releases a block of memory at address addr of size siz that
+was previously allocated by the DDI function kmem_alloc(9F). Both
+addr and siz must correspond to the original allocation. If you
+have source code for the driver, follow kmem_alloc() and
+kmem_free() in the code to make sure they allocate and free the
+
+same chunk of memory.
