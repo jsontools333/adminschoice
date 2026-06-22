@@ -1,0 +1,31 @@
+---
+// Inline affiliate disclosure. FTC guidance requires disclosure to be
+// clear and near the affiliate links — a legal-page mention alone isn't enough.
+// Drop this near the top of any post that contains affiliate links.
+---
+<aside class="affiliate-disclosure">
+  <span aria-hidden="true">&#8505;</span>
+  <p>
+    This post contains affiliate links. If you buy through them we may earn a
+    small commission at no extra cost to you. It never affects our
+    recommendations. See our <a href="/disclaimer/">disclosure</a>.
+  </p>
+</aside>
+
+<style>
+  .affiliate-disclosure {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    background: var(--bg-secondary);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    margin: 1.25rem 0;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+  .affiliate-disclosure span { color: var(--accent); font-size: 1rem; line-height: 1.4; }
+  .affiliate-disclosure p { margin: 0; line-height: 1.5; }
+  .affiliate-disclosure a { color: var(--accent-ink); }
+</style>

@@ -16,7 +16,7 @@ const {
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImage = new URL(image, Astro.site).href;
 const siteTitle = "Admin's Choice";
-const fullTitle = title === siteTitle ? title : `${title} — ${siteTitle}`;
+const fullTitle = title;
 ---
 <!DOCTYPE html>
 <html lang="en">

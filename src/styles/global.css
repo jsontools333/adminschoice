@@ -24,7 +24,7 @@
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   /* Rhythm */
-  --maxw-prose: 680px;
+  --maxw-prose: 720px;
   --radius: 6px;
 }
 
@@ -48,6 +48,7 @@ html {
   font-family: var(--font-sans);
   color: var(--text);
   background: var(--bg);
+  font-size: 18px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -62,10 +63,10 @@ h1, h2, h3, h4 {
   font-weight: 600;
   scroll-margin-top: 80px;   /* so anchor jumps clear the sticky header */
 }
-h1 { font-size: 2rem; margin: 0 0 0.5rem; }
-h2 { font-size: 1.4rem; margin: 2rem 0 0.75rem; }
-h3 { font-size: 1.15rem; margin: 1.6rem 0 0.6rem; }
-h4 { font-size: 1rem; margin: 1.4rem 0 0.5rem; }
+h1 { font-size: 2.4rem; margin: 0 0 0.6rem; }
+h2 { font-size: 1.55rem; margin: 2.2rem 0 0.8rem; }
+h3 { font-size: 1.25rem; margin: 1.7rem 0 0.6rem; }
+h4 { font-size: 1.05rem; margin: 1.4rem 0 0.5rem; }
 
 /* Anchor link affordance on headings */
 .heading-anchor {
@@ -79,6 +80,11 @@ h2:hover .heading-anchor, h3:hover .heading-anchor { opacity: 1; }
 
 /* ---------- Prose ---------- */
 p { margin: 0 0 1rem; }
+.prose p, .prose li {
+  font-size: 1.06rem;
+  line-height: 1.75;
+}
+.prose { font-size: 1.06rem; }
 a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; }
 a:hover { text-decoration-thickness: 2px; }
 
@@ -90,7 +96,7 @@ strong { font-weight: 600; }
 /* ---------- Inline code ---------- */
 :not(pre) > code {
   font-family: var(--font-mono);
-  font-size: 0.875em;
+  font-size: 0.9em;
   background: var(--bg-secondary);
   border: 0.5px solid var(--border);
   padding: 1px 5px;
@@ -104,8 +110,8 @@ pre {
   border-radius: var(--radius);
   padding: 16px 18px;
   overflow-x: auto;
-  font-size: 0.85rem;
-  line-height: 1.6;
+  font-size: 0.95rem;
+  line-height: 1.65;
   margin: 1rem 0;
   border: 0.5px solid #21262d;
 }
@@ -122,7 +128,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin: 1rem 0;
-  font-size: 0.92rem;
+  font-size: 0.98rem;
 }
 th, td {
   text-align: left;
@@ -171,22 +177,52 @@ th { background: var(--bg-secondary); font-weight: 600; }
   margin: 0 auto;
 }
 .wordmark { display: flex; flex-direction: column; gap: 1px; text-decoration: none; }
-.wordmark__name { font-size: 15px; font-weight: 600; color: var(--text); }
-.wordmark__rule { width: 26px; height: 2.5px; background: var(--accent); margin-left: auto; }
-.nav { display: flex; gap: 18px; font-size: 13px; }
+.wordmark__name { font-size: 20px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+.wordmark__rule { width: 32px; height: 3px; background: var(--accent); margin-left: auto; }
+.nav { display: flex; gap: 20px; font-size: 14px; }
 .nav a { color: var(--text-secondary); text-decoration: none; }
 .nav a:hover { color: var(--text); }
 
 /* ---------- Footer ---------- */
 .site-footer {
   border-top: 0.5px solid var(--border);
-  padding: 18px 24px;
-  font-size: 12px;
-  color: var(--text-tertiary);
+  margin-top: 3rem;
+}
+.site-footer__inner {
   max-width: 1100px;
-  margin: 3rem auto 0;
+  margin: 0 auto;
+  padding: 32px 24px 24px;
   display: flex;
   justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.site-footer__brand { max-width: 280px; }
+.site-footer__name { font-size: 15px; font-weight: 600; display: block; margin-bottom: 4px; }
+.site-footer__tag { font-size: 12px; color: var(--text-tertiary); line-height: 1.5; }
+.site-footer__links { display: flex; gap: 3rem; }
+.site-footer__col { display: flex; flex-direction: column; gap: 8px; }
+.site-footer__heading {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 2px;
+}
+.site-footer__col a { font-size: 13px; color: var(--text-secondary); text-decoration: none; }
+.site-footer__col a:hover { color: var(--text); }
+.site-footer__bottom {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  border-top: 0.5px solid var(--border);
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+@media (max-width: 560px) {
+  .site-footer__links { gap: 2rem; }
+  .site-footer__inner { flex-direction: column; gap: 1.5rem; }
 }
 
 /* ---------- Meta strip on posts ---------- */
@@ -206,5 +242,5 @@ th { background: var(--bg-secondary); font-weight: 600; }
 
 @media (max-width: 640px) {
   .nav { display: none; }
-  h1 { font-size: 1.6rem; }
+  h1 { font-size: 1.9rem; }
 }

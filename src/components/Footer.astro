@@ -2,10 +2,29 @@
 const year = new Date().getFullYear();
 ---
 <footer class="site-footer">
-  <span>Est. 2001 · Rebuilt {year} · Hosted on Cloudflare Pages</span>
-  <span>
-    <a href="/feed.xml">RSS</a> ·
-    <a href="/about/">About</a> ·
-    <a href="/contact/">Contact</a>
-  </span>
+  <div class="site-footer__inner">
+    <div class="site-footer__brand">
+      <span class="site-footer__name">Admin's Choice</span>
+      <span class="site-footer__tag">Practical Linux for sysadmins and SREs · since 2001</span>
+    </div>
+    <nav class="site-footer__links" aria-label="Footer">
+      <div class="site-footer__col">
+        <span class="site-footer__heading">Site</span>
+        <a href="/topics/">Topics</a>
+        <a href="/posts/">All posts</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </div>
+      <div class="site-footer__col">
+        <span class="site-footer__heading">Legal</span>
+        <a href="/privacy-policy/">Privacy Policy</a>
+        <a href="/terms/">Terms of Use</a>
+        <a href="/disclaimer/">Disclaimer</a>
+        <a href="/cookie-policy/">Cookie Policy</a>
+      </div>
+    </nav>
+  </div>
+  <div class="site-footer__bottom">
+    <span>&copy; 2001&ndash;{year} Admin's Choice. All rights reserved.</span>
+  </div>
 </footer>

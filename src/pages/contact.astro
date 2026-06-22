@@ -1,0 +1,103 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+---
+<PageLayout
+  title="Contact"
+  description="Get in touch with Admin's Choice — questions, corrections, or feedback on our Linux and sysadmin references."
+>
+  <p>
+    Have a question, spotted an error in a reference, or want to suggest a topic?
+    Send a message below and we'll get back to you. Corrections are especially
+    welcome — accuracy matters on a reference site.
+  </p>
+
+  <form id="contact-form" class="contact-form">
+    <!-- Web3Forms access key -->
+    <input type="hidden" name="access_key" value="b5a4fb96-0a03-4b8b-8208-dde0c9fa5c93" />
+    <input type="hidden" name="subject" value="New message from Admin's Choice contact form" />
+    <input type="hidden" name="from_name" value="Admin's Choice" />
+    <!-- Honeypot anti-spam -->
+    <input type="checkbox" name="botcheck" class="hidden" style="display:none;" />
+
+    <label>
+      <span>Name</span>
+      <input type="text" name="name" required autocomplete="name" />
+    </label>
+    <label>
+      <span>Email</span>
+      <input type="email" name="email" required autocomplete="email" />
+    </label>
+    <label>
+      <span>Message</span>
+      <textarea name="message" rows="6" required></textarea>
+    </label>
+    <button type="submit">Send message</button>
+    <p id="form-result" class="form-result" role="status" aria-live="polite"></p>
+  </form>
+
+  <p class="contact-alt">
+    Prefer not to use the form? You can also reach out via the project's
+    <a href="https://github.com/jsontools333" rel="noopener" target="_blank">GitHub</a>.
+  </p>
+</PageLayout>
+
+<style>
+  .contact-form { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; max-width: 460px; }
+  .contact-form label { display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.9rem; font-weight: 500; }
+  .contact-form input, .contact-form textarea {
+    font: inherit;
+    padding: 8px 10px;
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+  }
+  .contact-form input:focus, .contact-form textarea:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+  .contact-form button {
+    align-self: flex-start;
+    padding: 8px 18px;
+    background: var(--accent);
+    color: #1a1a1a;
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+  .contact-form button:hover { filter: brightness(1.05); }
+  .form-result { font-size: 0.85rem; margin: 0; }
+  .form-result.success { color: #16794f; }
+  .form-result.error { color: #b3261e; }
+  .contact-alt { font-size: 0.85rem; color: var(--text-secondary); }
+</style>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  const result = document.getElementById('form-result');
+  if (form && result) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      result.textContent = 'Sending…';
+      result.className = 'form-result';
+      try {
+        const data = new FormData(form);
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          body: data,
+        });
+        const json = await res.json();
+        if (json.success) {
+          result.textContent = 'Thanks — your message has been sent.';
+          result.className = 'form-result success';
+          form.reset();
+        } else {
+          result.textContent = 'Something went wrong. Please try again.';
+          result.className = 'form-result error';
+        }
+      } catch {
+        result.textContent = 'Network error. Please try again later.';
+        result.className = 'form-result error';
+      }
+    });
+  }
+</script>

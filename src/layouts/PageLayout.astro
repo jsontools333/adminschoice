@@ -1,0 +1,18 @@
+---
+import BaseLayout from './BaseLayout.astro';
+const { title, description, updated } = Astro.props;
+---
+<BaseLayout title={title} description={description}>
+  <main class="page">
+    <article class="prose">
+      <h1>{title}</h1>
+      {updated && <p class="page__updated">Last updated: {updated}</p>}
+      <slot />
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  .page { max-width: var(--maxw-prose); margin: 0 auto; padding: 2.5rem 1.5rem 1rem; }
+  .page__updated { font-size: 0.8rem; color: var(--text-tertiary); margin-bottom: 1.5rem; }
+</style>

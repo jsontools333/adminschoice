@@ -26,6 +26,8 @@ const posts = defineCollection({
     testedOn: z.array(z.string()).default([]),
     // Whether this is featured on the homepage
     featured: z.boolean().default(false),
+    // Set true on posts containing affiliate links (shows inline disclosure)
+    affiliate: z.boolean().default(false),
     // SEO: explicit canonical if the slug changed
     canonicalSlug: z.string().optional(),
   }),

@@ -36,7 +36,7 @@ const topicMeta = {
 const meta = topicMeta[topic] ?? { label: topic, blurb: '' };
 ---
 <BaseLayout
-  title={`${meta.label} — Admin's Choice`}
+  title={meta.label}
   description={`${meta.label} references and guides. ${meta.blurb}`}
 >
   <main class="topic-page">
