@@ -1,9 +1,28 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import AdUnit from '../components/AdUnit.astro';
+import { ADSENSE } from '../config/adsense';
 
 const posts = await getCollection('posts');
-const featured = posts.filter((p) => p.data.featured);
+const bySlug = Object.fromEntries(posts.map((p) => [p.slug, p]));
+
+// Essential Reading — explicitly curated, hand-ordered. The big-number hubs
+// and strongest references go here and stay pinned (the cyberciti pattern).
+const essentialSlugs = [
+  '30-linux-commands-every-sysadmin-should-know',
+  '25-systemd-commands-every-linux-admin-should-master',
+  'ai-prompts-for-sre-devops',
+  'crontab-quick-reference',
+  'crontab-examples',
+  'linux-monitoring-commands',
+  'systemctl-commands',
+  'ssh-without-password',
+];
+const essential = essentialSlugs.map((s) => bySlug[s]).filter(Boolean);
+
+// Featured cards = featured posts that aren't already in Essential Reading
+const featured = posts.filter((p) => p.data.featured && !essentialSlugs.includes(p.slug));
 const recent = posts.sort((a, b) => new Date(b.data.pubDate) - new Date(a.data.pubDate)).slice(0, 8);
 ---
 <BaseLayout title="Admin's Choice" description="Tested Linux commands, real-world cron examples, shell scripting references, and DevOps guides. Trusted by sysadmins since 2001.">
@@ -14,9 +33,28 @@ const recent = posts.sort((a, b) => new Date(b.data.pubDate) - new Date(a.data.p
       <p>Tested commands, real-world examples, and honest comparisons. No fluff, no AI-generated filler — just the references your team's wiki should be.</p>
     </section>
 
+    {essential.length > 0 && (
+      <section class="essential">
+        <div class="essential__head">
+          <h2>Essential reading</h2>
+          <span class="essential__note">Start here — our most useful references</span>
+        </div>
+        <ol class="essential__list">
+          {essential.map((p) => (
+            <li class="essential__item">
+              <a href={`/${p.slug}/`}>
+                <span class="essential__title">{p.data.title}</span>
+                <span class="essential__topic">{p.data.topic}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )}
+
     {featured.length > 0 && (
       <section>
-        <h2>Most-bookmarked references</h2>
+        <h2>More popular references</h2>
         <div class="grid">
           {featured.map((p) => (
             <a class="card" href={`/${p.slug}/`}>
@@ -38,6 +76,8 @@ const recent = posts.sort((a, b) => new Date(b.data.pubDate) - new Date(a.data.p
       </ul>
       <p class="more"><a href="/posts/">See all {posts.length} posts →</a> · <a href="/topics/">Browse by topic</a></p>
     </section>
+
+    <AdUnit slot={ADSENSE.slots.homeInline} />
   </main>
 </BaseLayout>
 
@@ -47,6 +87,51 @@ const recent = posts.sort((a, b) => new Date(b.data.pubDate) - new Date(a.data.p
   .pill { display: inline-block; padding: 3px 10px; background: var(--accent-wash); color: var(--accent-ink); font-size: 11px; font-weight: 500; border-radius: 999px; margin-bottom: 14px; }
   .hero h1 { font-size: 2.6rem; line-height: 1.15; }
   .hero p { font-size: 1.2rem; color: var(--text-secondary); max-width: 580px; line-height: 1.6; }
+
+  /* Essential Reading — pinned, numbered, the cyberciti-style flagship block */
+  .essential {
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    padding: 22px 24px 14px;
+    margin-bottom: 2.5rem;
+    background: linear-gradient(180deg, var(--accent-wash), transparent 60%);
+  }
+  .essential__head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .essential__head h2 { margin: 0; font-size: 1.4rem; }
+  .essential__note { font-size: 0.85rem; color: var(--text-secondary); }
+  .essential__list {
+    list-style: none;
+    counter-reset: ess;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px 24px;
+  }
+  .essential__item { counter-increment: ess; border-bottom: 0.5px solid var(--border); }
+  .essential__item a {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 11px 2px;
+    text-decoration: none;
+    color: inherit;
+  }
+  .essential__item a::before {
+    content: counter(ess);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 18px;
+  }
+  .essential__item a:hover .essential__title { color: var(--accent-ink); }
+  .essential__title { font-size: 0.98rem; font-weight: 500; line-height: 1.35; flex: 1; }
+  .essential__topic { font-family: var(--font-mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-tertiary); flex-shrink: 0; }
+  @media (max-width: 600px) {
+    .essential__list { grid-template-columns: 1fr; }
+  }
+
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
   .card { border: 0.5px solid var(--border); border-radius: var(--radius); padding: 16px; text-decoration: none; color: inherit; }
   .card:hover { border-color: var(--border-strong); }

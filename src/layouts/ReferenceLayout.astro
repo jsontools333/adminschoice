@@ -1,6 +1,8 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import AffiliateDisclosure from '../components/AffiliateDisclosure.astro';
+import AdUnit from '../components/AdUnit.astro';
+import { ADSENSE } from '../config/adsense';
 const { frontmatter, headings = [] } = Astro.props;
 const { title, description, pubDate, updatedDate, topic, readingTime, testedOn = [], tier, affiliate = false } = frontmatter;
 
@@ -40,9 +42,11 @@ const crown = tier === 'crown-jewel';
         {testedOn.length > 0 && ` · Tested on ${testedOn.join(', ')}`}
       </p>
       {affiliate && <AffiliateDisclosure />}
+      <AdUnit slot={ADSENSE.slots.postTop} />
       <div class="prose">
         <slot />
       </div>
+      <AdUnit slot={ADSENSE.slots.postBottom} />
     </article>
   </main>
 </BaseLayout>
