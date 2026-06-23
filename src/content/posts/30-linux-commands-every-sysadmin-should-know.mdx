@@ -1,0 +1,289 @@
+---
+title: "30 Linux Commands Every SysAdmin Should Know"
+description: "The 30 essential Linux commands every system administrator and SRE should master — with examples, common options, and links to in-depth references for each."
+pubDate: 2026-06-22
+updatedDate: 2026-06-22
+pageType: reference
+topic: sysadmin
+readingTime: "12 min read"
+tags: ["linux", "commands", "sysadmin", "reference", "cheat-sheet"]
+testedOn: ["Ubuntu 24.04", "Debian 12", "RHEL 9", "Rocky Linux 10"]
+featured: true
+---
+
+Every Linux system administrator and SRE builds up a core set of commands they
+reach for daily. This is that set — 30 commands grouped by what they do, with a
+quick example for each and a link to a deeper reference where we have one. Bookmark
+it; it's the page to send to anyone learning the ropes.
+
+<Callout type="tip" title="How to use this page">
+Each command below shows the one form you'll use most. For the commands with a
+dedicated reference on this site, follow the link for options, edge cases, and
+worked examples.
+</Callout>
+
+## Files and directories
+
+**1. `ls` — list directory contents**
+
+```bash
+ls -lah        # long format, all files, human-readable sizes
+```
+
+The `-l` gives the long listing (permissions, owner, size, date), `-a` shows
+hidden dotfiles, and `-h` makes sizes readable (K/M/G instead of bytes).
+
+**2. `cd` — change directory**
+
+```bash
+cd /var/log    # go to a path
+cd -           # jump back to the previous directory
+```
+
+**3. `cp` — copy files and directories**
+
+```bash
+cp -a source/ dest/    # archive mode: preserves permissions, timestamps, links
+```
+
+**4. `mv` — move or rename**
+
+```bash
+mv old.conf new.conf   # rename
+mv file.txt /tmp/      # move
+```
+
+**5. `rm` — remove files and directories**
+
+```bash
+rm -i file.txt    # prompt before each delete (safer)
+rm -rf dir/       # recursive, forced — powerful and unforgiving
+```
+
+To force-remove a directory and understand the flags safely, see
+[rmdir force in Linux](/rmdir-force-force-remove-linux-directories/).
+
+**6. `find` — search the filesystem**
+
+```bash
+find /var/log -name "*.log" -mtime +7    # logs older than 7 days
+```
+
+`find` is one of the most powerful commands on the system. For 14 practical
+patterns, see [find command: top ways to find files](/find-command-15-ways-to-find-files-in-unix-and-linux/).
+
+**7. `chmod` — change permissions**
+
+```bash
+chmod 750 script.sh     # rwx for owner, r-x for group, nothing for others
+```
+
+## Viewing and editing files
+
+**8. `cat` — print a file**
+
+```bash
+cat /etc/os-release     # show the whole file
+```
+
+**9. `less` — page through a file**
+
+```bash
+less /var/log/syslog    # scroll with arrows, /search, q to quit
+```
+
+**10. `grep` — search text**
+
+```bash
+grep -ri "error" /var/log/    # recursive, case-insensitive search
+```
+
+**11. `awk` — field processing**
+
+```bash
+awk '{print $1, $4}' access.log    # print columns 1 and 4
+```
+
+`awk` is a whole language for text processing. See
+[awk commands and examples](/awk/) for the field model and real recipes.
+
+**12. `sed` — stream editing**
+
+```bash
+sed -i 's/old/new/g' config.txt    # find-and-replace in place
+```
+
+**13. `vi` / `vim` — the editor that's always installed**
+
+```bash
+vi /etc/hosts
+```
+
+If vi feels cryptic, the [vi editor quick reference](/vi-editor-quick-reference/)
+covers the modes and the commands worth memorizing.
+
+## Processes and monitoring
+
+**14. `ps` — snapshot of processes**
+
+```bash
+ps aux --sort=-%cpu | head    # top processes by CPU
+```
+
+**15. `top` — live process view**
+
+```bash
+top              # press P for CPU, M for memory, q to quit
+```
+
+For the difference between top and htop and how to read the fields, see
+[top vs htop](/top-vs-htop/).
+
+**16. `kill` — signal a process**
+
+```bash
+kill -15 1234    # graceful stop (SIGTERM)
+kill -9 1234     # force kill (SIGKILL) — last resort
+```
+
+**17. `free` — memory usage**
+
+```bash
+free -h          # read the 'available' column, not 'free'
+```
+
+Why "free" looks low on a healthy system is explained in
+[how to check memory usage](/check-memory-usage-linux/).
+
+**18. `df` — disk space**
+
+```bash
+df -h            # usage per filesystem
+```
+
+**19. `du` — what's using the space**
+
+```bash
+du -sh /var/* | sort -h    # biggest items, sorted
+```
+
+Both are covered in depth in [how to check disk space](/check-disk-space-linux/).
+For a full tour of monitoring commands, see
+[Linux monitoring commands](/linux-monitoring-commands/).
+
+## Services and scheduling
+
+**20. `systemctl` — control services**
+
+```bash
+sudo systemctl restart nginx
+systemctl status nginx
+```
+
+The full command set is in the [systemctl reference](/systemctl-commands/), and
+when a service won't start, [systemd service failed to start](/systemd-service-failed-to-start/)
+walks the fix.
+
+**21. `journalctl` — read system logs**
+
+```bash
+journalctl -u nginx -f     # follow a service's logs live
+```
+
+See [journalctl: view and filter logs](/journalctl-view-logs/) for time and
+priority filtering.
+
+**22. `crontab` — schedule jobs**
+
+```bash
+crontab -e       # edit your scheduled jobs
+```
+
+The [crontab quick reference](/crontab-quick-reference/) and
+[75+ crontab examples](/crontab-examples/) cover the syntax and recipes.
+
+## Networking
+
+**23. `ss` — socket statistics (the modern netstat)**
+
+```bash
+sudo ss -tlnp    # listening TCP ports with the owning process
+```
+
+**24. `netstat` — network connections**
+
+```bash
+netstat -tuln    # still useful; see our 10 common usages
+```
+
+See [netstat: 10 common usages](/netstat-10-most-common-usage-with-examples/) and
+[iostat, vmstat, netstat](/iostat-vmstat-netstat/) for performance angles.
+
+**25. `ssh` — secure shell**
+
+```bash
+ssh user@host
+```
+
+For passwordless key-based login, see
+[SSH without a password](/ssh-without-password/), and for more options,
+[ssh examples and usage](/ssh-examples-usage-options-protocol/).
+
+**26. `curl` — transfer data / test endpoints**
+
+```bash
+curl -I https://example.com    # just the response headers
+```
+
+**27. `dig` — DNS lookups**
+
+```bash
+dig +short example.com    # just the answer
+```
+
+When DNS misbehaves, [DNS troubleshooting](/dns-troubleshooting/) is the checklist.
+
+## Archives and transfer
+
+**28. `tar` — archive files**
+
+```bash
+tar -czf backup.tar.gz /etc/    # create a gzipped archive
+tar -xzf backup.tar.gz          # extract it
+```
+
+**29. `rsync` — efficient sync and backup**
+
+```bash
+rsync -avz src/ user@host:/dest/    # archive, verbose, compressed
+```
+
+**30. `scp` — copy over SSH**
+
+```bash
+scp file.txt user@host:/tmp/
+```
+
+## Keep this within reach
+
+These 30 cover the daily core, but each is a doorway to more. The reference pages
+linked above go deeper on the commands that reward it — cron, find, awk, systemctl,
+and the monitoring tools. For everything by topic, browse the
+[full topic index](/topics/).
+
+## FAQ
+
+**What's the single most important command to learn first?**
+`man` — the manual. `man find`, `man systemctl`, and so on give you the
+authoritative options for any command on your system. Pair it with `grep` to
+search within a man page.
+
+**Why `ss` instead of `netstat`?**
+`netstat` is deprecated on modern distros (part of the older net-tools package).
+`ss` is faster and the current standard, though `netstat` still works where it's
+installed.
+
+**Are these the same across distributions?**
+The core commands here are identical across Ubuntu, Debian, RHEL, and Rocky.
+Service names differ (e.g. `httpd` vs `apache2`), but `systemctl`, `journalctl`,
+and the file/process commands work the same everywhere.

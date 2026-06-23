@@ -1,0 +1,41 @@
+---
+// A single AdSense ad unit. Renders nothing when ads are disabled or the
+// publisher ID is still the placeholder — so it's safe to leave in place
+// before you go live.
+import { ADSENSE } from '../config/adsense';
+
+const { slot, label = true } = Astro.props;
+const live = ADSENSE.enabled && ADSENSE.client && !ADSENSE.client.includes('XXXX');
+---
+{live && (
+  <div class="ad-unit">
+    {label && <span class="ad-unit__label">Advertisement</span>}
+    <ins
+      class="adsbygoogle"
+      style="display:block"
+      data-ad-client={ADSENSE.client}
+      data-ad-slot={slot}
+      data-ad-format="auto"
+      data-full-width-responsive="true"
+    ></ins>
+    <script is:inline>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+)}
+
+<style>
+  .ad-unit {
+    margin: 2rem 0;
+    text-align: center;
+    min-height: 90px;
+  }
+  .ad-unit__label {
+    display: block;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-tertiary);
+    margin-bottom: 4px;
+  }
+  /* Constrain ad height so a unit can never dominate the reading column */
+  .ad-unit :global(ins) { max-height: 280px; }
+</style>

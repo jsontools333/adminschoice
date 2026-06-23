@@ -1,0 +1,234 @@
+---
+title: "25 systemd Commands Every Linux Admin Should Master"
+description: "25 essential systemd and systemctl commands for managing services, reading logs, and controlling Linux systems — with examples and links to deeper guides."
+pubDate: 2026-06-22
+updatedDate: 2026-06-22
+pageType: reference
+topic: services
+readingTime: "11 min read"
+tags: ["systemd", "systemctl", "journalctl", "services", "cheat-sheet"]
+testedOn: ["Ubuntu 24.04", "Debian 12", "RHEL 9", "Rocky Linux 10"]
+featured: true
+---
+
+systemd runs nearly every modern Linux distribution — it's the init system that
+starts at boot and manages services, logging, scheduling, and system state. These
+25 commands are the ones that matter for day-to-day administration, grouped by
+task, each with an example. For the deeper topics we have dedicated references
+linked inline.
+
+<Callout type="tip" title="Two commands cover most days">
+`systemctl` controls services; `journalctl` reads their logs. Master those two
+and the rest of this list fills in the gaps.
+</Callout>
+
+## Controlling services
+
+**1. Start a service**
+
+```bash
+sudo systemctl start nginx
+```
+
+**2. Stop a service**
+
+```bash
+sudo systemctl stop nginx
+```
+
+**3. Restart a service**
+
+```bash
+sudo systemctl restart nginx
+```
+
+**4. Reload config without downtime**
+
+```bash
+sudo systemctl reload nginx    # re-reads config, keeps connections
+```
+
+**5. Reload or restart, whichever the service supports**
+
+```bash
+sudo systemctl reload-or-restart nginx
+```
+
+All of these and the differences between them are covered in the
+[systemctl reference](/systemctl-commands/).
+
+## Checking state
+
+**6. Full status with recent logs**
+
+```bash
+systemctl status nginx
+```
+
+**7. Is it running? (scriptable)**
+
+```bash
+systemctl is-active nginx      # prints "active" / "inactive" / "failed"
+```
+
+**8. Is it enabled at boot?**
+
+```bash
+systemctl is-enabled nginx
+```
+
+**9. List everything that has failed**
+
+```bash
+systemctl --failed
+```
+
+Run this after every reboot — a silently failed service is a common surprise.
+
+**10. Check if a specific service is up**
+
+For health checks and checking several services at once, see
+[how to check if a service is running](/check-if-service-is-running-linux/).
+
+## Boot behavior
+
+**11. Enable a service at boot, and start it now**
+
+```bash
+sudo systemctl enable --now nginx
+```
+
+**12. Disable at boot, and stop it now**
+
+```bash
+sudo systemctl disable --now nginx
+```
+
+**13. Mask a service (block it entirely)**
+
+```bash
+sudo systemctl mask postfix      # can't be started, even as a dependency
+sudo systemctl unmask postfix
+```
+
+<Callout type="warning" title="enable and start are different">
+`start` runs a service now; `enable` makes it start at boot. They're separate —
+use `enable --now` to do both and avoid a service that runs now but vanishes
+after a reboot.
+</Callout>
+
+## Listing and inspecting
+
+**14. List active services**
+
+```bash
+systemctl list-units --type=service
+```
+
+**15. List every installed service and its boot state**
+
+```bash
+systemctl list-unit-files --type=service
+```
+
+**16. Show the effective unit file**
+
+```bash
+systemctl cat nginx
+```
+
+**17. Show every property of a unit**
+
+```bash
+systemctl show nginx -p ExecStart -p User -p Restart
+```
+
+**18. List what a unit depends on**
+
+```bash
+systemctl list-dependencies nginx
+```
+
+## Reading logs with journalctl
+
+**19. Logs for one service**
+
+```bash
+journalctl -u nginx
+```
+
+**20. Follow logs in real time**
+
+```bash
+journalctl -u nginx -f
+```
+
+**21. Logs since last boot**
+
+```bash
+journalctl -b
+```
+
+**22. Errors only**
+
+```bash
+journalctl -p err -b
+```
+
+The full set of time, priority, and boot filters is in
+[journalctl: view and filter logs](/journalctl-view-logs/).
+
+## Editing units and scheduling
+
+**23. Reload unit files after editing**
+
+```bash
+sudo systemctl daemon-reload
+```
+
+Forgetting this after editing a unit file is the most common reason a change
+"doesn't take." To write a service from scratch, see
+[how to create a systemd service](/create-systemd-service/).
+
+**24. List active timers**
+
+```bash
+systemctl list-timers
+```
+
+systemd timers are the modern alternative to cron. For when to use which, see
+[systemd timers vs cron](/systemd-timers-vs-cron/).
+
+**25. Control system state**
+
+```bash
+sudo systemctl reboot      # restart the machine
+sudo systemctl poweroff    # shut down
+systemctl is-system-running    # overall health: running / degraded
+```
+
+## When something breaks
+
+The command that fails most often is a service that won't start. The systematic
+fix — reading the exit code, checking the journal, and the common causes — is in
+[systemd service failed to start](/systemd-service-failed-to-start/).
+
+## FAQ
+
+**My distro uses `crond`/`httpd`, another uses `cron`/`apache2` — does that change these?**
+Service *names* differ by distribution, but every `systemctl` and `journalctl`
+command here is identical across distros. Use `systemctl list-units --type=service`
+to find the exact name on your system.
+
+**Do these need root?**
+Read-only commands (`status`, `is-active`, `list-units`, `cat`, `journalctl`) work
+without root. Anything that changes state (`start`, `enable`, `mask`,
+`daemon-reload`) needs `sudo`.
+
+**Is systemd on every Linux distribution?**
+Nearly all major ones — Ubuntu, Debian, RHEL, Fedora, Rocky, SUSE, and Arch.
+A few minimal or specialized distros use alternatives, but for mainstream server
+work, systemd is universal.
+
+For the full services toolkit, browse the
+[services and systemd topic](/topics/services/).

@@ -1,0 +1,288 @@
+---
+title: "15 ChatGPT / Claude Prompts Every SRE and DevOps Engineer Should Bookmark"
+description: "15 copy-paste AI prompts for log analysis, incident response, postmortems, runbooks, and alert tuning — with the caveats that keep AI from misleading you."
+pubDate: 2026-06-22
+updatedDate: 2026-06-22
+pageType: reference
+topic: devops
+readingTime: "12 min read"
+tags: ["ai", "sre", "devops", "chatgpt", "claude", "prompts"]
+testedOn: ["ChatGPT", "Claude", "Gemini"]
+featured: true
+---
+
+AI assistants are genuinely useful for the operational side of SRE and DevOps —
+analysing logs, drafting postmortems, generating runbooks, tuning noisy alerts.
+But the output is only as good as the prompt and the data you give it. These 15
+prompts are templates you can copy, fill in, and reuse. Each one notes where the
+AI is likely to mislead you, because that matters more than the prompt itself.
+
+<Callout type="warning" title="The one habit that makes every prompt better">
+Paste logs, errors, and command output **verbatim** — never paraphrase. AI models
+pattern-match on the exact text; summarising strips the detail that leads to the
+right answer. And for anything that generates a script, add "make it idempotent
+and safe to run multiple times" and "include a rollback procedure."
+</Callout>
+
+<Callout type="tip" title="Where AI will lie to you">
+The single biggest failure mode in ops: AI confidently presents a **symptom as the
+root cause**. Given logs of a Redis memory spike caused by an upstream bug, a model
+will often declare Redis the cause because it's the loudest signal. Treat every
+root-cause claim as a hypothesis to verify, not a conclusion. The better models
+tell you when they're guessing — push them to.
+</Callout>
+
+## Log analysis
+
+### 1. Find the signal in noisy logs
+
+```text
+Here are production logs from [service] between [time] and [time]:
+
+[paste raw logs verbatim]
+
+Cluster these by error type. For each cluster, give the count, a representative
+line, and your best guess at severity. Surface anything anomalous or out of
+pattern. Do NOT conclude a root cause yet — just organise what's here and flag
+what's worth investigating.
+```
+
+The explicit "don't conclude a root cause yet" is deliberate — it stops the model
+jumping to a confident-but-wrong cause and keeps it in summarising mode, which is
+what it's actually good at. For building the commands to extract those logs in the
+first place, see [awk commands and examples](/awk/).
+
+### 2. Explain an unfamiliar error or stack trace
+
+```text
+Explain this error in plain English, then list the most likely causes ranked by
+probability. For each cause, give a verification command I can run to confirm or
+rule it out. Flag any cause you're uncertain about.
+
+[paste exact error / stack trace]
+```
+
+The "verification command per cause" framing is what makes this useful — you get a
+checklist to work through, not a guess to trust blindly.
+
+### 3. Build a log-parsing one-liner
+
+```text
+I need to extract [what you're looking for] from logs in this format:
+
+[paste 2-3 sample log lines]
+
+Give me a single grep/awk/jq command. Explain what each part does so I can adjust
+it. Prefer portable syntax that works on a standard Linux box.
+```
+
+For the underlying tools these generate, the [find command guide](/find-command-15-ways-to-find-files-in-unix-and-linux/)
+and [awk reference](/awk/) cover the patterns worth knowing yourself.
+
+## Incident management
+
+### 4. Structured triage during a live incident
+
+```text
+Live incident. Symptom: [what you're seeing]. Started: [when]. Recent changes:
+[deploys, config changes, traffic shifts in the last few hours].
+
+Give me an ordered list of hypotheses, most likely first. For each, give a
+NON-DESTRUCTIVE command to verify it. Do not suggest anything that changes state
+until I've confirmed the cause.
+```
+
+The "non-destructive, don't change state" constraint is the important part —
+during an incident the last thing you want is the AI suggesting a restart that
+destroys the evidence.
+
+### 5. Generate root-cause hypotheses from symptoms
+
+```text
+Symptoms: [list what you're observing across metrics, logs, user reports].
+
+Give me a ranked list of possible root causes. For each, clearly separate the
+symptom from the underlying cause, and tell me what evidence would confirm it.
+Note explicitly where you're inferring vs. where the data supports the claim.
+```
+
+Forcing the symptom/cause separation directly counters the most common AI failure
+in incident analysis. When the system is on fire, see
+[systemd service failed to start](/systemd-service-failed-to-start/) for the
+command-level version of this workflow.
+
+### 6. Draft the stakeholder update
+
+```text
+Turn this technical situation into a status update for [leadership / customers /
+status page]. Keep it clear and non-technical, state impact and what we're doing,
+avoid speculation about cause, and give an honest next-update time.
+
+Situation: [paste the technical details]
+```
+
+The hardest part of an incident is often the communication, not the fix. This is
+one of the safest AI uses — it's rewording, not diagnosing.
+
+## Postmortems
+
+### 7. Draft a blameless postmortem from a timeline
+
+```text
+Write a blameless postmortem from this incident. Use the structure: summary,
+impact, timeline, root cause (5 Whys), contributing factors, what went well, what
+went wrong, action items with owners and due dates. Keep it blameless — focus on
+systems and process, not individuals.
+
+Incident: [what happened, severity, duration]
+Timeline: [chronological events and actions]
+```
+
+This is the highest-value AI task in ops — it turns 60–90 minutes of archaeology
+into a first draft in seconds. You still own the accuracy; the AI owns the
+structure and the blank-page problem.
+
+### 8. Extract action items from a messy retro
+
+```text
+Here are raw notes / chat scrollback from an incident retro:
+
+[paste notes]
+
+Pull out every concrete action item. For each, suggest an owner role (not a name)
+and a priority. Flag anything that's discussed but has no clear follow-up.
+```
+
+### 9. Facilitate a 5 Whys analysis
+
+```text
+Facilitate a 5 Whys for this problem: [state the problem]. Ask me one "why" at a
+time, wait for my answer, then ask the next. After five (or when we hit a root
+cause), summarise the causal chain and suggest where to break it.
+```
+
+The one-at-a-time instruction makes this interactive rather than the AI inventing
+all five answers itself — which would defeat the point.
+
+## Runbook improvement
+
+### 10. Generate a runbook from an alert
+
+```text
+Write an incident-response runbook for the alert "[alert name]" on [service].
+Include: what the alert means and its impact, immediate triage steps (with exact
+commands), a diagnostic decision tree, remediation per likely cause, escalation
+path, and a post-incident checklist. Format as something a tired on-call engineer
+can follow at 3am.
+```
+
+The "3am" framing genuinely changes the output — it pushes the model toward
+explicit commands and away from vague guidance. The commands it generates for
+service issues map to the [systemctl reference](/systemctl-commands/) and
+[journalctl logs guide](/journalctl-view-logs/).
+
+### 11. Turn a one-off fix into a reusable runbook
+
+```text
+I just resolved an issue by doing the following:
+
+[paste what you did — commands, steps]
+
+Turn this into a reusable runbook. Make any scripts idempotent, add verification
+steps after each action, note required permissions, and describe how to confirm
+success and how to roll back.
+```
+
+This is how good runbooks actually get written — captured right after the incident
+while it's fresh, instead of never.
+
+### 12. Audit an existing runbook for gaps
+
+```text
+Review this runbook for gaps. Flag: missing rollback steps, commands that could be
+destructive without warning, unclear or ambiguous steps, anything that looks
+stale, and missing verification. Don't rewrite it — just list what's weak.
+
+[paste runbook]
+```
+
+## Alert tuning and monitoring
+
+### 13. Diagnose alert fatigue
+
+```text
+Here are our current alert rules:
+
+[paste alert definitions]
+
+Identify alerts that are likely noisy, redundant, or non-actionable. For each
+problem alert, suggest whether to retune the threshold, merge it, downgrade
+severity, or delete it. Prioritise reducing pages that don't require action.
+```
+
+Alert fatigue is a retention problem as much as a reliability one. For the metrics
+behind sensible thresholds, see
+[Linux monitoring commands](/linux-monitoring-commands/) and
+[how to check memory usage](/check-memory-usage-linux/).
+
+### 14. Write a Prometheus alert rule with a runbook link
+
+```text
+Write a Prometheus alerting rule for this condition: [describe the SLO or symptom,
+e.g. "error rate above 2% for 5 minutes"]. Include an appropriate severity label,
+a clear summary and description annotation, a "for" duration to avoid flapping,
+and a runbook_url annotation placeholder.
+```
+
+The `for` duration and runbook URL are the details people forget — building them
+into the prompt means every alert you generate is actionable from the first page.
+
+### 15. Design golden-signal dashboards
+
+```text
+I'm building a dashboard for [service]. Recommend what to track across the four
+golden signals — latency, traffic, errors, saturation — for this kind of service.
+For each, suggest the specific metric, a sensible visualisation, and a starting
+alert threshold I can tune later.
+```
+
+The four golden signals are the right default for any service dashboard. The
+[monitoring commands reference](/linux-monitoring-commands/) covers the
+host-level versions of saturation and errors.
+
+## Using these well
+
+A few principles that apply across all 15:
+
+- **AI augments judgement; it doesn't replace it.** Every root-cause claim is a
+  hypothesis to verify, every generated script gets read before it runs, every
+  postmortem gets fact-checked against reality.
+- **Give it real data.** The quality of the output tracks the quality of what you
+  paste in. Verbatim logs beat summaries every time.
+- **Never paste secrets.** Scrub credentials, tokens, internal hostnames, and
+  customer data before pasting into any external AI tool. For sensitive
+  environments, a locally-run model keeps the data in-house.
+- **Make prompts into team assets.** The prompts that work get saved, shared, and
+  refined — the same way a good runbook does.
+
+## FAQ
+
+**Do these work with ChatGPT, Claude, and Gemini?**
+Yes — they're model-agnostic. In practice the models differ in tendencies: some
+fill gaps with confident guesses, others are more cautious and tell you when
+they're inferring. For incident work, the cautious behaviour is safer; push
+whichever model you use to flag its uncertainty.
+
+**Is it safe to paste production logs into an AI tool?**
+Only after scrubbing secrets, tokens, internal hostnames, and customer data. Many
+organisations prohibit pasting production data into external tools entirely —
+check your policy. A self-hosted local model avoids the data-exposure question.
+
+**Will AI replace on-call engineers?**
+No. AI shortens the archaeology — log triage, postmortem drafting, runbook
+generation — but the judgement calls, the business context, and the decision to
+change production state remain human. It's a force multiplier, not a replacement.
+
+For the command-level skills these prompts lean on, see
+[30 Linux commands every sysadmin should know](/30-linux-commands-every-sysadmin-should-know/)
+and browse the [DevOps topic](/topics/devops/).
