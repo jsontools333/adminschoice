@@ -4,14 +4,14 @@
 
 export const ADSENSE = {
   enabled: true,
-  // Replace with your real publisher ID (format: ca-pub-XXXXXXXXXXXXXXXX)
-  client: 'ca-pub-XXXXXXXXXXXXXXXX',
-  // Ad slot IDs — create these in your AdSense dashboard (Ads → By ad unit).
-  // Each placement uses its own slot so you can see which positions earn.
+  // Real AdSense publisher ID (matches public/ads.txt)
+  client: 'ca-pub-3492132681763333',
+  // Ad slot IDs from the AdSense dashboard. Each placement is its own unit
+  // so you can see which positions earn in AdSense reporting.
   slots: {
-    homeInline: '0000000001',   // homepage, between sections
-    postTop: '0000000002',      // post, after intro (highest-value)
-    postMid: '0000000003',      // post, mid-article between sections
-    postBottom: '0000000004',   // post, after FAQ / end
+    homeInline: '8176396114',   // homepage, below the lists
+    postTop: '3646390097',      // post, after intro (highest-value)
+    postMid: '4578152219',      // post, mid-article (not yet placed in layout)
+    postBottom: '6302297421',   // post, after content / end
   },
 };
