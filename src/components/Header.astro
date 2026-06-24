@@ -9,9 +9,12 @@ const nav = [
 <header class="site-header">
   <div class="site-header__inner">
     <a class="wordmark" href="/" aria-label="Admin's Choice home">
-      <span class="wordmark__mark" aria-hidden="true">#_</span>
-      <span class="wordmark__name">Admin's Choice</span>
+      <img class="wordmark__logo" src="/logo.png" alt="Admin's Choice" width="205" height="58" />
     </a>
+    <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-label="Toggle menu" />
+    <label for="nav-toggle" class="nav-burger" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </label>
     <nav class="nav" aria-label="Primary">
       {nav.map((item) => <a href={item.href}>{item.label}</a>)}
     </nav>

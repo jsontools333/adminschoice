@@ -29,8 +29,17 @@ const recent = posts.sort((a, b) => new Date(b.data.pubDate) - new Date(a.data.p
   <main class="home">
     <section class="hero">
       <span class="pill">Trusted since 2001 · rebuilt for 2026</span>
-      <h1>Practical Linux for sysadmins and SREs</h1>
+      <h1>Practical Linux for sysadmins, SREs, and DevOps engineers</h1>
       <p>Tested commands, real-world examples, and honest comparisons. No fluff, no AI-generated filler — just the references your team's wiki should be.</p>
+      <div class="hero__cta">
+        <a class="btn btn--primary" href="/topics/">Browse references →</a>
+        <a class="btn btn--ghost" href="/posts/">View all posts</a>
+      </div>
+      <div class="hero__chips">
+        <span class="chip"><b>$</b> systemctl restart nginx</span>
+        <span class="chip"><b>$</b> crontab -e</span>
+        <span class="chip"><b>$</b> journalctl -u app -f</span>
+      </div>
     </section>
 
     {essential.length > 0 && (
@@ -51,6 +60,13 @@ const recent = posts.sort((a, b) => new Date(b.data.pubDate) - new Date(a.data.p
         </ol>
       </section>
     )}
+
+    <section class="stats">
+      <div class="stat"><div class="stat__num">{posts.length}</div><div class="stat__label">references</div></div>
+      <div class="stat"><div class="stat__num">12</div><div class="stat__label">topics</div></div>
+      <div class="stat"><div class="stat__num"><span class="stat__accent">25</span>+ yrs</div><div class="stat__label">since 2001</div></div>
+      <div class="stat"><div class="stat__num">100%</div><div class="stat__label">tested commands</div></div>
+    </section>
 
     {featured.length > 0 && (
       <section>
@@ -83,10 +99,36 @@ const recent = posts.sort((a, b) => new Date(b.data.pubDate) - new Date(a.data.p
 
 <style>
   .home { max-width: 880px; margin: 0 auto; padding: 2.5rem 1.5rem; }
-  .hero { margin-bottom: 2.5rem; }
-  .pill { display: inline-block; padding: 3px 10px; background: var(--accent-wash); color: var(--accent-ink); font-size: 11px; font-weight: 500; border-radius: 999px; margin-bottom: 14px; }
-  .hero h1 { font-size: 2.6rem; line-height: 1.15; }
-  .hero p { font-size: 1.2rem; color: var(--text-secondary); max-width: 580px; line-height: 1.6; }
+  .hero { text-align: center; margin: 1rem 0 2.5rem; }
+  .pill { display: inline-block; padding: 5px 13px; background: var(--accent-wash); color: var(--accent-ink); font-size: 11.5px; font-weight: 500; font-family: var(--font-mono); letter-spacing: 0.04em; border-radius: 999px; margin-bottom: 20px; }
+  .hero h1 { font-size: 2.6rem; line-height: 1.12; letter-spacing: -0.025em; color: var(--navy); max-width: 640px; margin: 0 auto 14px; }
+  .hero p { font-size: 1.18rem; color: var(--text-secondary); max-width: 560px; line-height: 1.6; margin: 0 auto 24px; }
+  .hero__cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
+  .btn { font-size: 14px; font-weight: 600; padding: 11px 22px; border-radius: 8px; display: inline-flex; align-items: center; gap: 7px; text-decoration: none; transition: transform .12s ease, background .15s ease, border-color .15s ease; }
+  .btn:hover { transform: translateY(-1px); }
+  .btn--primary { background: var(--red); color: #fff; }
+  .btn--primary:hover { background: var(--red-deep); }
+  .btn--ghost { background: var(--bg); color: var(--navy); border: 1px solid var(--border); }
+  .btn--ghost:hover { border-color: var(--navy); }
+  .hero__chips { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .chip { font-family: var(--font-mono); font-size: 12px; color: var(--navy-soft); background: var(--bg-secondary); border: 1px solid var(--border); padding: 6px 12px; border-radius: 7px; }
+  .chip b { color: var(--accent-ink); font-weight: 700; }
+
+  /* Stats band — navy block */
+  .stats {
+    background: var(--navy);
+    border-radius: 14px;
+    padding: 26px 30px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 2.5rem;
+  }
+  .stat { text-align: center; }
+  .stat__num { font-size: 1.9rem; font-weight: 800; color: #fff; letter-spacing: -0.02em; line-height: 1.1; }
+  .stat__accent { color: var(--coral); }
+  .stat__label { font-size: 11.5px; color: #aab0d4; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 3px; }
 
   /* Essential Reading — pinned, numbered, the cyberciti-style flagship block */
   .essential {
@@ -97,7 +139,7 @@ const recent = posts.sort((a, b) => new Date(b.data.pubDate) - new Date(a.data.p
     background: linear-gradient(180deg, var(--accent-wash), transparent 60%);
   }
   .essential__head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-  .essential__head h2 { margin: 0; font-size: 1.4rem; }
+  .essential__head h2 { margin: 0; font-size: 1.4rem; color: var(--navy); }
   .essential__note { font-size: 0.85rem; color: var(--text-secondary); }
   .essential__list {
     list-style: none;
@@ -130,6 +172,14 @@ const recent = posts.sort((a, b) => new Date(b.data.pubDate) - new Date(a.data.p
   .essential__topic { font-family: var(--font-mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-tertiary); flex-shrink: 0; }
   @media (max-width: 600px) {
     .essential__list { grid-template-columns: 1fr; }
+    .essential__topic { display: none; }
+    .home { padding: 1.75rem 1.25rem; }
+    .hero h1 { font-size: 1.95rem; }
+    .hero p { font-size: 1.05rem; }
+    .stats { padding: 22px 18px; gap: 16px 12px; }
+    .stat { flex: 1 1 40%; }
+    .stat__num { font-size: 1.6rem; }
+    .hero__chips .chip { font-size: 11px; }
   }
 
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
