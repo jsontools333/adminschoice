@@ -1,0 +1,214 @@
+---
+title: "kubectl: couldn't get current server API group list (Fixed)"
+description: "Fix the kubectl 'memcache.go:265 couldn't get current server API group list' error — diagnose the connection-refused, kubeconfig, expired-cert, and credential causes."
+pubDate: 2026-06-26
+updatedDate: 2026-06-26
+pageType: guide
+topic: devops
+readingTime: "8 min read"
+tags: ["kubectl", "kubernetes", "kubeconfig", "eks", "troubleshooting"]
+testedOn: ["kubectl 1.29+", "minikube", "EKS", "AKS"]
+featured: false
+---
+
+You run almost any `kubectl` command and get a wall of repeated errors like:
+
+```text
+E0202 10:40:56.460499 6352 memcache.go:265] couldn't get current server API
+group list: Get "http://localhost:8080/api?timeout=32s": dial tcp
+127.0.0.1:8080: connect: connection refused
+```
+
+The `memcache.go:265` part just points at the line in kubectl's source — it's not
+the real problem. The real message is at the end: **kubectl couldn't reach the
+Kubernetes API server.** The exact ending (`connection refused`, `EOF`, `certificate
+has expired`, `asked for the client to provide credentials`) tells you *which*
+cause you have. This guide walks each one.
+
+<Callout type="tip" title="Read the end of the error first">
+The text after the URL is the actual diagnosis:
+`connection refused` → kubectl isn't pointed at your cluster (kubeconfig).
+`EOF` / timeout → the cluster or API server is down.
+`certificate has expired` → your system clock is wrong, or the cert rotated.
+`asked for the client to provide credentials` → your auth/token expired.
+</Callout>
+
+## The big clue: localhost:8080
+
+If the URL in your error is `http://localhost:8080`, that's the tell. **8080 is
+kubectl's built-in default** — the address it falls back to when it has *no
+working kubeconfig at all*. kubectl isn't failing to reach your cluster; it
+doesn't know your cluster exists. Nearly every "connection refused" version of
+this error is a kubeconfig problem.
+
+## Fix 1 — Point kubectl at your cluster (connection refused)
+
+kubectl reads its config from `~/.kube/config` (or whatever `$KUBECONFIG` points
+to). If that file is missing, empty, or not readable by the user you're running
+as, you get the localhost:8080 fallback.
+
+**Check what kubectl currently sees:**
+
+```bash
+kubectl config current-context
+kubectl config view --minify
+```
+
+If that errors or shows nothing, the config is the problem. Fix it based on where
+your cluster lives:
+
+```bash
+# minikube
+minikube update-context
+
+# Amazon EKS
+aws eks update-kubeconfig --name <cluster> --region <region>
+
+# Azure AKS
+az aks get-credentials --resource-group <rg> --name <cluster> --overwrite-existing
+
+# Google GKE
+gcloud container clusters get-credentials <cluster> --region <region>
+```
+
+These write a correct kubeconfig so kubectl knows your cluster's real address.
+
+<Callout type="warning" title="The 'wrong user' trap">
+kubectl reads the config from the *current user's* home directory. If you set up
+the cluster as your normal user but run `kubectl` under `sudo` (or as root), it
+looks in root's home, finds no config, and falls back to localhost:8080. Run
+kubectl as the same user that owns `~/.kube/config` — don't prefix it with
+`sudo`.
+</Callout>
+
+## Fix 2 — Make sure the cluster is actually running (EOF / timeout)
+
+If the error ends in `EOF`, a timeout, or names your cluster's real address (not
+localhost), kubectl *found* your config but the API server didn't answer. The
+cluster or its control plane is down or unreachable.
+
+**For local clusters:**
+
+```bash
+minikube status     # or: kind get clusters / docker ps
+minikube start      # if it's stopped
+```
+
+A stopped minikube is the most common cause of the EOF variant — the config still
+points at an address that nothing is listening on anymore.
+
+**For remote clusters,** confirm the API server is up and reachable:
+
+```bash
+kubectl cluster-info
+curl -k https://<api-server-address>:6443/healthz
+```
+
+If `cluster-info` hangs or the health check fails, the problem is the cluster or
+the network path to it (firewall, VPN, security group), not kubectl.
+
+## Fix 3 — Sync your system clock (certificate has expired)
+
+If the error mentions `tls: failed to verify certificate` or
+`certificate has expired or is not yet valid`, the surprising common cause is a
+**wrong system clock.** Kubernetes uses TLS certificates with validity windows;
+if your machine's time is off by enough, valid certs *look* expired or
+not-yet-valid to kubectl.
+
+Check and fix the time:
+
+```bash
+timedatectl status          # is the clock synced?
+sudo timedatectl set-ntp true   # re-enable time sync
+```
+
+After the clock corrects, retry `kubectl get nodes`. If the certificate genuinely
+expired (common on clusters left idle for months), you'll need to rotate the
+cluster certificates instead — but check the clock first, it's the quicker fix.
+
+## Fix 4 — Refresh expired credentials (asked for credentials)
+
+If the error ends with `the server has asked for the client to provide
+credentials`, kubectl reached the API server but your authentication was rejected
+— usually an expired token.
+
+This is common with cloud clusters that use short-lived credentials:
+
+```bash
+# EKS — refresh both the AWS credentials and the kubeconfig
+aws sts get-caller-identity        # confirm your AWS creds are valid
+aws eks update-kubeconfig --name <cluster> --region <region>
+
+# AKS
+az account set --subscription <id>
+az aks get-credentials --resource-group <rg> --name <cluster> --overwrite-existing
+```
+
+On EKS specifically, if a *different* IAM role or user created the cluster, your
+identity may not be mapped. Confirm your ARN is in the cluster's access config (or
+the legacy `aws-auth` ConfigMap) so you're authorised at all.
+
+## Fix 5 — Check you're in the right context and shell
+
+Two quieter causes worth ruling out:
+
+- **Wrong context.** If you have several clusters, kubectl might be pointed at one
+  that's down. List and switch:
+
+  ```bash
+  kubectl config get-contexts
+  kubectl config use-context <the-right-one>
+  ```
+
+- **Wrong shell/terminal.** `$KUBECONFIG` set in one shell doesn't carry to
+  another. If kubectl works in one terminal but not another (e.g. you switched
+  from bash to PowerShell, or opened a fresh window), re-run your
+  `get-credentials` command in the shell that's failing.
+
+## Diagnose by the error ending
+
+Match the tail of your error to the fix:
+
+| Error ends with | Cause | Fix |
+|-----------------|-------|-----|
+| `localhost:8080 ... connection refused` | No working kubeconfig | Fix 1 |
+| `EOF` or timeout | Cluster/API server down | Fix 2 |
+| `certificate has expired / not yet valid` | Clock out of sync (usually) | Fix 3 |
+| `asked for the client to provide credentials` | Expired auth token | Fix 4 |
+| Works in one terminal, not another | Context or shell | Fix 5 |
+
+## Debug deeper if none of these fit
+
+Turn on verbose logging to see exactly what kubectl is attempting — the address it
+calls and where the request fails:
+
+```bash
+kubectl get pods -v=10
+```
+
+This prints the full request flow: which server URL it's hitting, the TLS
+handshake, and the precise failure point. That almost always pinpoints which of
+the causes above you're dealing with.
+
+## FAQ
+
+**Why does it say localhost:8080 when my cluster is in the cloud?**
+Because kubectl couldn't load a kubeconfig, so it fell back to its built-in
+default address. It's not trying to reach your real cluster — it doesn't know
+about it. Re-run your provider's `get-credentials` command.
+
+**Why does it print the same error three or four times?**
+kubectl probes several API groups on startup, and each probe fails the same way,
+so you see the message repeated. It's one underlying failure, not several.
+
+**It worked yesterday and broke today — what changed?**
+Common triggers: a system update reset your time or network, a short-lived cloud
+token expired overnight, or a local cluster (minikube/kind) stopped. Check the
+error ending to tell which.
+
+**Is `memcache.go:265` the actual problem?**
+No — that's just the source-code location where kubectl logs the failure. The
+useful information is the URL and the reason after it.
+
+For more Kubernetes and DevOps references, browse the
+[DevOps topic](/topics/devops/).

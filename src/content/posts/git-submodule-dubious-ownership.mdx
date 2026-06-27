@@ -1,0 +1,208 @@
+---
+title: "Fix: git submodule update — \"fatal: detected dubious ownership\""
+description: "How to fix Git's 'detected dubious ownership in repository' error during git submodule update — the safe.directory fix, why it happens, and the CI, Docker, and root cases."
+pubDate: 2026-06-26
+updatedDate: 2026-06-26
+pageType: guide
+topic: devops
+readingTime: "7 min read"
+tags: ["git", "submodule", "safe.directory", "ci-cd", "docker"]
+testedOn: ["Git 2.35+", "Ubuntu 24.04", "Docker", "GitHub Actions"]
+featured: false
+---
+
+You run `git submodule update` and Git stops with:
+
+```text
+fatal: detected dubious ownership in repository at '/path/to/repo'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /path/to/repo
+```
+
+This is Git refusing to operate on a repository it thinks is owned by someone
+else. It's a security feature, not a bug — and with submodules it has a wrinkle
+that the one-line fix in the error message often doesn't fully solve. Here's the
+fix, why it happens, and the cases that bite people in CI and Docker.
+
+<Callout type="tip" title="The fix, for most cases">
+Mark the repository (and its submodules) as safe:
+
+```bash
+git config --global --add safe.directory /path/to/repo
+git config --global --add safe.directory '*'   # if submodules still fail
+```
+
+The wildcard `'*'` trusts all repositories for the current user — the reliable
+choice when submodules live in nested paths Git checks separately.
+</Callout>
+
+## Why this happens
+
+Git 2.35.2 introduced an ownership check to fix a real security hole
+([CVE-2022-24765](https://nvd.nist.gov/vuln/detail/CVE-2022-24765)). Before the
+fix, if you `cd`'d into a directory someone else controlled, a malicious
+`.git/config` placed there could run arbitrary commands as *you* the moment you
+ran any Git command. The check closes that hole: Git now refuses to act on a
+repository whose directory is owned by a different user than the one running Git.
+
+When the owner of the repo directory doesn't match your current user, you get
+"dubious ownership." It's Git saying: *"I don't trust this repo enough to read
+its config and run hooks, because someone else owns it."*
+
+## Why submodules make it worse
+
+A submodule is a separate Git repository nested inside your main one. The
+ownership check runs on **each repository independently** — the parent and every
+submodule. So even after you add the parent repo to `safe.directory`, the update
+can still fail when it descends into a submodule whose path Git evaluates
+separately.
+
+This is the part the error message's single-line suggestion misses. The error
+points at one path, you add that path, and it fails again on the next submodule.
+
+<Callout type="warning" title="Adding one path is often not enough">
+With submodules, adding only the parent repo to `safe.directory` frequently
+leaves the submodules failing. You either add each submodule path too, or use the
+`'*'` wildcard to cover them all at once.
+</Callout>
+
+## The fixes, from safest to broadest
+
+There are three real fixes. Which one is right depends on *why* the ownership
+mismatched in the first place.
+
+### 1. Fix the ownership (best when you can)
+
+If the mismatch is accidental — for example you cloned with `sudo` and the repo
+ended up owned by `root` while you work as a normal user — the cleanest fix is to
+correct the ownership rather than tell Git to ignore it:
+
+```bash
+sudo chown -R "$(id -un):$(id -gn)" /path/to/repo
+```
+
+This makes the files actually yours, so Git's check passes naturally and you keep
+the security benefit. Use this when you have `sudo` and the repo is on a drive you
+control.
+
+### 2. Add to safe.directory (the targeted fix)
+
+When you can't or shouldn't change ownership — a shared drive, a mounted volume,
+a NAS — tell Git to trust the specific repository:
+
+```bash
+git config --global --add safe.directory /path/to/repo
+```
+
+For submodules, add each one, or use the wildcard to cover them in one shot:
+
+```bash
+git config --global --add safe.directory '*'
+```
+
+`safe.directory` is a multi-value setting, so you can add as many specific paths
+as you need. Check what's currently trusted with:
+
+```bash
+git config --global --get-all safe.directory
+```
+
+<Callout type="tip" title="On Windows, use forward slashes">
+Even on Windows, paths in `safe.directory` use forward slashes:
+`C:/Users/you/project`, not backslashes. This trips up a lot of people.
+</Callout>
+
+### 3. System-level trust (for CI and containers)
+
+In CI pipelines and Docker containers, the checkout often runs as one user and
+the Git command as another (or as `root`), so `--global` for your user doesn't
+help. Apply the trust at the system level instead:
+
+```bash
+git config --system --add safe.directory '*'
+```
+
+This is the standard fix inside Docker images and CI runners, where the
+environment is controlled and the repositories are ones you put there yourself.
+
+## The cases that actually cause this
+
+Knowing the trigger tells you which fix to reach for:
+
+| Scenario | What happened | Best fix |
+|----------|---------------|----------|
+| Cloned with `sudo` | Repo owned by `root`, you're not | `chown` it back (fix 1) |
+| Docker container | Container UID ≠ mounted volume owner | `--system safe.directory '*'` or run as matching UID |
+| CI pipeline | Checkout user ≠ job user | `--system safe.directory '*'` |
+| Shared drive / NAS | Files owned by another account | `--global safe.directory <path>` |
+| WSL / external USB | FAT32/NTFS report inconsistent ownership | `--global safe.directory <path>` |
+
+## Fixing it in Docker
+
+The error is extremely common in Docker because the build user and the mounted
+repo's owner rarely match. Two clean approaches:
+
+Run the container as the host user so ownership lines up:
+
+```bash
+docker run --user "$(id -u):$(id -g)" -v "$PWD:/repo" your-image
+```
+
+Or trust all repos inside the image, which is safe in a controlled build:
+
+```dockerfile
+RUN git config --system --add safe.directory '*'
+```
+
+## Fixing it in GitHub Actions / GitLab CI
+
+If a step that runs `git submodule update` fails with this error, add a config
+step before it:
+
+```bash
+git config --global --add safe.directory '*'
+git submodule update --init --recursive
+```
+
+In GitHub Actions specifically, the official `actions/checkout` handles this for
+the main repo — but custom scripts that re-run Git on the workspace, or that
+clone additional repos, often still hit it. The `safe.directory '*'` line ahead
+of your Git commands resolves it.
+
+## Is the wildcard safe to use?
+
+`safe.directory '*'` disables the ownership check entirely, so it's worth being
+deliberate about it:
+
+- **On your own machine or a controlled CI/Docker image:** fine. You put the
+  repositories there; there's no untrusted third party placing a malicious
+  `.git/config`.
+- **On a shared or multi-tenant host:** prefer specific paths over the wildcard,
+  so you're only trusting the repos you actually mean to.
+
+The check exists to stop *other people's* repositories from running code as you.
+If every repo on the machine is yours, the wildcard costs you nothing. If it
+isn't, be specific.
+
+## FAQ
+
+**Why does it fail again after I add the suggested path?**
+Because submodules are separate repositories checked independently. Adding the
+parent path doesn't cover the nested submodule paths — add each one, or use `'*'`.
+
+**Does `--global` work inside a Docker container or CI job?**
+Often not, because the Git command may run as a different user (frequently
+`root`) than the `--global` config belongs to. Use `--system` in those
+environments.
+
+**What's the actual security risk being prevented?**
+[CVE-2022-24765](https://nvd.nist.gov/vuln/detail/CVE-2022-24765): a repository
+owned by another user could carry a crafted config that executes commands as you
+the moment you run Git in it. The ownership check blocks that.
+
+**How do I see which directories I've already trusted?**
+`git config --global --get-all safe.directory` lists them. Use `--system` to see
+system-level entries.
+
+For more Git references, browse the [DevOps topic](/topics/devops/).

@@ -3,8 +3,10 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { ADSENSE } from '../config/adsense';
+import { ANALYTICS } from '../config/analytics';
 
 const adsLive = ADSENSE.enabled && ADSENSE.client && !ADSENSE.client.includes('XXXX');
+const analyticsLive = ANALYTICS.enabled && ANALYTICS.measurementId && !ANALYTICS.measurementId.includes('XXXX');
 
 const {
   title,
@@ -63,6 +65,18 @@ const fullTitle = title;
       src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE.client}`}
       crossorigin="anonymous"
     ></script>
+  )}
+
+  {analyticsLive && (
+    <Fragment>
+      <script async src={`https://www.googletagmanager.com/gtag/js?id=${ANALYTICS.measurementId}`}></script>
+      <script is:inline define:vars={{ gaId: ANALYTICS.measurementId }}>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){ dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', gaId);
+      </script>
+    </Fragment>
   )}
 
   {type === 'article' && (

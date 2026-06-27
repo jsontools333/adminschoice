@@ -1,0 +1,106 @@
+---
+title: "How to Check Open Ports on Linux (ss, netstat, lsof)"
+description: "Three ways to list open and listening ports on Linux — using ss, netstat, and lsof — with examples for finding which process owns a port."
+pubDate: 2026-06-26
+updatedDate: 2026-06-26
+pageType: guide
+topic: networking
+readingTime: "5 min read"
+tags: ["ports", "ss", "netstat", "lsof", "networking"]
+testedOn: ["Ubuntu 24.04", "Debian 12", "RHEL 9"]
+featured: false
+---
+
+Checking which ports are open is one of the most common networking tasks on a
+Linux server — whether you're debugging a service that won't bind, hunting for an
+unexpected listener, or confirming a firewall change. Here are the three commands
+that cover every case.
+
+<Callout type="tip" title="The short answer">
+Use `ss -tlnp` to list listening TCP ports with the process that owns each one.
+It's the modern, fast default on any current Linux system.
+</Callout>
+
+## The quick comparison
+
+| Command | Best for | Pre-installed |
+|---------|----------|---------------|
+| `ss` | The modern default — fast, detailed | Yes, everywhere |
+| `netstat` | Familiar syntax, older systems | Often needs installing |
+| `lsof` | Finding the process behind a port | Usually yes |
+
+## Using ss (the modern way)
+
+`ss` is the current standard, replacing the older `netstat`. To list all
+listening TCP ports with the owning process:
+
+```bash
+sudo ss -tlnp
+```
+
+The flags break down as:
+
+- `-t` — TCP sockets
+- `-l` — listening only
+- `-n` — numeric (don't resolve names, which is faster)
+- `-p` — show the process using each socket
+
+For UDP ports, swap `-t` for `-u`:
+
+```bash
+sudo ss -ulnp
+```
+
+<Callout type="info" title="Why sudo?">
+Without `sudo`, the `-p` flag can't show process details for sockets owned by
+other users. You'll still see the ports, just not which process owns them.
+</Callout>
+
+## Using netstat (the classic)
+
+If you're on an older system or prefer the familiar syntax:
+
+```bash
+sudo netstat -tlnp
+```
+
+The flags are the same as `ss`. On modern distributions `netstat` is part of the
+`net-tools` package, which often isn't installed by default — see our
+[netstat usage guide](/netstat-10-most-common-usage-with-examples/) for more.
+
+## Finding which process owns a port
+
+When a port is taken and you need to know what's using it, `lsof` is the cleanest
+tool. To find what's listening on port 8080:
+
+```bash
+sudo lsof -i :8080
+```
+
+This shows the command, PID, and user holding the port — exactly what you need
+before deciding whether to stop or reconfigure it.
+
+<Callout type="warning" title="Before you kill a process">
+Confirm what the process actually is before stopping it. A port you don't
+recognise might be a legitimate service. Check the command name and, if unsure,
+look it up rather than killing it blind.
+</Callout>
+
+## FAQ
+
+**What's the difference between ss and netstat?**
+`ss` is the modern replacement — it's faster and reads socket information more
+directly from the kernel. `netstat` still works where it's installed, but it's
+considered legacy on current distributions.
+
+**How do I check a specific port quickly?**
+Combine `ss` with `grep`: `ss -tlnp | grep :443` shows whether anything is
+listening on port 443.
+
+**Why does a port show as listening on 127.0.0.1 but not externally?**
+A service bound to `127.0.0.1` only accepts local connections. To accept
+external traffic it must bind to `0.0.0.0` (all interfaces) or a specific public
+address — check the service's configuration.
+
+For more networking references, browse the
+[networking topic](/topics/networking/).

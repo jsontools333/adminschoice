@@ -1,0 +1,230 @@
+---
+title: "Fix: Docker \"exec /usr/bin/sh: exec format error\""
+description: "How to fix Docker's 'exec format error' — diagnose the architecture mismatch behind it, then fix it with --platform, buildx multi-arch builds, or QEMU emulation."
+pubDate: 2026-06-26
+updatedDate: 2026-06-26
+pageType: guide
+topic: devops
+readingTime: "8 min read"
+tags: ["docker", "buildx", "arm64", "apple-silicon", "ci-cd"]
+testedOn: ["Docker 24+", "Apple Silicon", "Linux amd64", "AWS Graviton"]
+featured: false
+---
+
+Your image builds fine, the container starts, and then it dies instantly with:
+
+```text
+exec /usr/bin/sh: exec format error
+```
+
+(The exact binary varies — you might see `/bin/sh`, `/usr/bin/bash`, or a
+`docker-entrypoint.sh`.) In almost every case this means one thing: **you're
+running an image built for a different CPU architecture than your machine.** An
+ARM image on an x86 host, or an x86 image on an ARM host. Here's how to confirm
+it and fix it for good.
+
+<Callout type="tip" title="The quick fix">
+If you just need to run the right variant of a public image, pull it for your
+platform:
+
+```bash
+docker run --platform linux/amd64 your-image
+```
+
+If you're building the image yourself and it needs to run elsewhere, build for
+both architectures with buildx (covered below).
+</Callout>
+
+## Why this happens
+
+A compiled binary is built for a specific CPU architecture. An `amd64` (x86_64)
+binary literally cannot run on an `arm64` CPU and vice versa — the instruction
+formats are incompatible. When Docker tries to execute the shell or entrypoint
+inside such a container, the kernel doesn't recognise the binary format and
+returns "exec format error."
+
+This used to be rare. It's now everywhere, because ARM machines have gone
+mainstream:
+
+- **Apple Silicon Macs** (M1/M2/M3/M4) are `arm64`
+- **AWS Graviton** instances are `arm64`
+- **Raspberry Pi** (v3+) is `arm64`
+- Most **servers and CI runners** are still `amd64`
+
+So the classic trap is: you build an image on your M-series Mac (arm64), push it,
+and it fails on an amd64 server — or you pull an arm64-only image onto an x86 box.
+
+## Step 1 — Confirm it's an architecture mismatch
+
+Don't guess. Check both sides.
+
+**Your host's architecture:**
+
+```bash
+uname -m
+```
+
+`x86_64` means amd64; `aarch64` or `arm64` means ARM.
+
+**The image's architecture:**
+
+```bash
+docker image inspect your-image | grep -i architecture
+```
+
+Or, for a remote image, list every platform it supports:
+
+```bash
+docker buildx imagetools inspect your-image:tag
+```
+
+If the image's architecture doesn't include your host's, that's your problem
+confirmed. Now pick the fix that matches your situation.
+
+## Fix 1 — Pull the right variant (running someone else's image)
+
+If the image is public and *does* publish a build for your architecture, Docker
+usually picks it automatically. When it doesn't, force it:
+
+```bash
+docker run --platform linux/amd64 your-image
+# or
+docker run --platform linux/arm64 your-image
+```
+
+You can set this as a default for a session so you don't repeat it:
+
+```bash
+export DOCKER_DEFAULT_PLATFORM=linux/amd64
+```
+
+<Callout type="warning" title="This only works if the variant exists">
+`--platform` tells Docker which architecture to pull — it can't conjure one that
+the publisher never built. If the image is arm64-only and you need amd64, you'll
+have to rebuild it (Fix 2) or emulate it (Fix 3).
+</Callout>
+
+## Fix 2 — Build for multiple architectures (your own image)
+
+This is the permanent fix when you control the image. Use `buildx` to build for
+both architectures at once, so the image runs anywhere:
+
+```bash
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  --tag youruser/yourimage:v1 \
+  --push \
+  .
+```
+
+A few things to know:
+
+- **`--push` is required for multi-platform builds.** The result is a *manifest
+  list* that points to one image per architecture, and Docker's classic local
+  store can't hold that — it has to go to a registry. (To keep one locally for
+  testing, build a single platform with `--load` instead.)
+- **Set up buildx once** if you haven't: `docker buildx create --use` creates a
+  builder that supports multi-platform.
+- For a single-architecture local test build:
+
+```bash
+docker buildx build --platform linux/arm64 --tag myapp:test --load .
+```
+
+### Handling architecture-specific steps in a Dockerfile
+
+If your Dockerfile downloads a binary or compiles code, it needs to know the
+target architecture. buildx sets `TARGETARCH` automatically:
+
+```dockerfile
+FROM alpine:3.19
+ARG TARGETARCH
+RUN case "$TARGETARCH" in \
+      amd64) ARCH="x86_64" ;; \
+      arm64) ARCH="aarch64" ;; \
+      *) echo "Unsupported: $TARGETARCH" && exit 1 ;; \
+    esac && \
+    wget "https://example.com/tool-${ARCH}" -O /usr/local/bin/tool
+```
+
+This builds the correct variant for each platform in the same multi-arch build.
+
+## Fix 3 — Emulate with QEMU (last resort)
+
+When you genuinely must run a foreign-architecture image and can't rebuild it,
+QEMU emulates the other CPU. Register the emulators once:
+
+```bash
+docker run --privileged --rm tonistiigi/binfmt --install all
+```
+
+After that, Docker can run amd64 images on ARM and vice versa.
+
+<Callout type="warning" title="Emulation is slow">
+QEMU emulation works but can be dramatically slower than native execution,
+especially for CPU-heavy workloads. Use it for one-off testing, not for
+production. Building a proper multi-arch image (Fix 2) is almost always better.
+</Callout>
+
+## The other cause: a bad shebang
+
+Architecture is the usual culprit, but "exec format error" can also come from a
+**script with a missing or malformed shebang.** If a container tries to execute a
+shell script directly and the first line isn't a valid interpreter line, the
+kernel doesn't know how to run it.
+
+Check that scripts start with a proper shebang on the very first line, with no
+leading spaces or blank lines and no Windows line endings:
+
+```bash
+#!/bin/sh
+```
+
+If you edited the script on Windows, CRLF line endings can corrupt the shebang.
+Convert it:
+
+```bash
+sed -i 's/\r$//' your-script.sh
+```
+
+And make sure it's executable: `chmod +x your-script.sh`.
+
+## Which fix to use
+
+| Situation | Fix |
+|-----------|-----|
+| Running a public image, wrong arch pulled | `--platform` (Fix 1) |
+| Your own image, must run on amd64 + arm64 | `buildx` multi-arch (Fix 2) |
+| Must run a foreign-arch image, can't rebuild | QEMU (Fix 3) |
+| Script fails with format error, arch is fine | Fix the shebang / line endings |
+
+## Avoiding it going forward
+
+If you build images that others (or your own servers) will run, **make
+multi-architecture builds the default.** A single `buildx` command covering
+`linux/amd64,linux/arm64` means nobody hits this error regardless of whether
+they're on an M-series Mac, a Graviton instance, or an x86 server. Wire it into
+your CI pipeline and the problem disappears permanently.
+
+## FAQ
+
+**Why does my image build fine but fail at runtime?**
+Building and running are separate steps. The image can build for one architecture
+and only fail when a host with a *different* architecture tries to execute its
+binaries. The build succeeding tells you nothing about which CPUs it can run on.
+
+**I'm on an Apple Silicon Mac — why does my image break on the server?**
+Your Mac is arm64, so a default build produces an arm64 image. A typical amd64
+server can't run it. Build with `buildx --platform linux/amd64,linux/arm64` so it
+runs on both.
+
+**Does `--platform linux/amd64` make an arm64-only image work on amd64?**
+No. `--platform` selects an existing variant; it can't create one. If no amd64
+build exists, you must rebuild it (Fix 2) or emulate (Fix 3).
+
+**How do I check what architectures an image supports?**
+`docker buildx imagetools inspect your-image:tag` lists every platform in the
+image's manifest.
+
+For more container and DevOps references, browse the
+[DevOps topic](/topics/devops/).

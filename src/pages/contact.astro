@@ -34,11 +34,6 @@ import PageLayout from '../layouts/PageLayout.astro';
     <button type="submit">Send message</button>
     <p id="form-result" class="form-result" role="status" aria-live="polite"></p>
   </form>
-
-  <p class="contact-alt">
-    Prefer not to use the form? You can also reach out via the project's
-    <a href="https://github.com/jsontools333" rel="noopener" target="_blank">GitHub</a>.
-  </p>
 </PageLayout>
 
 <style>
@@ -69,6 +64,7 @@ import PageLayout from '../layouts/PageLayout.astro';
   .form-result.success { color: #16794f; }
   .form-result.error { color: #b3261e; }
   .contact-alt { font-size: 0.85rem; color: var(--text-secondary); }
+
 </style>
 
 <script>
