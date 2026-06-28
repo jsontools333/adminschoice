@@ -1,57 +1,151 @@
 ---
-title: "RefDesk"
-description: "RefDesk"
+title: "RefDesk — Essential DevOps & Linux Resources"
+description: "A curated directory of official documentation, downloads, and learning resources for the modern sysadmin and DevOps stack — Linux, Docker, Kubernetes, Terraform, Argo CD, Prometheus, and more."
 pubDate: 2009-12-01
-updatedDate: 2026-06-20
+updatedDate: 2026-06-26
 pageType: guide
 topic: sysadmin
-tier: "TIER 2 (core reference)"
 tags: ["basics"]
-testedOn: ["Linux", "Unix"]
+testedOn: ["Linux", "DevOps", "Cloud"]
 ---
 
-### FAQ
+A hand-picked directory of the resources we actually use — official
+documentation, download and install pages, container registries, and learning
+hubs for the modern Linux, DevOps, and cloud stack. Every link goes to a
+canonical, current source, so you're always one click from the real docs or the
+official download.
 
-- [Unix History and timeline](http://www.unix-systems.org/what_is_unix/history_timeline.html) ,
-- [Unix for advance Users](http://www.uwsg.iu.edu/UAU/uau.html) ,
-- [Unix Bourne Shell Guide with Ksh](http://www.torget.se/users/d/Devlin/shell/index.html) ,
-- [Korn Shell](http://docs.sun.com/db/doc/816-3318/6m9jv8akh?q=ksh&a=view)
-- [BASH reference Guide](https://tiswww.case.edu/php/chet/bash/bashref.html)
+## Infrastructure as Code
 
-### Solaris Documentation
+The tools for defining and provisioning infrastructure declaratively.
 
-- [Solaris 7 System Administration Collection](http://docs.sun.com/?p=coll/47.8)
-- [Solaris 8 System Administrator Collection](http://docs.sun.com/?p=coll/47.11)
-- [Solaris 9 System Administartion Collection](http://docs.sun.com/?p=coll/47.13)
-- [Oracle Solaris 10 Documentation](http://www.oracle.com/technetwork/documentation/solaris-10-192992.html)
-- [Oracle Solaris 11 Documentation](http://www.oracle.com/technetwork/documentation/solaris-11-192991.html)
-- [Multibooting Solaris](http://multiboot.solaris-x86.org/)
+| Tool | Documentation | Download / Get started |
+|------|---------------|------------------------|
+| **Terraform** | [developer.hashicorp.com/terraform](https://developer.hashicorp.com/terraform) | [Install](https://developer.hashicorp.com/terraform/install) · [Registry](https://registry.terraform.io/) |
+| **OpenTofu** | [opentofu.org/docs](https://opentofu.org/docs/) | [Install](https://opentofu.org/docs/intro/install/) |
+| **Pulumi** | [pulumi.com/docs](https://www.pulumi.com/docs/) | [Download](https://www.pulumi.com/docs/install/) |
+| **Ansible** | [docs.ansible.com](https://docs.ansible.com/) | [Install](https://docs.ansible.com/ansible/latest/installation_guide/) · [Galaxy](https://galaxy.ansible.com/) |
 
-### Sun
+<Callout type="tip" title="Where to find reusable modules">
+The [Terraform Registry](https://registry.terraform.io/) and
+[Ansible Galaxy](https://galaxy.ansible.com/) are the official hubs for
+community modules and roles — review, download, and reuse instead of writing
+everything from scratch.
+</Callout>
 
-- [Sun System Handbook](http://www.shrubbery.net/~heas/sun-feh-2_1/)
+## Containers & orchestration
 
-### Documentation Home
+Building, shipping, and running containers.
 
-- [BSD](http://freebsd.org/)
-- [Linux](http://www.redhat.com/support/manuals/RHL-6.1-Manual/getting-started-guide/)
-- [Hp](http://docs.hp.com/) , [Veritas](http://support.veritas.com/index.htm)
+| Tool | Documentation | Download / Hub |
+|------|---------------|----------------|
+| **Docker** | [docs.docker.com](https://docs.docker.com/) | [Get Docker](https://docs.docker.com/get-docker/) · [Docker Hub](https://hub.docker.com/) |
+| **Kubernetes** | [kubernetes.io/docs](https://kubernetes.io/docs/home/) | [Install kubectl](https://kubernetes.io/docs/tasks/tools/) |
+| **Podman** | [docs.podman.io](https://docs.podman.io/) | [Install](https://podman.io/docs/installation) |
+| **Helm** | [helm.sh/docs](https://helm.sh/docs/) | [Install](https://helm.sh/docs/intro/install/) · [Artifact Hub](https://artifacthub.io/) |
+| **containerd** | [containerd.io/docs](https://containerd.io/docs/) | [Releases](https://github.com/containerd/containerd/releases) |
 
-### Patches & Software's
+<Callout type="info" title="Container registries worth knowing">
+[Docker Hub](https://hub.docker.com/) is the default public registry.
+[Artifact Hub](https://artifacthub.io/) indexes Helm charts, operators, and
+more. For official, security-scanned base images, see
+[Docker Official Images](https://hub.docker.com/search?q=&type=image&official=true).
+</Callout>
 
-- [Solaris Patches](http://www.oracle.com/technetwork/systems/patches/solaris/patch-resource-jsp-139458.html)
-- [Solaris Freeware](http://www.sunfreeware.com/)
-- [GNU Software](http://www.gnu.org/software/software.html) ,
-- [big brother](http://www.bb4.com/)
-- [webmin .com](http://www.webmin.com/)
-- [bugzilla.org](http://www.bugzilla.org/)
+## GitOps & CI/CD
 
-### Certification Info
+Continuous delivery and Git-driven deployment.
 
-- [Oracle Solaris 11 System Administration 1Z0-821](http://education.oracle.com/pls/web_prod-plq-dad/db_pages.getpage?page_id=654&get_params=p_id:202) ,
-- [Red Hat](http://www.redhat.com/training/rhce/courses/) , [HP](http://www.hp.com/education/) ,
-- [Free Study Guides](http://studyguides.cramsession.com/)
+| Tool | Documentation | Source / Releases |
+|------|---------------|-------------------|
+| **Argo CD** | [argo-cd.readthedocs.io](https://argo-cd.readthedocs.io/) | [GitHub](https://github.com/argoproj/argo-cd/releases) |
+| **Argo Workflows** | [argo-workflows.readthedocs.io](https://argo-workflows.readthedocs.io/) | [GitHub](https://github.com/argoproj/argo-workflows/releases) |
+| **Flux** | [fluxcd.io/flux](https://fluxcd.io/flux/) | [Install](https://fluxcd.io/flux/installation/) |
+| **Jenkins** | [jenkins.io/doc](https://www.jenkins.io/doc/) | [Download](https://www.jenkins.io/download/) |
+| **GitHub Actions** | [docs.github.com/actions](https://docs.github.com/en/actions) | [Marketplace](https://github.com/marketplace?type=actions) |
+| **GitLab CI/CD** | [docs.gitlab.com/ci](https://docs.gitlab.com/ee/ci/) | — |
 
-### Others
+## Observability & monitoring
 
-- [RAID primer](http://www.finitesystems.com/PRODUCT/raid/raidlevel.htm)
+Metrics, logs, traces, and dashboards.
+
+| Tool | Documentation | Download |
+|------|---------------|----------|
+| **Prometheus** | [prometheus.io/docs](https://prometheus.io/docs/) | [Download](https://prometheus.io/download/) |
+| **Grafana** | [grafana.com/docs](https://grafana.com/docs/) | [Download](https://grafana.com/grafana/download) · [Dashboards](https://grafana.com/grafana/dashboards/) |
+| **Loki** | [grafana.com/docs/loki](https://grafana.com/docs/loki/latest/) | [Releases](https://github.com/grafana/loki/releases) |
+| **OpenTelemetry** | [opentelemetry.io/docs](https://opentelemetry.io/docs/) | [Downloads](https://opentelemetry.io/docs/collector/installation/) |
+| **Jaeger** | [jaegertracing.io/docs](https://www.jaegertracing.io/docs/) | [Download](https://www.jaegertracing.io/download/) |
+
+<Callout type="tip" title="Pre-built Grafana dashboards">
+The [Grafana dashboard library](https://grafana.com/grafana/dashboards/) has
+thousands of ready-to-import dashboards for almost any exporter — review and
+download by ID instead of building from scratch.
+</Callout>
+
+## Cloud provider docs
+
+The big three, plus their CLIs.
+
+| Provider | Documentation | CLI / Tools |
+|----------|---------------|-------------|
+| **AWS** | [docs.aws.amazon.com](https://docs.aws.amazon.com/) | [AWS CLI](https://docs.aws.amazon.com/cli/) · [Architecture Center](https://aws.amazon.com/architecture/) |
+| **Google Cloud** | [cloud.google.com/docs](https://cloud.google.com/docs) | [gcloud CLI](https://cloud.google.com/sdk/docs/install) |
+| **Microsoft Azure** | [learn.microsoft.com/azure](https://learn.microsoft.com/en-us/azure/) | [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/) |
+
+## Linux distributions & docs
+
+Official documentation for the distributions you'll actually run.
+
+| Distro | Documentation |
+|--------|---------------|
+| **Ubuntu** | [ubuntu.com/server/docs](https://ubuntu.com/server/docs) · [Help](https://help.ubuntu.com/) |
+| **Debian** | [debian.org/doc](https://www.debian.org/doc/) |
+| **Red Hat (RHEL)** | [docs.redhat.com](https://docs.redhat.com/) |
+| **Rocky Linux** | [docs.rockylinux.org](https://docs.rockylinux.org/) |
+| **Fedora** | [docs.fedoraproject.org](https://docs.fedoraproject.org/) |
+| **Arch Linux** | [wiki.archlinux.org](https://wiki.archlinux.org/) |
+
+<Callout type="info" title="The Arch Wiki is for everyone">
+Even if you don't run Arch, the [Arch Wiki](https://wiki.archlinux.org/) is one
+of the best general-purpose Linux references anywhere — its guides on systemd,
+networking, and hardware apply across distributions.
+</Callout>
+
+## Shell, scripting & core tools
+
+References for the command line itself.
+
+| Resource | What it's for |
+|----------|---------------|
+| **GNU Bash Manual** | [The official Bash reference](https://www.gnu.org/software/bash/manual/) |
+| **ShellCheck** | [Lint your shell scripts](https://www.shellcheck.net/) ([source](https://github.com/koalaman/shellcheck)) |
+| **explainshell** | [Break down any command line](https://explainshell.com/) |
+| **GNU Coreutils** | [Manual for ls, cp, find, and friends](https://www.gnu.org/software/coreutils/manual/) |
+| **tldr pages** | [Practical, example-first man pages](https://tldr.sh/) |
+| **man7.org** | [Authoritative Linux man pages](https://man7.org/linux/man-pages/) |
+
+## Learning & reference hubs
+
+Where to go deeper.
+
+| Resource | What it offers |
+|----------|----------------|
+| **Kubernetes the Hard Way** | [Build a cluster from scratch to learn the internals](https://github.com/kelseyhightower/kubernetes-the-hard-way) |
+| **CNCF Landscape** | [Map of the entire cloud-native ecosystem](https://landscape.cncf.io/) |
+| **roadmap.sh (DevOps)** | [Visual learning paths for DevOps and SRE](https://roadmap.sh/devops) |
+| **Google SRE Books** | [The SRE books, free to read online](https://sre.google/books/) |
+| **DevDocs** | [Unified, searchable API docs for dozens of tools](https://devdocs.io/) |
+| **Awesome Sysadmin** | [Curated list of open-source sysadmin tools](https://github.com/awesome-foss/awesome-sysadmin) |
+
+<Callout type="info" title="Found a broken or outdated link?">
+This directory is maintained and links are checked periodically. If you spot one
+that's moved or gone, let us know via the [contact page](/contact/) and we'll fix
+it.
+</Callout>
+
+---
+
+Looking for hands-on guides rather than links? Browse our
+[DevOps topic](/topics/devops/) for tested, copy-paste references, or start with
+the [full topic index](/topics/).
